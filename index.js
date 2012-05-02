@@ -30,14 +30,30 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, exports, java;
+  var ClojureScript, exports, java, str, util;
   
   ClojureScript = {};
   
   java = require('java');
   
-  'do some cool stuff ...';
+  java.classpath.push(__dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar');
   
+  java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj');
+  
+  java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/cljs');
+  
+  util = require('util');
+  
+  str = '(ns user) (defn foo [a b]   (str a \" \" b))';
+  
+  java.newInstance('clojure.lang.LispReader$StringReader', str, function(err, data) {
+    if (err) {
+      console.error(err.message);
+    }
+    if (data) {
+      return console.log(data);
+    }
+  });
   
   if ((typeof exports !== "undefined" && exports !== null)) {
     if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {

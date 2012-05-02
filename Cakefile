@@ -358,7 +358,7 @@ task 'test', 'executes the test suite with mocha', (options) ->
 
   console.log ''
   clog.info 'invoking mocha'
-  ( mo = exec ( './node_modules/mocha/bin/mocha --colors --reporter ' + reporter + ' --timeout 5000 --slow 300 --compilers coffee:coffee-script' ), \
+  ( mo = exec ( './node_modules/mocha/bin/mocha --colors --reporter ' + reporter + ' --timeout 60000 --slow 300 --compilers coffee:coffee-script' ), \
               { cwd: __dirname }, \
               (err) -> null
   )
@@ -441,7 +441,7 @@ task 'test-cont', 'watches spec/*, retests on changes', (options) ->
       specCb()
 
   makeChild = ->
-    ( mo = exec ( './node_modules/mocha/bin/mocha --colors --reporter ' + reporter + ' --timeout 5000 --slow 300 --compilers coffee:coffee-script' ), \
+    ( mo = exec ( './node_modules/mocha/bin/mocha --colors --reporter ' + reporter + ' --timeout 60000 --slow 300 --compilers coffee:coffee-script' ), \
                 { cwd: __dirname },
                 (err) -> null
 
