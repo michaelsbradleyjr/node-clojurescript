@@ -1,0 +1,46 @@
+{
+  "author": "Michael Bradley, Jr. <michaelsbradleyjr@gmail.com> (https://github.com/michaelsbradleyjr)",
+  "name": "clojure-script",
+  "description": "Provides experimental require support for ClojureScript modules",
+  "keywords": [
+    "clojure",
+    "clojurescript",
+    "clojure-script",
+    "java"
+  ],
+  "version": "0.0.0-1",
+  "homepage": "https://github.com/michaelsbradleyjr/node-clojurescript",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/michaelsbradleyjr/node-clojurescript.git"
+  },
+  "main": "./index.js",
+  "scripts": {
+  "test": "./node_modules/coffee-script/bin/cake test"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chai": ">=0.4.2",
+    "clog": ">=0.1.2",
+    "coffee-script": ">=1.2.0",
+    "docco" : "https://github.com/michaelsbradleyjr/docco/tarball/master",
+    "gfms": ">=0.0.3",
+    "java": ">=0.0.3",
+    "mocha": "https://github.com/michaelsbradleyjr/mocha/tarball/check-ENOENT-1.0.3",
+    "nopt" : ">=1.0.10",
+    "sinon": ">=1.3.1",
+    "sinon-chai": ">=1.1.0",
+    "touch": ">=0.0.1",
+    "underscore": ">=1.3.1",
+    "underscore.string": ">=2.0.0",
+    "watch" : ">=0.5.1"
+  },
+  "optionalDependencies": {},
+  "directories": {
+    "lib": "./lib",
+    "test": "./test"
+  }
+}

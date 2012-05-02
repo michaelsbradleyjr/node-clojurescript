@@ -1,0 +1,11 @@
+SEEKER DEMO
+===========
+run by typing:
+
+    ./nodejuice demos/seeker/
+
+Open http://localhost:8080 in your browsers.
+
+Open "demos/seeker/static/index.htm" in a text editor.
+Make changes and press save on your text editor.
+The Web browser will update automatically.

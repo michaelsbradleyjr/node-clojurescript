@@ -1,0 +1,16 @@
+language: node_js
+branches:
+  only:
+    - master
+    - stable
+node_js:
+  - 0.6
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+  irc:
+    channels:
+      - "irc.freenode.net##turbonode"
+    on_success: always
+    on_failure: always

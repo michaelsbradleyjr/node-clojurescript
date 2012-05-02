@@ -1,0 +1,13 @@
+fuse*
+.DS_Store
+*~
+*.*~
+.*.sw*
+._*
+.#*
+*.swp
+
+docs_lib/
+node_modules/
+
+npm-debug.log
