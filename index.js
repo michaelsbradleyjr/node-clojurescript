@@ -46,15 +46,6 @@
   
   str = '(ns user) (defn foo [a b]   (str a \" \" b))';
   
-  java.newInstance('clojure.lang.LispReader$StringReader', str, function(err, data) {
-    if (err) {
-      console.error(err.message);
-    }
-    if (data) {
-      return console.log(data);
-    }
-  });
-  
   if ((typeof exports !== "undefined" && exports !== null)) {
     if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
       exports = module.exports = ClojureScript;

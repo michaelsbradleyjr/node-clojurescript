@@ -17,10 +17,17 @@ chai.use sinonChai
 describe 'sanity check', ->
 
   it '''
-    example should be defined
+    ClojureScript should be defined
   ''', (done) ->
 
     ( expect ClojureScript ).to.exist
+
+    done()
+
+
+  it '''
+    should have a "compile" method
+  ''', (done) ->
 
     # will remain purposely broken (i.e. undefined) until I can get
     # the most basic exportable compile function working

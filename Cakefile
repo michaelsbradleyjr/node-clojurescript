@@ -360,7 +360,8 @@ task 'test', 'executes the test suite with mocha', (options) ->
   clog.info 'invoking mocha'
   ( mo = exec ( './node_modules/mocha/bin/mocha --colors --reporter ' + reporter + ' --timeout 60000 --slow 300 --compilers coffee:coffee-script' ), \
               { cwd: __dirname }, \
-              (err) -> null
+              (err) ->
+                if err then process.exit 1
   )
   mo.stdout.pipe process.stdout
   mo.stderr.pipe process.stderr
