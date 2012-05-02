@@ -1,4 +1,3 @@
-*.jar
 target
 clojure.iws
 clojure.ipr
