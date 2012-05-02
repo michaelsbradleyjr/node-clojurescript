@@ -22,4 +22,8 @@ describe 'sanity check', ->
 
     ( expect ClojureScript ).to.exist
 
+    # will remain purposely broken (i.e. undefined) until I can get
+    # the most basic exportable compile function working
+    ( expect ClojureScript.compile ).to.be.a 'function'
+
     done()
