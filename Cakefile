@@ -138,8 +138,6 @@ task 'build', 'builds the library', ->
     else
       loadPackaging()
       packageAndWrite stdout
-      #invoke 'ender'
-      #allEm.enderEm.once 'built', ->
       invoke 'docs'
   )
 
@@ -203,13 +201,7 @@ task 'build-cont', 'watches manifest and lib/*, rebuilds on changes', ->
       if ( matched = coff.SOURCE_STREAM.match whole )
         coff.SOURCE_STREAM = _s.splice coff.SOURCE_STREAM, 0, matched[0].length
         packageAndWrite matched[0]
-        #if allProc.enderProc?.length
-        #  console.log ''
-        #  clog.info 'ender build process killed, will restart after rebuild'
-        #killProc allProc.enderProc
         killProc allProc.docsProc
-        #killProc allProc.standaloneSpecsProc
-        #invoke 'ender'
         buildContEm.emit 'built'
 
     buildContProc.push coff
@@ -218,9 +210,7 @@ task 'build-cont', 'watches manifest and lib/*, rebuilds on changes', ->
 
   manifestWatch.on 'reload', ->
     killProc buildContProc
-    #killProc allProc.enderProc
     killProc allProc.docsProc
-    #killProc allProc.standaloneSpecsProc
     if allProc.testContProc?.length
       console.log ''
       clog.info 'mocha process killed, will restart after rebuild'
@@ -289,8 +279,6 @@ task 'docs', 'rebuilds the annotated source docs', ->
   cp.stderr.pipe process.stderr
 
   docsProc.push cp
-
-  #invoke 'standalone-specs'
 
 
 
