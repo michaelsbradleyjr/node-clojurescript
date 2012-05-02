@@ -2,6 +2,8 @@
 
 ClojureScript = {}
 
+ClojureScript.VERSION = VERSION = '0.0.0-2'
+
 java = require 'java'
 
 java.classpath.push ( __dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar' )
