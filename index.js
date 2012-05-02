@@ -30,9 +30,11 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, exports;
+  var ClojureScript, exports, java;
   
   ClojureScript = {};
+  
+  java = require('java');
   
   'do some cool stuff ...';
   

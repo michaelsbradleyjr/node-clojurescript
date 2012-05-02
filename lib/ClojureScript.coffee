@@ -2,7 +2,7 @@
 
 ClojureScript = {}
 
-
+java = require 'java'
 
 
 'do some cool stuff ...'
