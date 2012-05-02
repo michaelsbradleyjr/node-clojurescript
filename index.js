@@ -1,6 +1,6 @@
 /*//////////////////////// NODE-CLOJURESCRIPT //////////////////////////
  *
- * Version 0.0.0-2
+ * Version 0.0.0-2-pre
  * https://github.com/michaelsbradleyjr/node-clojurescript
  *
  * This software is Copyright (c) 2012 by Michael Bradley, Jr.
@@ -34,11 +34,13 @@
   
   ClojureScript = {};
   
-  ClojureScript.VERSION = VERSION = '0.0.0-2';
+  ClojureScript.VERSION = VERSION = '0.0.0-2-pre';
   
   java = require('java');
   
   java.classpath.push(__dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar');
+  
+  java.classpath.push(__dirname + '/support/closure-compiler-latest/compiler.jar');
   
   java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj');
   

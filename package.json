@@ -8,7 +8,7 @@
     "clojure-script",
     "java"
   ],
-  "version": "0.0.0-2",
+  "version": "0.0.0-2-pre",
   "homepage": "https://github.com/michaelsbradleyjr/node-clojurescript",
   "repository": {
     "type": "git",

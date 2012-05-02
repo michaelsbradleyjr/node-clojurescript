@@ -2,11 +2,12 @@
 
 <span class="nv">ClojureScript = </span><span class="p">{}</span>
 
-<span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-2&#39;</span>
+<span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-2-pre&#39;</span>
 
 <span class="nv">java = </span><span class="nx">require</span> <span class="s">&#39;java&#39;</span>
 
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojure-8306949/clojure-1.4.0.jar&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/closure-compiler-latest/compiler.jar&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript-7472ab9/src/clj&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript-7472ab9/src/cljs&#39;</span> <span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>main = java.import 'clojure.main'</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Compiler     = java.import 'clojure.lang.Compiler'
 StringReader = java.import 'clojure.lang.LispReader$StringReader'
