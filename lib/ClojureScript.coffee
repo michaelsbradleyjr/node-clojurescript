@@ -21,9 +21,9 @@ util = require 'util'
 
 str = '(ns user) (defn foo [a b]   (str a \" \" b))'
 
-java.newInstance 'clojure.lang.LispReader$StringReader', str, (err, data) ->
-  if err then console.error err.message
-  if data then console.log data
+#java.newInstance 'clojure.lang.LispReader$StringReader', str, (err, data) ->
+#  if err then console.error err.message
+#  if data then console.log data
 
 #Compiler.loadSync ( java.newInstanceSync 'clojure.lang.LispReader$StringReader', str )
 
