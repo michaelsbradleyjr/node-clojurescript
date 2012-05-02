@@ -2,7 +2,7 @@ The following files contain a version (semver) number and need to be
 adjusted:
 
   <repo>/package.json
-  <repo>/lib/Example.coffee
+  <repo>/lib/ClojureScript.coffee
   <repo>/lib/packaging/licensing.js
 
 
