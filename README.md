@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/michaelsbradleyjr/node-clojurescript.png?branch=master)](http://travis-ci.org/michaelsbradleyjr/node-clojurescript)
+
 # node-clojurescript
 
 An experiment.
