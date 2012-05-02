@@ -7,11 +7,16 @@ fuse*
 .#*
 *.swp
 
+*.jar
+
 docs/
 docs_lib/
 lib/
 node_modules/
-support/
+support/archive/
+support/VERSIONING.txt
+support/nodejuice
+support/tools
 test/
 
 .gitignore
