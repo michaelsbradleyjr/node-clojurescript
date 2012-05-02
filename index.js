@@ -1,6 +1,6 @@
 /*//////////////////////// NODE-CLOJURESCRIPT //////////////////////////
  *
- * Version 0.0.0-1
+ * Version 0.0.0-2
  * https://github.com/michaelsbradleyjr/node-clojurescript
  *
  * This software is Copyright (c) 2012 by Michael Bradley, Jr.
@@ -30,9 +30,11 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, exports, java, str, util;
+  var ClojureScript, VERSION, exports, java, str, util;
   
   ClojureScript = {};
+  
+  ClojureScript.VERSION = VERSION = '0.0.0-2';
   
   java = require('java');
   
