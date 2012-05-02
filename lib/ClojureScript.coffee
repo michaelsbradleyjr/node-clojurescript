@@ -7,6 +7,7 @@ ClojureScript.VERSION = VERSION = '0.0.0-2'
 java = require 'java'
 
 java.classpath.push ( __dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar' )
+java.classpath.push ( __dirname + '/support/closure-compiler-latest/compiler.jar' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript-7472ab9/src/cljs' )
 
