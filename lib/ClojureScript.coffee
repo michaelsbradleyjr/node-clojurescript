@@ -4,50 +4,25 @@ ClojureScript = {}
 
 ClojureScript.VERSION = VERSION = '0.0.0-2-pre'
 
+fs = require 'fs'
 java = require 'java'
 
-java.classpath.push ( __dirname + '/../support/clojure-clojure-8306949/clojure-1.4.0.jar' )
-java.classpath.push ( __dirname + '/../support/closure-compiler-latest/compiler.jar' )
-java.classpath.push ( __dirname + '/../support/clojure-clojurescript-7472ab9/src/clj' )
-java.classpath.push ( __dirname + '/../support/clojure-clojurescript-7472ab9/src/cljs' )
+java.classpath.push ( __dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar' )
+java.classpath.push ( __dirname + '/support/closure-compiler-latest/compiler.jar' )
+java.classpath.push ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj' )
+java.classpath.push ( __dirname + '/support/clojure-clojurescript-7472ab9/src/cljs' )
 
-#main = java.import 'clojure.main'
+StringReader = java.import 'java.io.StringReader'
+Compiler = java.import 'clojure.lang.Compiler'
 
-Compiler     = java.import 'clojure.lang.Compiler'
-#StringReader = java.import 'clojure.lang.LispReader$StringReader'
-#RT       = java.import 'clojure.lang.RT'
+cljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj' ), 'utf8'
+cljscSR = new StringReader cljsc
+Compiler.loadSync cljscSR
 
-util = require 'util'
-#console.log util.inspect Compiler, true, null, true
-#console.log util.inspect RT, true, null, true
+compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'compile-file'
 
-
-# Possible bug in clojure/lang/LispReader$StringReader regarding double quotes
-str = java.newInstanceSync 'java.io.StringReader', '(ns user) (defn foo [a b] (str a b))"'
-
-lispReader = java.newInstanceSync 'clojure.lang.LispReader$StringReader'
-lispReader.invoke str, null, (err, data) ->
-  if err then console.error err.message
-  if data then console.log data
-
-#java.newInstance 'clojure.lang.LispReader$StringReader', str, (err, data) ->
-#  if err then console.error err.message
-#  if data then console.log data
-
-#Compiler.loadSync ( java.newInstanceSync 'clojure.lang.LispReader$StringReader', str )
-
-###
-str.resetSync()
-Compiler.load str, (err, data) ->
-    if err then console.error err.message
-    if data then console.log data
-###
-
-#console.log main.mainSync() #(err, data) ->
-  #console.log main.main ( __dirname + '/../support/clojure-clojurescript-7472ab9/bin/cljsc.clj' ), \
-  #                      ( __dirname + '/../temp/hello.cljs' ), (err, data) ->
-  #if err then console.error err.message
-  #if data then console.log data
+ClojureScript.compile = (path) ->
+  compileFile path
 
 
 
