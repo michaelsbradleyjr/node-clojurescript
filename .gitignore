@@ -7,7 +7,11 @@ fuse*
 .#*
 *.swp
 
+*.jar
+
 docs_lib/
 node_modules/
+support/archive/
+support/adinardi-google-closure-compiler-46caff8/build/
 
 npm-debug.log
