@@ -22,7 +22,7 @@ Compiler.loadSync cljscSR
 compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'compile-file'
 
 ClojureScript.compile = (path) ->
-  compileFile path
+  compileFile.invokeSync path, '{}'
 
 
 

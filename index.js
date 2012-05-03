@@ -61,7 +61,7 @@
   compileFile = java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'compile-file');
   
   ClojureScript.compile = function(path) {
-    return compileFile(path);
+    return compileFile.invokeSync(path, '{}');
   };
   
   if ((typeof exports !== "undefined" && exports !== null)) {
