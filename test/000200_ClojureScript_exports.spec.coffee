@@ -14,12 +14,12 @@ chai.use sinonChai
 
 
 
-describe 'sanity check', ->
+describe 'ClojureScript exports', ->
 
   it '''
-    ClojureScript should be defined
+    should have a "compile" method
   ''', (done) ->
 
-    ( expect ClojureScript ).to.exist
+    ( expect ClojureScript.compile ).to.be.a 'function'
 
     done()
