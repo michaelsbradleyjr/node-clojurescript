@@ -22,7 +22,7 @@
 <span class="nv">compileFile = </span><span class="nx">java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;cljs.closure&#39;</span><span class="p">,</span> <span class="s">&#39;compile-file&#39;</span>
 
 <span class="nv">ClojureScript.compile = </span><span class="nf">(path) -&gt;</span>
-  <span class="nx">compileFile</span> <span class="nx">path</span>
+  <span class="nx">compileFile</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">path</span><span class="p">,</span> <span class="s">&#39;{}&#39;</span>
 
 
 
