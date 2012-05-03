@@ -1,7 +1,7 @@
 {
   "author": "Michael Bradley, Jr. <michaelsbradleyjr@gmail.com> (https://github.com/michaelsbradleyjr)",
   "name": "clojure-script",
-  "description": "Provides experimental require support for ClojureScript modules",
+  "description": "experimental NodeJS-require support for ClojureScript modules",
   "keywords": [
     "clojure",
     "clojurescript",
@@ -9,7 +9,7 @@
     "java"
   ],
   "version": "0.0.0-2-pre",
-  "homepage": "https://github.com/michaelsbradleyjr/node-clojurescript",
+  "homepage": "http://michaelsbradleyjr.github.com/node-clojurescript",
   "repository": {
     "type": "git",
     "url": "git://github.com/michaelsbradleyjr/node-clojurescript.git"
@@ -19,7 +19,7 @@
   "test": "./node_modules/coffee-script/bin/cake test"
   },
   "engines": {
-    "node": "*"
+    "node": "~0.6"
   },
   "dependencies": {},
   "devDependencies": {
