@@ -7,8 +7,6 @@ fuse*
 .#*
 *.swp
 
-*.jar
-
 docs/
 docs_lib/
 lib/

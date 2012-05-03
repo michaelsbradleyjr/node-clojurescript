@@ -7,8 +7,6 @@ fuse*
 .#*
 *.swp
 
-*.jar
-
 docs_lib/
 node_modules/
 support/adinardi-google-closure-compiler-46caff8/build/
