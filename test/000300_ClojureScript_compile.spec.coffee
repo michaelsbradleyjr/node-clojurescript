@@ -14,12 +14,16 @@ chai.use sinonChai
 
 
 
-describe 'sanity check', ->
+describe 'ClojureScript.compile', ->
 
   it '''
-    ClojureScript should be defined
+    should compile a ClojureScript file into a JavaScript string
   ''', (done) ->
 
-    ( expect ClojureScript ).to.exist
+    file = ( __dirname + '/cljs/hello.cljs' )
+
+    ( expect ( out = ClojureScript.compile file ) ).to.be.a 'string'
+
+    #console.log out
 
     done()
