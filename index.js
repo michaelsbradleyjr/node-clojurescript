@@ -30,11 +30,13 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, VERSION, exports, java, str, util;
+  var ClojureScript, Compiler, StringReader, VERSION, cljsc, cljscSR, compileFile, exports, fs, java;
   
   ClojureScript = {};
   
   ClojureScript.VERSION = VERSION = '0.0.0-2-pre';
+  
+  fs = require('fs');
   
   java = require('java');
   
@@ -46,9 +48,21 @@
   
   java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/cljs');
   
-  util = require('util');
+  StringReader = java["import"]('java.io.StringReader');
   
-  str = '(ns user) (defn foo [a b]   (str a \" \" b))';
+  Compiler = java["import"]('clojure.lang.Compiler');
+  
+  cljsc = fs.readFileSync(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj', 'utf8');
+  
+  cljscSR = new StringReader(cljsc);
+  
+  Compiler.loadSync(cljscSR);
+  
+  compileFile = java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'compile-file');
+  
+  ClojureScript.compile = function(path) {
+    return compileFile(path);
+  };
   
   if ((typeof exports !== "undefined" && exports !== null)) {
     if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
