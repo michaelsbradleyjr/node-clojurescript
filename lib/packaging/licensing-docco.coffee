@@ -21,7 +21,7 @@
 #&nbsp;<br />
 # <<<>>>
 #
-# ClojureScript
+# node-clojurescript
 #
 # [https://github.com/michaelsbradleyjr/node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript)
 #
