@@ -2,7 +2,7 @@
 
   (:require [cljs.closure :as closure]))
 
-(def options {:pretty-print true :target :nodejs})
+(def options {:optimizations :simple :target :nodejs})
 
 (defn build
   [source]

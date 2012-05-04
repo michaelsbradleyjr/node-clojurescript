@@ -13,18 +13,16 @@ chai.use sinonChai
 
 
 
-describe 'ClojureScript.compile', ->
+describe 'ClojureScript extensions', ->
 
   it '''
-    should compile a ClojureScript file into a JavaScript string
+    should auto-compile a ".cljs" file loaded with NodeJS-require
   ''', (done) ->
 
     file = ( __dirname + '/cljs/hello.cljs' )
 
-    out = ClojureScript.compile file
+    console.log ( require file )
 
-    #console.log out
-
-    ( expect out ).to.be.a 'string'
+    #( expect hello.greet 'world' ).to.equal 'hello world'
 
     done()
