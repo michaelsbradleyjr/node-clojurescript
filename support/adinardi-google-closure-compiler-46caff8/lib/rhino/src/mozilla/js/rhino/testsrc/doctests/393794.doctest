@@ -1,4 +1,0 @@
-js> var x = { foo: "bar" }
-js> var y = { __proto__: x };
-js> y.foo;
-bar
