@@ -1,5 +1,0 @@
-*.jar
-target
-clojure.iws
-clojure.ipr
-nbproject/private/

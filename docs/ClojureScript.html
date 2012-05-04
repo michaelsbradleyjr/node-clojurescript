@@ -3,28 +3,28 @@
 <span class="nv">fs   = </span><span class="nx">require</span> <span class="s">&#39;fs&#39;</span>
 <span class="nv">java = </span><span class="nx">require</span> <span class="s">&#39;java&#39;</span>
 
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojure-8306949/clojure-1.4.0.jar&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/compiler-20111114/compiler.jar&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript-7472ab9/src/clj&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript-7472ab9/src/cljs&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/clojure.jar&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/compiler.jar&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/goog.jar&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/js.jar&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/clj&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span>
 
 <span class="nv">StringReader = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
 <span class="nv">Compiler     = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;clojure.lang.Compiler&#39;</span>
 
 <span class="nv">ClojureScript = </span><span class="p">{}</span>
 
-<span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-3-pre&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>cljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj' ), 'utf8'
-cljscSR = new StringReader cljsc
-Compiler.loadSync cljscSR</p>
+<span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-3-pre&#39;</span>
 
-<p>compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'compile-file'</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
+<span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
 <span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
 <span class="nx">Compiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
 
 <span class="nv">build = </span><span class="nx">java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
 
 <span class="nv">ClojureScript.compile = compile = </span><span class="nf">(filename) -&gt;</span>
-  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>&nbsp;<br />
+  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />

@@ -36,13 +36,17 @@
   
   java = require('java');
   
-  java.classpath.push(__dirname + '/support/clojure-clojure-8306949/clojure-1.4.0.jar');
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/clojure.jar');
   
-  java.classpath.push(__dirname + '/support/compiler-20111114/compiler.jar');
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/compiler.jar');
   
-  java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj');
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/goog.jar');
   
-  java.classpath.push(__dirname + '/support/clojure-clojurescript-7472ab9/src/cljs');
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/js.jar');
+  
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/src/clj');
+  
+  java.classpath.push(__dirname + '/support/clojure-clojurescript/src/cljs');
   
   StringReader = java["import"]('java.io.StringReader');
   
