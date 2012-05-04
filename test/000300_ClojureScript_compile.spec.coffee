@@ -21,8 +21,10 @@ describe 'ClojureScript.compile', ->
 
     file = ( __dirname + '/cljs/hello.cljs' )
 
-    ( expect ( out = ClojureScript.compile file ) ).to.be.a 'string'
+    out = ClojureScript.compile file
 
-    #console.log out
+    console.log out
+
+    ( expect out ).to.be.a 'string'
 
     done()
