@@ -2,7 +2,7 @@
 
 ClojureScript = {}
 
-ClojureScript.VERSION = VERSION = '0.0.0-2-pre'
+ClojureScript.VERSION = VERSION = '0.0.0-2'
 
 fs = require 'fs'
 java = require 'java'
