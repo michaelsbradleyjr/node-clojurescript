@@ -21,7 +21,7 @@
   },
   "scripts": {
     "test": "./node_modules/coffee-script/bin/cake test",
-    "postinstall": "cd ./support/clojure-clojurescript/ && script/bootstrap && script/compile"
+      "postinstall": "cd ./support && tar xzf ./archive/clojure-clojurescript-r1011-0-g7472ab9.tar.gz && mv clojure-clojurescript-7472ab9 clojure-clojurescript && cd ./clojure-clojurescript/ && ./script/bootstrap && ./script/compile"
   },
   "engines": {
     "node": "~0.6"
