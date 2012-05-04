@@ -30,7 +30,7 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, Compiler, StringReader, VERSION, cljsc, cljscSR, compile, compileFile, exports, fs, java;
+  var ClojureScript, Compiler, StringReader, VERSION, build, compile, exports, fs, java, ncljsc, ncljscSR;
   
   fs = require('fs');
   
@@ -52,16 +52,16 @@
   
   ClojureScript.VERSION = VERSION = '0.0.0-3-pre';
   
-  cljsc = fs.readFileSync(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj', 'utf8');
+  ncljsc = fs.readFileSync(__dirname + '/ncljsc.clj', 'utf8');
   
-  cljscSR = new StringReader(cljsc);
+  ncljscSR = new StringReader(ncljsc);
   
-  Compiler.loadSync(cljscSR);
+  Compiler.loadSync(ncljscSR);
   
-  compileFile = java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'compile-file');
+  build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
   
-  ClojureScript.compile = compile = function(path) {
-    return compileFile.invokeSync(path, '{}');
+  ClojureScript.compile = compile = function(filename) {
+    return build.invokeSync(filename);
   };
   
   if (require.extensions) {

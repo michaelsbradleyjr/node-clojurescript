@@ -15,11 +15,17 @@ ClojureScript = {}
 
 ClojureScript.VERSION = VERSION = '0.0.0-3-pre'
 
-cljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj' ), 'utf8'
-cljscSR = new StringReader cljsc
-Compiler.loadSync cljscSR
+#cljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj' ), 'utf8'
+#cljscSR = new StringReader cljsc
+#Compiler.loadSync cljscSR
+#
+#compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'compile-file'
 
-compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'compile-file'
+ncljsc = fs.readFileSync ( __dirname + '/ncljsc.clj' ), 'utf8'
+ncljscSR = new StringReader ncljsc
+Compiler.loadSync ncljscSR
 
-ClojureScript.compile = compile = (path) ->
-  compileFile.invokeSync path, '{}'
+build = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
+
+ClojureScript.compile = compile = (filename) ->
+  build.invokeSync filename
