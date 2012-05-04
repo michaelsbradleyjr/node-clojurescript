@@ -11,9 +11,10 @@ docs/
 docs_lib/
 lib/
 node_modules/
-support/VERSIONING.txt
+support/clojure-clojurescript/
 support/nodejuice
 support/tools
+support/VERSIONING.txt
 test/
 
 .gitignore
