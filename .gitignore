@@ -9,6 +9,6 @@ fuse*
 
 docs_lib/
 node_modules/
-support/nodejuice/symlinks/
+support/nodejuice/symlinks/node
 
 npm-debug.log
