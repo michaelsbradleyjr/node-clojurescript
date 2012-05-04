@@ -1,0 +1,4 @@
+TO RUN: ./nodejuice demos/rad
+OPEN: http://localhost:8080/
+
+READ: 'app/rad.js'

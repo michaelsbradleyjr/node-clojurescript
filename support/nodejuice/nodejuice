@@ -1,0 +1,202 @@
+#!/bin/bash
+
+# ====
+# TODO
+# ====
+# -
+# -NodeJuice 1.5.0 Features
+# ---> DONE! Browser Scroll Push      (on scroll event, transmit scrollTop)
+# ---> DONE! Scroll TO on page load.  (all scroll to same spot after reload push)
+# ---> Follow Navigation.       (on browser changes, they all change.)
+# ---> 
+# -
+# -
+# -(maybe fixed) error, same problem when you delete a file.  stat failure?
+# -allow data streaming in sidekick server.
+# -xdr3: make easy production/dev mode with closure compiler.
+# -redo debian packages.
+# -write new blog "HOW NODEJUICE WORKS" use text from jul email.
+# -update amuse to unify methods between wsgi and sidekick
+# -make all functions({}) with object as ONLY ARG
+# -unit tests plz
+# -test failed function in utility.noble()
+# -redo video tutorial
+# -scrolling auto on all attached clients, only localhost can send scrolls.
+# -scrollTo() on page reload.
+# -sticky pages, if localhost changes a page, then all other clients will go.
+# -sidekick video tutorial
+# -aws api
+
+# BUILD COMMAND
+# =============
+# java -jar /opt/minify/compiler.jar \
+# --js /opt/nodejuice/library/seeker.js \
+# > /opt/nodejuice/library/seeker.min.js
+
+
+# USAGE:
+# ===================================================
+# ./nodejuice /path/to/app [seeker] [wsgi] [sidekick]
+#
+# wsgi     - servers dynamic and static content. (Web Server)
+# seeker   - pushes updates to your web browser.
+# sidekick - use with apache and other web servers.
+ 
+
+# Examples:
+# =========
+#
+# This will launch seeker and wsgi servers.
+# ./nodejuice /home/stephen/application
+# 
+# This will launch seeker server only.
+# ./nodejuice /home/stephen/application seeker
+#
+# This will launch only wsgi server only.
+# ./nodejuice /home/stephen/application wsgi
+#
+# This will launch sidekick and seeker server.
+# Use this for APACHE (apache) or other web servers.
+# ./nodejuice /home/stephen/application sidekick
+#
+# Launch ALL Servers (This is pointless and harmless).
+# ./nodejuice /home/stephen/application sidekick wsgi seeker
+
+application=`echo $1 | sed -e 's#/$##'`
+
+if [ "${application:0:1}" != "/" ]
+then
+    cwd=`pwd`
+    application="`echo $cwd/$1 | sed -e 's#/$##'`"
+fi
+
+nodeconfig1="$application/configure/nodejuice.js"
+nodeconfig2="$application/config/nodejuice.js"
+nodeconfig3="$application/nodejuice.js"
+
+nodejuice=`dirname $0`
+
+if [ nodejuice='.' ]; then nodejuice="`pwd`"; fi
+
+seeker="$nodejuice/servers/seeker.js"
+wsgi="$nodejuice/servers/wsgi.js"
+sidekick="$nodejuice/servers/sidekick.js"
+node="$nodejuice/symlinks/node"
+
+## Check if Application Directory exixts
+if [ ! -e $application ]
+then
+    echo -e "\nDirectory does not exist: $application"
+    exit
+fi
+
+if [ -e "$nodeconfig1" ]; then nodeconfig="$nodeconfig1"; fi
+if [ -e "$nodeconfig2" ]; then nodeconfig="$nodeconfig2"; fi
+if [ -e "$nodeconfig3" ]; then nodeconfig="$nodeconfig3"; fi
+
+## Check for configurations files
+if [[ ! -e "$nodeconfig1" && ! -e "$nodeconfig2" && ! -e "$nodeconfig3" ]]
+then
+    nodeconfig="$nodejuice/config/nodejuice.js"
+    echo -e "\n\033[0;33;1m  WARNING: 'nodejuice.js' configuration file not found. "
+    echo -e "  Using Default Configuration for: $application"
+    echo -e "  Default Configuration is Here: $nodeconfig \033[0m"
+fi
+
+nodeconfig="`echo $nodeconfig | sed -e 's#\.js$##'`"
+
+ask_for_node() {
+    echo -e "Node server not detected on your system."
+    echo -e "Node must be installed to use nodejuice."
+    echo -e "Download node at: http://nodejs.org/#download"
+    echo -e "\nIf Node is installed in a different directory, "
+    echo "type /location/to/node/node and press [enter] : "
+
+    read usr_node
+
+    if [ ! -e "$usr_node" ]
+    then
+        echo -e "\nThat's not a file try again :("
+        exit
+    else
+        ## Create Symlink for user based on entered directory.
+        rm "$node"
+        `ln -s $usr_node $node`
+    fi
+}
+
+## Check for node symlink
+if [[ !( -e "$node" && -e "`readlink $node`" ) ]]
+then
+
+    ## check `which` for node
+    if [ -e `which node` ]
+    then
+        ## Create Symlink for user
+        rm "$node"
+        which_node=`which node`
+        `ln -s $which_node $node`
+    else
+        ask_for_node
+    fi
+fi
+
+trap leave INT TERM EXIT
+
+leave() {
+    echo -e "\n\nnodejuice shuting down... goodbye"
+    trap - INT TERM EXIT
+    sleep .15
+    ps -aef | grep servers | grep node | grep -v grep | awk '{print $2}' | xargs kill
+}
+
+startup() {
+    if [ ! "$1" ]; then return; fi
+
+    case "$1" in
+    "wsgi")
+        if [ $running_wsgi ]; then return; fi
+        running_wsgi=1
+        $node $wsgi $application $nodejuice $nodeconfig $devmode &
+        ;;
+    "seeker")
+        devmode="yes"
+        if [ $running_seeker ]; then return; fi
+        running_seeker=1
+        $node $seeker $application $nodejuice $nodeconfig $devmode &
+        ;;
+    "sidekick")
+        devmode="yes"
+        if [ $running_sidekick ]; then return; fi
+        running_sidekick=1
+        $node $sidekick $application $nodejuice $nodeconfig $devmode &
+
+        if [ $running_seeker ]; then return; fi
+        running_seeker=1
+        $node $seeker $application $nodejuice $nodeconfig $devmode &
+        ;;
+    *)
+        echo -e "\033[0;33;1m"
+        echo -e "  USAGE: "
+        echo -e "  ================================================ "
+        echo -e "  ./nodejuice /path/to/app [wsgi] [seeker] [sidekick] "
+        echo -e "  "
+        echo -e "  wsgi     - servers dynamic and static content. (Web Server) "
+        echo -e "  seeker   - pushes updates to your web browser. "
+        echo -e "  sidekick - use with apache and other web servers. \033[0m"
+        leave
+        ;;
+    esac
+}
+
+if [ "$2" != "wsgi" ]; then devmode="yes"; fi
+
+if [ ! "$2" ]; then startup "seeker"; startup "wsgi"; else
+    startup "$2"; startup "$3"; startup "$4"; startup "$5" 
+fi
+
+wait
+
+# echo -e "$node $seeker $application $nodejuice $nodeconfig $devmode"
+# echo -e "$node $wsgi $application $nodejuice $nodeconfig $devmode"
+# echo -e "$node $sidekick $application $nodejuice $nodeconfig $devmode"

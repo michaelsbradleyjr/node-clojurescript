@@ -1,0 +1,64 @@
+<h1>Run StaticMatic with NodeJuice</h1>
+
+<ul>
+    <li>
+        Setup your <a href=http://www.staticmatic.net/>StaticMatic</a> Proejct:
+        <pre class=code>staticmatic setup <span class=string>my-project-name</span></pre>
+    </li>
+    <li>
+        Start <a href=http://www.staticmatic.net/>StaticMatic</a> Preview Server:
+        <pre class=code>staticmatic preview <span class=string>my-project-name</span></pre>
+    </li>
+
+    <li>
+        Copy nodejuice.js configuration into <span class=string>my-project-name</span> dir.
+        <pre class=code>cp ./nodejuice/demos/staticmatic/nodejuice.js <span class=string>my-project-name</span>/.</pre>
+    </li>
+    <li>
+        Edit the configuration file to point the 
+        <strong>fetch</strong> variable at your server.
+        <pre class=code>// nodejuice.js - the config file
+exports.sidekick = {
+    port  : 3010, <span class=keyword>// Points to StaticMatic Preview w/ NodeJuice</span>
+    fetch : {
+        host : 'localhost',
+        port : 3000
+    }
+};
+
+exports.seeker = {
+    host   : null,  // Leave 'null' to listen on all hosts.
+    port   : 8002,  // port :-/
+    delay  : 180,   // time in ms before page starts to reload.
+                    // setting too low will cause file read errors in Apache
+    wait   : 1200,  // time in milliseconds before a new connection.
+                    // setting too low will make crazziness.
+    add    : true,  // allow new file to push updates.
+    remove : true,  // allow file delete to push updates.
+    touch  : false, // allow file touch to push updates.
+    access : false, // allow file reads to push updates.
+    bits   : true,  // allow chmod/chown to push updates.
+    save   : true,  // allow file save to push updates.
+    dir    : true,  // allow directory changes to push updates.
+    ignore : [      // path or file name to ignore.
+        /\/\./,
+        /git$/,
+        /svn$/,
+        /cvs$/,
+        /swp$/,
+        /~$/
+    ]
+};</pre>
+    </li>
+
+    <li>
+        Start NodeJuice SideKick Server:
+        <pre class=code>cd /path/to/nodejuice
+./nodejuice /path/to/<span class=string>my-project-name</span> <span class=keyword>sidekick</span>
+</pre>
+    </li>
+    <li>
+        Run Browser:
+        <pre class=code>http://localhost:3010/</pre>
+    </li>
+</ul>
