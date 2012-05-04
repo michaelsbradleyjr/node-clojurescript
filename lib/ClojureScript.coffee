@@ -23,15 +23,3 @@ compileFile = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure'
 
 ClojureScript.compile = (path) ->
   compileFile.invokeSync path, '{}'
-
-
-
-
-if ( exports? )
-  if ( module?.exports )
-    exports = module.exports = ClojureScript
-  exports.ClojureScript = ClojureScript
-else
-  this['ClojureScript'] = ClojureScript
-
-` // BOTTOM `
