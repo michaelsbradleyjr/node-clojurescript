@@ -2,10 +2,8 @@
 
   (:require [cljs.closure :as closure]))
 
-(def comp-options {})
-(def deps-options {})
-(def optm-options {:optimizations :advanced :pretty-print true})
+(def options {:pretty-print true :target :nodejs})
 
 (defn build
   [source]
-  (closure/optimize optm-options (closure/add-dependencies deps-options (closure/-compile source comp-options))))
+  (closure/build source options))
