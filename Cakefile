@@ -323,6 +323,7 @@ task 'static-server', 'starts the auto-refreshing static file web server', ->
   staticServerEm = allEm.staticServerEm ?= new EventEmitter
   staticServerProc = allProc.staticServerProc ?= []
 
+  ###
   ( srv = spawn './nodejuice', \
                 [ __dirname ], \
                 { cwd: ( __dirname + '/support/nodejuice' ) }
@@ -331,6 +332,7 @@ task 'static-server', 'starts the auto-refreshing static file web server', ->
 
   console.log ''
   clog.info 'starting static-server, listening on port 4300'
+  ###
 
   staticServerEm.emit 'started'
 

@@ -30,11 +30,7 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, Compiler, StringReader, VERSION, cljsc, cljscSR, compileFile, exports, fs, java;
-  
-  ClojureScript = {};
-  
-  ClojureScript.VERSION = VERSION = '0.0.0-3-pre';
+  var ClojureScript, Compiler, StringReader, VERSION, cljsc, cljscSR, compile, compileFile, exports, fs, java;
   
   fs = require('fs');
   
@@ -52,6 +48,10 @@
   
   Compiler = java["import"]('clojure.lang.Compiler');
   
+  ClojureScript = {};
+  
+  ClojureScript.VERSION = VERSION = '0.0.0-3-pre';
+  
   cljsc = fs.readFileSync(__dirname + '/support/clojure-clojurescript-7472ab9/src/clj/cljs/closure.clj', 'utf8');
   
   cljscSR = new StringReader(cljsc);
@@ -60,9 +60,21 @@
   
   compileFile = java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'compile-file');
   
-  ClojureScript.compile = function(path) {
+  ClojureScript.compile = compile = function(path) {
     return compileFile.invokeSync(path, '{}');
   };
+  
+  if (require.extensions) {
+    require.extensions['.cljs'] = function(module, filename) {
+      var content;
+      content = compile(filename);
+      return module._compile(content, filename);
+    };
+  } else if (require.registerExtension) {
+    require.registerExtension('.cljs', function(content) {
+      return compile(content);
+    });
+  }
   
   if ((typeof exports !== "undefined" && exports !== null)) {
     if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {

@@ -5,7 +5,6 @@ sinon     = require 'sinon'
 sinonChai = require 'sinon-chai'
 
 index = __dirname + '/..'
-delete require.cache[ ( require.resolve index ) ]
 ClojureScript = require index
 
 {expect} = chai
