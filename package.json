@@ -17,7 +17,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "./node_modules/coffee-script/bin/cake test",
-      "postinstall": "cd ./support/clojure-clojure-8306949/ && ant && cd ../adinardi-google-closure-compiler-46caff8/ && ant"
+    "postinstall": "cd ./support/clojure-clojure-8306949/ && ant"
   },
   "engines": {
     "node": "~0.6"
