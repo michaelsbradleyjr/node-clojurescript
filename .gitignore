@@ -9,6 +9,7 @@ fuse*
 
 docs_lib/
 node_modules/
+support/clojure-clojurescript/
 support/nodejuice/symlinks/node
 
 npm-debug.log
