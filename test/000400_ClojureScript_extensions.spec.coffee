@@ -21,8 +21,8 @@ describe 'ClojureScript extensions', ->
 
     file = ( __dirname + '/cljs/hello.cljs' )
 
-    console.log ( require file )
+    {hello} = require file
 
-    #( expect hello.greet 'world' ).to.equal 'hello world'
+    ( expect hello.greet 'world' ).to.equal 'hello world'
 
     done()

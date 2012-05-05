@@ -10,7 +10,7 @@
 ;     as part of an attempt to better support ClojureScript modules
 ;     within the NodeJS runtime
 
-(def optimizations {:optimizations :simple :target :nodejs})
+(def optimizations {:optimizations :simple :target :nodejs :pretty-print true})
 
 (ns ncljsc
   "Compile ClojureScript to JavaScript with optimizations from Google
