@@ -68,7 +68,7 @@
   
   build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
   
-  ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print true}";
+  ClojureScript.defaultOptions = "{:optimizations :advanced :target :nodejs :pretty-print false}";
   
   ClojureScript.compile = compile = function(filename, options) {
     if (options == null) {

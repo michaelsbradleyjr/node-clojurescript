@@ -870,9 +870,9 @@
   (let [opts (if (= java.lang.String (type opts))
                (load-string opts)
                opts)
-        opts (if (= :nodejs (:target opts))
-               (merge {:optimizations :simple} opts)
-               opts)
+        ;;opts (if (= :nodejs (:target opts))
+        ;;       (merge {:optimizations :simple} opts)
+        ;;       opts)
         ups-deps (get-upstream-deps)
         all-opts (assoc opts
                         :ups-libs (:libs ups-deps)
