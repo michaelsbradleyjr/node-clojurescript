@@ -11,7 +11,6 @@ docs/
 docs_lib/
 lib/
 node_modules/
-out/
 support/clojure-clojurescript/
 support/nodejuice
 support/tools

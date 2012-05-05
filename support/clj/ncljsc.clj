@@ -333,7 +333,7 @@
           (comp/emit (comp/analyze (empty-env) form)))))))
 
 (defn output-directory [opts]
-  (or (:output-dir opts) "out"))
+  (or (:output-dir opts) (or (:npm-pkg-out opts) "out")))
 
 (def compiled-cljs (atom {}))
 

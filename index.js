@@ -30,7 +30,7 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, Compiler, StringReader, VERSION, build, compile, exports, fs, java, ncljsc, ncljscSR;
+  var ClojureScript, Compiler, StringReader, VERSION, build, compile, exports, fs, java, ncljsc, ncljscSR, npmPkgOut;
   
   fs = require('fs');
   
@@ -70,10 +70,15 @@
   
   ClojureScript.defaultOptions = "{:optimizations :advanced :target :nodejs :pretty-print false}";
   
+  npmPkgOut = function() {
+    return " :npm-pkg-out \"" + (__dirname + '/support/out') + "\" }";
+  };
+  
   ClojureScript.compile = compile = function(filename, options) {
     if (options == null) {
       options = ClojureScript.defaultOptions;
     }
+    options = options.slice(0, options.length - 1) + npmPkgOut();
     return build.invokeSync(filename, options);
   };
   

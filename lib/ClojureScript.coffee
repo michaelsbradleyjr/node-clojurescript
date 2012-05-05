@@ -27,5 +27,8 @@ build = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
 
 ClojureScript.defaultOptions = "{:optimizations :advanced :target :nodejs :pretty-print false}"
 
+npmPkgOut = -> " :npm-pkg-out \"#{( __dirname + '/support/out' )}\" }"
+
 ClojureScript.compile = compile = (filename, options = ClojureScript.defaultOptions) ->
+  options = ( options[0...( options.length - 1 )] + npmPkgOut() )
   build.invokeSync filename, options

@@ -27,7 +27,10 @@
 
 <span class="nv">ClojureScript.defaultOptions = </span><span class="s">&quot;{:optimizations :advanced :target :nodejs :pretty-print false}&quot;</span>
 
+<span class="nv">npmPkgOut = </span><span class="o">-&gt;</span> <span class="s">&quot; :npm-pkg-out \&quot;</span><span class="si">#{</span><span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out&#39;</span> <span class="p">)</span><span class="si">}</span><span class="s">\&quot; }&quot;</span>
+
 <span class="nv">ClojureScript.compile = compile = </span><span class="nf">(filename, options = ClojureScript.defaultOptions) -&gt;</span>
+  <span class="nv">options = </span><span class="p">(</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="nx">npmPkgOut</span><span class="p">()</span> <span class="p">)</span>
   <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />

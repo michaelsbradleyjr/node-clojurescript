@@ -9,7 +9,6 @@ fuse*
 
 docs_lib/
 node_modules/
-out/
 support/clojure-clojurescript/
 support/nodejuice/symlinks/node
 
