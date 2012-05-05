@@ -867,10 +867,12 @@
 (defn build
   "Given a source which can be compiled, produce runnable JavaScript."
   [source opts]
-  (let [load-opts (load-string opts)
-        opts (if (= :nodejs (:target load-opts))
-               (merge {:optimizations :simple} load-opts)
-               load-opts)
+  (let [opts (if (= java.lang.String (type opts))
+               (load-string opts)
+               opts)
+        opts (if (= :nodejs (:target opts))
+               (merge {:optimizations :simple} opts)
+               opts)
         ups-deps (get-upstream-deps)
         all-opts (assoc opts
                         :ups-libs (:libs ups-deps)
