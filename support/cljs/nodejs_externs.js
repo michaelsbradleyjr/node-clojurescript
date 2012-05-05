@@ -1,0 +1,13 @@
+function global(){}
+function process(){}
+function console(){}
+function Buffer(){}
+function require(){}
+function __filename(){}
+function __dirname(){}
+function module(){}
+function exports(){}
+function setTimeout(){}
+function clearTimeout(){}
+function setInterval(){}
+function clearInterval(){}
