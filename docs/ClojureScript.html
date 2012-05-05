@@ -9,6 +9,8 @@
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/js.jar&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/clj&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/cljs&#39;</span> <span class="p">)</span>
 
 <span class="nv">StringReader = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
 <span class="nv">Compiler     = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;clojure.lang.Compiler&#39;</span>
@@ -17,7 +19,7 @@
 
 <span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-3-pre&#39;</span>
 
-<span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
+<span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
 <span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
 <span class="nx">Compiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
 

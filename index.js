@@ -48,6 +48,10 @@
   
   java.classpath.push(__dirname + '/support/clojure-clojurescript/src/cljs');
   
+  java.classpath.push(__dirname + '/support/clj');
+  
+  java.classpath.push(__dirname + '/support/cljs');
+  
   StringReader = java["import"]('java.io.StringReader');
   
   Compiler = java["import"]('clojure.lang.Compiler');
@@ -56,7 +60,7 @@
   
   ClojureScript.VERSION = VERSION = '0.0.0-3-pre';
   
-  ncljsc = fs.readFileSync(__dirname + '/ncljsc.clj', 'utf8');
+  ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
   
   ncljscSR = new StringReader(ncljsc);
   

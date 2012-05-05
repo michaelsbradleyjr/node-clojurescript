@@ -164,7 +164,7 @@
                     (for [p paths u (find-js-resources p)] u))
         add-target (fn [ext]
                      (if (= :nodejs target)
-                       (cons (io/resource "cljs/nodejs_externs.js")
+                       (cons (io/resource "ncljsc-nodejs_externs.js")
                              (or ext []))
                        ext))
         load-js (fn [ext]
@@ -502,7 +502,7 @@
                                           :provides ["my.example"]}]})
   (library-dependencies {:foreign-libs [{:file "local/file.js"
                                             :provides ["my.example"]}]})
-  (library-dependencies {:foreign-libs [{:file "cljs/nodejs_externs.js"
+  (library-dependencies {:foreign-libs [{:file "ncljsc-nodejs_externs.js"
                                           :provides ["my.example"]}]}))
 
 (defn goog-dependencies*
@@ -861,7 +861,7 @@
 
 (defn add-header [{:keys [hashbang target]} js]
   (if (= :nodejs target)
-    (str "#!" (or hashbang "/usr/bin/nodejs") "\n" js)
+    (str "#!" (or hashbang "/usr/bin/env node") "\n" js)
     js))
 
 (defn build
@@ -877,7 +877,7 @@
         compiled (concat
                    (if (coll? compiled) compiled [compiled])
                    (when (= :nodejs (:target all-opts))
-                     [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
+                     [(-compile (io/resource "ncljsc-nodejscli.cljs") all-opts)]))
         js-sources (if (coll? compiled)
                      (apply add-dependencies all-opts compiled)
                      (add-dependencies all-opts compiled))]

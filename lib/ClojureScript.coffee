@@ -9,6 +9,8 @@ java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' 
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/js.jar' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
+java.classpath.push ( __dirname + '/support/clj' )
+java.classpath.push ( __dirname + '/support/cljs' )
 
 StringReader = java.import 'java.io.StringReader'
 Compiler     = java.import 'clojure.lang.Compiler'
