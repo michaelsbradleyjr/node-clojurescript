@@ -17,7 +17,7 @@ ClojureScript = {}
 
 ClojureScript.VERSION = VERSION = '0.0.0-3-pre'
 
-ncljsc = fs.readFileSync ( __dirname + '/ncljsc.clj' ), 'utf8'
+ncljsc = fs.readFileSync ( __dirname + '/support/clj/ncljsc.clj' ), 'utf8'
 ncljscSR = new StringReader ncljsc
 Compiler.loadSync ncljscSR
 
