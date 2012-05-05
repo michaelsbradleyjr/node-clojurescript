@@ -1,6 +1,6 @@
 /*//////////////////////// NODE-CLOJURESCRIPT //////////////////////////
  *
- * Version 0.0.0-3-pre
+ * Version 0.0.0-3
  * https://github.com/michaelsbradleyjr/node-clojurescript
  *
  * This software is Copyright (c) 2012 by Michael Bradley, Jr.
@@ -58,7 +58,7 @@
   
   ClojureScript = {};
   
-  ClojureScript.VERSION = VERSION = '0.0.0-3-pre';
+  ClojureScript.VERSION = VERSION = '0.0.0-3';
   
   ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
   
