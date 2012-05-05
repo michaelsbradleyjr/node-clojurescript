@@ -25,8 +25,10 @@
 
 <span class="nv">build = </span><span class="nx">java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
 
-<span class="nv">ClojureScript.compile = compile = </span><span class="nf">(filename) -&gt;</span>
-  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
+<span class="nv">ClojureScript.defaultOptions = </span><span class="s">&quot;{:optimizations :simple :target :nodejs :pretty-print true}&quot;</span>
+
+<span class="nv">ClojureScript.compile = compile = </span><span class="nf">(filename, options = ClojureScript.defaultOptions) -&gt;</span>
+  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />

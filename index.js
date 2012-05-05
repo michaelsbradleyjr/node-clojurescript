@@ -68,8 +68,13 @@
   
   build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
   
-  ClojureScript.compile = compile = function(filename) {
-    return build.invokeSync(filename);
+  ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print true}";
+  
+  ClojureScript.compile = compile = function(filename, options) {
+    if (options == null) {
+      options = ClojureScript.defaultOptions;
+    }
+    return build.invokeSync(filename, options);
   };
   
   if (require.extensions) {

@@ -10,7 +10,7 @@
 ;     as part of an attempt to better support ClojureScript modules
 ;     within the NodeJS runtime
 
-(def optimizations {:optimizations :simple :target :nodejs :pretty-print true})
+;(def optimizations {:optimizations :simple :target :nodejs :pretty-print true})
 
 (ns ncljsc
   "Compile ClojureScript to JavaScript with optimizations from Google
@@ -866,8 +866,11 @@
 
 (defn build
   "Given a source which can be compiled, produce runnable JavaScript."
-  [source]
-  (let [opts optimizations
+  [source opts]
+  (let [load-opts (load-string opts)
+        opts (if (= :nodejs (:target load-opts))
+               (merge {:optimizations :simple} load-opts)
+               load-opts)
         ups-deps (get-upstream-deps)
         all-opts (assoc opts
                         :ups-libs (:libs ups-deps)

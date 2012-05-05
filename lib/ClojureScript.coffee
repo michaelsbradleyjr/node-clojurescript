@@ -25,5 +25,7 @@ Compiler.loadSync ncljscSR
 
 build = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
 
-ClojureScript.compile = compile = (filename) ->
-  build.invokeSync filename
+ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print true}"
+
+ClojureScript.compile = compile = (filename, options = ClojureScript.defaultOptions) ->
+  build.invokeSync filename, options
