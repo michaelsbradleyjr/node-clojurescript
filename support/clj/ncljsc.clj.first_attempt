@@ -1,9 +1,0 @@
-(ns ncljsc
-
-  (:require [cljs.closure :as closure]))
-
-(def options {:optimizations :advanced :target :nodejs})
-
-(defn build
-  [source]
-  (closure/build source options))
