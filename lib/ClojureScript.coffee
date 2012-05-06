@@ -16,7 +16,7 @@ java.classpath.push ( __dirname + '/support/cljs' )
 
 ClojureScript = {}
 
-ClojureScript.VERSION = VERSION = '0.0.0-4-pre'
+ClojureScript.VERSION = VERSION = '0.0.0-4'
 
 ClojureScript.java = java
 
