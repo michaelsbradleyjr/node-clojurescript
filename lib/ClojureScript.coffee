@@ -11,9 +11,7 @@ java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' 
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/js.jar' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
-#java.classpath.push ( __dirname + '/support/clj/pomegranate-0.0.12.jar' )
 java.classpath.push ( __dirname + '/support/clj' )
-java.classpath.push ( __dirname + '/support/cljs' )
 
 ClojureScript = {}
 
@@ -42,8 +40,6 @@ ClojureScript.build = build = (target, options = ClojureScript.options) ->
     cp = path.dirname resolved
   else
     throw new Error 'target path must be a file or a directory'
-  #if ( ( java.classpath.indexOf cp ) is -1 )
-  #  java.classpath.push cp
 
   options = addCp options, cp
 

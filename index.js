@@ -54,8 +54,6 @@
   
   java.classpath.push(__dirname + '/support/clj');
   
-  java.classpath.push(__dirname + '/support/cljs');
-  
   ClojureScript = {};
   
   ClojureScript.VERSION = VERSION = '0.0.0-5-pre';

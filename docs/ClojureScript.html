@@ -10,8 +10,8 @@
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/goog.jar&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/js.jar&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/clj&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>java.classpath.push ( __dirname + '/support/clj/pomegranate-0.0.12.jar' )</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/cljs&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span>
+<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj&#39;</span> <span class="p">)</span>
 
 <span class="nv">ClojureScript = </span><span class="p">{}</span>
 
@@ -39,8 +39,9 @@
   <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isFile</span><span class="p">()</span> <span class="p">)</span>
     <span class="nv">cp = </span><span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">resolved</span>
   <span class="k">else</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;target path must be a file or a directory&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>if ( ( java.classpath.indexOf cp ) is -1 )
- java.classpath.push cp</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">options = </span><span class="nx">addCp</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cp</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;target path must be a file or a directory&#39;</span>
+
+  <span class="nv">options = </span><span class="nx">addCp</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cp</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">build</span><span class="p">.</span><span class="nx">calledPreviously</span> <span class="p">)</span>
     <span class="nv">StringReader        = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
@@ -54,7 +55,7 @@
 
     <span class="nv">build.calledPreviously = </span><span class="kc">true</span>
 
-  <span class="nx">build</span><span class="p">.</span><span class="nx">clojureBuild</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>&nbsp;<br />
+  <span class="nx">build</span><span class="p">.</span><span class="nx">clojureBuild</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
