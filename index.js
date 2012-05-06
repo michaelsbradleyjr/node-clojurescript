@@ -68,7 +68,9 @@
   
   build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
   
-  ClojureScript.defaultOptions = "{:optimizations :advanced :target :nodejs :pretty-print false}";
+  ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}";
+  
+  ClojureScript.options = ClojureScript.defaultOptions;
   
   npmPkgOut = function() {
     return " :npm-pkg-out \"" + (__dirname + '/support/out') + "\" }";
@@ -76,7 +78,7 @@
   
   ClojureScript.compile = compile = function(filename, options) {
     if (options == null) {
-      options = ClojureScript.defaultOptions;
+      options = ClojureScript.options;
     }
     options = options.slice(0, options.length - 1) + npmPkgOut();
     return build.invokeSync(filename, options);

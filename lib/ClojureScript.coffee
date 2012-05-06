@@ -25,10 +25,11 @@ Compiler.loadSync ncljscSR
 
 build = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
 
-ClojureScript.defaultOptions = "{:optimizations :advanced :target :nodejs :pretty-print false}"
+ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}"
+ClojureScript.options = ClojureScript.defaultOptions
 
 npmPkgOut = -> " :npm-pkg-out \"#{( __dirname + '/support/out' )}\" }"
 
-ClojureScript.compile = compile = (filename, options = ClojureScript.defaultOptions) ->
+ClojureScript.compile = compile = (filename, options = ClojureScript.options) ->
   options = ( options[0...( options.length - 1 )] + npmPkgOut() )
   build.invokeSync filename, options
