@@ -1,5 +1,11 @@
 ;   Copyright (c) 2011-2012 Chas Emerick and all other contributors.
-;   Licensed under the EPL. (See the file epl-v10.html.)
+;   The use and distribution terms for this software are covered by the
+;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+;   which can be found in the file epl-v10.html under the licenses
+;   directory at the root of this distribution.
+;   By using this software in any fashion, you are agreeing to be bound by
+;   the terms of this license.
+;   You must not remove this notice, or any other, from this software.
 
 ;   Modified by Michael Bradley, Jr.
 ;     as part of an attempt to better support ClojureScript modules
