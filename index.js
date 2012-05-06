@@ -62,6 +62,8 @@
   
   ClojureScript.VERSION = VERSION = '0.0.0-4-pre';
   
+  ClojureScript.java = java;
+  
   ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
   
   ncljscSR = new StringReader(ncljsc);

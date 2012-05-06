@@ -20,6 +20,8 @@
 
 <span class="nv">ClojureScript.VERSION = VERSION = </span><span class="s">&#39;0.0.0-4-pre&#39;</span>
 
+<span class="nv">ClojureScript.java = </span><span class="nx">java</span>
+
 <span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
 <span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
 <span class="nx">Compiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
