@@ -16,9 +16,9 @@ chai.use sinonChai
 describe 'ClojureScript exports', ->
 
   it '''
-    should have a "compile" method
+    should have a "build" method
   ''', (done) ->
 
-    ( expect ClojureScript.compile ).to.be.a 'function'
+    ( expect ClojureScript.build ).to.be.a 'function'
 
     done()

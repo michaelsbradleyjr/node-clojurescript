@@ -11,6 +11,7 @@ java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' 
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/js.jar' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj' )
 java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
+#java.classpath.push ( __dirname + '/support/clj/pomegranate-0.0.12.jar' )
 java.classpath.push ( __dirname + '/support/clj' )
 java.classpath.push ( __dirname + '/support/cljs' )
 
@@ -25,10 +26,11 @@ ClojureScript.options = ClojureScript.defaultOptions
 
 ClojureScript.tmpDir = new tmpDir
 
-tmpOut = -> " :tmp-out \"#{ ClojureScript.tmpDir.path }\" }"
+tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ ClojureScript.tmpDir.path }\"}"
+addCp  = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
 
 ClojureScript.build = build = (target, options = ClojureScript.options) ->
-  options = ( options[0...( options.length - 1 )] + tmpOut() )
+  options = tmpOut options
 
   resolved = path.resolve ( path.normalize target )
   if ( not ( path.existsSync resolved ) )
@@ -40,8 +42,10 @@ ClojureScript.build = build = (target, options = ClojureScript.options) ->
     cp = path.dirname resolved
   else
     throw new Error 'target path must be a file or a directory'
-  if ( ( java.classpath.indexOf cp ) is -1 )
-    java.classpath.push cp
+  #if ( ( java.classpath.indexOf cp ) is -1 )
+  #  java.classpath.push cp
+
+  options = addCp options, cp
 
   if ( not build.calledPreviously )
     StringReader        = java.import 'java.io.StringReader'

@@ -21,7 +21,7 @@ describe 'ClojureScript.compile', ->
 
     file = ( __dirname + '/cljs/hello.cljs' )
 
-    out = ClojureScript.compile file
+    out = ClojureScript.build file
 
     #console.log out
 

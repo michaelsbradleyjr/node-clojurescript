@@ -19,12 +19,12 @@ echo "Compiling..."
 
 fi
 
-cd ../clj
-
-if [ ! -e ./pomegranate-0.0.12.jar ]
-then
-
-echo "Fetching Pomegranate..."
-curl -O -s http://repo1.maven.org/maven2/com/cemerick/pomegranate/0.0.12/pomegranate-0.0.12.jar
-
-fi
+#if [ ! -e ./support/clj/pomegranate-0.0.12.jar ]
+#then
+#
+#cd ./support/clj
+#
+#echo "Fetching Pomegranate..."
+#curl -O -s http://repo1.maven.org/maven2/com/cemerick/pomegranate/0.0.12/pomegranate-0.0.12.jar
+#
+#fi

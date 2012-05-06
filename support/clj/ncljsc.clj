@@ -41,7 +41,8 @@
   "
   (:require [cljs.compiler :as comp]
             [clojure.java.io :as io]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [pomegranate :as pomegranate])
   (:import java.io.File
            java.io.BufferedInputStream
            java.net.URL
@@ -869,29 +870,31 @@
   [source opts]
   (let [opts (if (= java.lang.String (type opts))
                (load-string opts)
-               opts)
-        ;;opts (if (= :nodejs (:target opts))
-        ;;       (merge {:optimizations :simple} opts)
-        ;;       opts)
-        ups-deps (get-upstream-deps)
-        all-opts (assoc opts
-                        :ups-libs (:libs ups-deps)
-                        :ups-foreign-libs (:foreign-libs ups-deps)
-                        :ups-externs (:externs ups-deps))
-        compiled (-compile source all-opts)
-        compiled (concat
-                   (if (coll? compiled) compiled [compiled])
-                   (when (= :nodejs (:target all-opts))
-                     [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
-        js-sources (if (coll? compiled)
-                     (apply add-dependencies all-opts compiled)
-                     (add-dependencies all-opts compiled))]
-    (if (:optimizations all-opts)
-      (->> js-sources
-           (apply optimize all-opts)
-           (add-header all-opts)
-           (output-one-file all-opts))
-      (apply output-unoptimized all-opts js-sources))))
+               opts)]
+    (if (not (nil? (:add-classpath opts)))
+      (pomegranate/add-classpath (:add-classpath opts)))
+    (let [;;opts (if (= :nodejs (:target opts))
+          ;;       (merge {:optimizations :simple} opts)
+          ;;       opts)
+          ups-deps (get-upstream-deps)
+          all-opts (assoc opts
+                          :ups-libs (:libs ups-deps)
+                          :ups-foreign-libs (:foreign-libs ups-deps)
+                          :ups-externs (:externs ups-deps))
+          compiled (-compile source all-opts)
+          compiled (concat
+                     (if (coll? compiled) compiled [compiled])
+                     (when (= :nodejs (:target all-opts))
+                       [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
+          js-sources (if (coll? compiled)
+                       (apply add-dependencies all-opts compiled)
+                       (add-dependencies all-opts compiled))]
+      (if (:optimizations all-opts)
+        (->> js-sources
+             (apply optimize all-opts)
+             (add-header all-opts)
+             (output-one-file all-opts))
+        (apply output-unoptimized all-opts js-sources)))))
 
 (comment
 
