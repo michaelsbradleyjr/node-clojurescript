@@ -1,7 +1,9 @@
 <!DOCTYPE html>  <html> <head>   <title>ClojureScript.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="ClojureScript.html">                 ClojureScript.coffee               </a>                                           <a class="source" href="extensions.html">                 extensions.coffee               </a>                                           <a class="source" href="command.html">                 command.coffee               </a>                                           <a class="source" href="exporter.html">                 exporter.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               ClojureScript.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="o">`</span> <span class="o">//</span> <span class="nx">TOP</span> <span class="o">`</span>
 
-<span class="nv">fs   = </span><span class="nx">require</span> <span class="s">&#39;fs&#39;</span>
-<span class="nv">java = </span><span class="nx">require</span> <span class="s">&#39;java&#39;</span>
+<span class="nv">fs     = </span><span class="nx">require</span> <span class="s">&#39;fs&#39;</span>
+<span class="nv">path   = </span><span class="nx">require</span> <span class="s">&#39;path&#39;</span>
+<span class="nv">java   = </span><span class="nx">require</span> <span class="s">&#39;java&#39;</span>
+<span class="nv">tmpDir = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/dir&#39;</span>
 
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/clojure.jar&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/lib/compiler.jar&#39;</span> <span class="p">)</span>
@@ -11,10 +13,6 @@
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj&#39;</span> <span class="p">)</span>
 <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/cljs&#39;</span> <span class="p">)</span>
-<span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">process</span><span class="p">.</span><span class="nx">cwd</span><span class="p">()</span> <span class="p">)</span>
-
-<span class="nv">StringReader = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
-<span class="nv">Compiler     = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;clojure.lang.Compiler&#39;</span>
 
 <span class="nv">ClojureScript = </span><span class="p">{}</span>
 
@@ -22,20 +20,37 @@
 
 <span class="nv">ClojureScript.java = </span><span class="nx">java</span>
 
-<span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
-<span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
-<span class="nx">Compiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
-
-<span class="nv">build = </span><span class="nx">java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
-
 <span class="nv">ClojureScript.defaultOptions = </span><span class="s">&quot;{:optimizations :simple :target :nodejs :pretty-print false}&quot;</span>
 <span class="nv">ClojureScript.options = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultOptions</span>
 
-<span class="nv">npmPkgOut = </span><span class="o">-&gt;</span> <span class="s">&quot; :npm-pkg-out \&quot;</span><span class="si">#{</span><span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out&#39;</span> <span class="p">)</span><span class="si">}</span><span class="s">\&quot; }&quot;</span>
+<span class="nv">ClojureScript.tmpDir = </span><span class="k">new</span> <span class="nx">tmpDir</span>
 
-<span class="nv">ClojureScript.compile = compile = </span><span class="nf">(filename, options = ClojureScript.options) -&gt;</span>
-  <span class="nv">options = </span><span class="p">(</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="nx">npmPkgOut</span><span class="p">()</span> <span class="p">)</span>
-  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">filename</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
+<span class="nv">tmpOut = </span><span class="o">-&gt;</span> <span class="s">&quot; :tmp-out \&quot;</span><span class="si">#{</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmpDir</span><span class="p">.</span><span class="nx">path</span> <span class="si">}</span><span class="s">\&quot; }&quot;</span>
+
+<span class="nv">ClojureScript.compile = compile = </span><span class="nf">(target, options = ClojureScript.options) -&gt;</span>
+  <span class="nv">options = </span><span class="p">(</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="nx">tmpOut</span><span class="p">()</span> <span class="p">)</span>
+
+  <span class="nv">resolved = </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="nx">target</span> <span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">resolved</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;target path must exist&#39;</span>
+  <span class="nv">stats = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">statSync</span> <span class="nx">resolved</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="p">)</span>
+    <span class="nv">cp = </span><span class="nx">resolved</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isFile</span><span class="p">()</span> <span class="p">)</span>
+    <span class="nv">cp = </span><span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">resolved</span>
+  <span class="k">else</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;target path must be a file or a directory&#39;</span>
+  <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="nx">cp</span>
+
+  <span class="nv">StringReader = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
+  <span class="nv">Compiler     = </span><span class="nx">java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;clojure.lang.Compiler&#39;</span>
+
+  <span class="nv">ncljsc = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj/ncljsc.clj&#39;</span> <span class="p">),</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
+  <span class="nx">Compiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
+
+  <span class="nv">build = </span><span class="nx">java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
+  <span class="nx">build</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />

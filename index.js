@@ -30,11 +30,15 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, Compiler, StringReader, VERSION, build, compile, exports, fs, java, ncljsc, ncljscSR, npmPkgOut;
+  var ClojureScript, VERSION, compile, exports, fs, java, path, tmpDir, tmpOut;
   
   fs = require('fs');
   
+  path = require('path');
+  
   java = require('java');
+  
+  tmpDir = require('temporary/lib/dir');
   
   java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/clojure.jar');
   
@@ -52,40 +56,48 @@
   
   java.classpath.push(__dirname + '/support/cljs');
   
-  java.classpath.push(process.cwd());
-  
-  StringReader = java["import"]('java.io.StringReader');
-  
-  Compiler = java["import"]('clojure.lang.Compiler');
-  
   ClojureScript = {};
   
   ClojureScript.VERSION = VERSION = '0.0.0-4-pre';
   
   ClojureScript.java = java;
   
-  ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
-  
-  ncljscSR = new StringReader(ncljsc);
-  
-  Compiler.loadSync(ncljscSR);
-  
-  build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
-  
   ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}";
   
   ClojureScript.options = ClojureScript.defaultOptions;
   
-  npmPkgOut = function() {
-    return " :npm-pkg-out \"" + (__dirname + '/support/out') + "\" }";
+  ClojureScript.tmpDir = new tmpDir;
+  
+  tmpOut = function() {
+    return " :tmp-out \"" + ClojureScript.tmpDir.path + "\" }";
   };
   
-  ClojureScript.compile = compile = function(filename, options) {
+  ClojureScript.compile = compile = function(target, options) {
+    var Compiler, StringReader, build, cp, ncljsc, ncljscSR, resolved, stats;
     if (options == null) {
       options = ClojureScript.options;
     }
-    options = options.slice(0, options.length - 1) + npmPkgOut();
-    return build.invokeSync(filename, options);
+    options = options.slice(0, options.length - 1) + tmpOut();
+    resolved = path.resolve(path.normalize(target));
+    if (!(path.existsSync(resolved))) {
+      throw new Error('target path must exist');
+    }
+    stats = fs.statSync(resolved);
+    if (stats.isDirectory()) {
+      cp = resolved;
+    } else if (stats.isFile()) {
+      cp = path.dirname(resolved);
+    } else {
+      throw new Error('target path must be a file or a directory');
+    }
+    java.classpath.push(cp);
+    StringReader = java["import"]('java.io.StringReader');
+    Compiler = java["import"]('clojure.lang.Compiler');
+    ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
+    ncljscSR = new StringReader(ncljsc);
+    Compiler.loadSync(ncljscSR);
+    build = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
+    return build.invokeSync(target, options);
   };
   
   if (require.extensions) {
