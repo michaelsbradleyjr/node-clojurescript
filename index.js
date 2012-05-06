@@ -25,6 +25,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
+//////////////////////////////// CREDIT ////////////////////////////////
+ *
+ * This software is derived from and incorporates existing works:
+ *
+ *  https://github.com/jashkenas/coffee-script
+ *  https://github.com/clojure/clojurescript
+ *  https://github.com/cemerick/pomegranate
+ *
 /*//////////////////////////////////////////////////////////////////////
 
 

@@ -10,6 +10,13 @@ An experiment.
 [node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) provides experimental [NodeJS](http://nodejs.org/) `require` support for [ClojureScript](https://github.com/clojure/clojurescript) modules.
 
 
+## Credit
+
+This software is derived from and incorporates existing works:
+
+[CoffeeScript](https://github.com/jashkenas/coffee-script),&nbsp; [ClojureScript](https://github.com/clojure/clojurescript),&nbsp; [Pomegranate](https://github.com/cemerick/pomegranate)
+
+
 ## Copyright and License
 
 This software is Copyright (c) 2012 by Michael Bradley, Jr.
