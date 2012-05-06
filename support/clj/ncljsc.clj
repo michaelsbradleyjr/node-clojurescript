@@ -56,6 +56,10 @@
            com.google.javascript.jscomp.JSError
            com.google.javascript.jscomp.CommandLineRunner))
 
+(defn pom-add-classpath
+  [cp]
+  (pomegranate/add-classpath cp))
+
 (def name-chars (map char (concat (range 48 57) (range 65 90) (range 97 122))))
 
 (defn random-char []
@@ -871,7 +875,7 @@
                (load-string opts)
                opts)]
     (if (not (nil? (:add-classpath opts)))
-      (pomegranate/add-classpath (:add-classpath opts)))
+      (pom-add-classpath (:add-classpath opts)))
     (let [;;opts (if (= :nodejs (:target opts))
           ;;       (merge {:optimizations :simple} opts)
           ;;       opts)

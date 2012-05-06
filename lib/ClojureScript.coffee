@@ -22,7 +22,8 @@ ClojureScript.initJava = (options) ->
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
   java.classpath.push ( __dirname + '/support/clj' )
 
-ClojureScript.initClojureCompiler = ->
+ClojureScript.initClojureCompiler = (javaOptions = ClojureScript.javaOptions) ->
+  if ( not @java ) then @initJava javaOptions
   @StringReader = StringReader = @java.import 'java.io.StringReader'
   @ClojureCompiler = ClojureCompiler = @java.import 'clojure.lang.Compiler'
 
@@ -30,7 +31,16 @@ ClojureScript.initClojureCompiler = ->
   ncljscSR = new StringReader ncljsc
   ClojureCompiler.loadSync ncljscSR
 
-  @build.clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
+  @clojureAddClassPath = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'pom-add-classpath'
+
+  @addClassPath = (cp) ->
+    @clojureAddClassPath.invokeSync cp
+
+  @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
+
+ClojureScript.addClassPath = (cp) ->
+  @initClojureCompiler()
+  @addClassPath cp
 
 ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}"
 ClojureScript.options = ClojureScript.defaultOptions
@@ -39,14 +49,20 @@ ClojureScript.tmp = new ClojureScript.Tempdir
 fs.mkdirSync ( ClojureScript.tmp.path + '/cljs' )
 
 pathCompiledCoreJS = __dirname + '/support/out/cljs/core.js'
+compiledCoreJS = ''
+ClojureScript.compiledCoreJS = -> compiledCoreJS
 if ( path.existsSync pathCompiledCoreJS )
-  ClojureScript.compiledCoreJS = fs.readFileSync pathCompiledCoreJS, 'utf8'
-  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/core.js' ), ClojureScript.compiledCoreJS, 'utf8'
+  compiledCoreJS = fs.readFileSync pathCompiledCoreJS, 'utf8'
+  ClojureScript.compiledCoreJS = -> compiledCoreJS
+  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/core.js' ), ClojureScript.compiledCoreJS(), 'utf8'
 
 pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js'
+compiledNodejsJS = ''
+ClojureScript.compiledNodejsJS = -> compiledNodejsJS
 if ( path.existsSync pathCompiledNodejsJS )
-  ClojureScript.compiledNodejsJS = fs.readFileSync pathCompiledNodejsJS, 'utf8'
-  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/nodejs.js' ), ClojureScript.compiledNodejsJS, 'utf8'
+  compiledNodejsJS = fs.readFileSync pathCompiledNodejsJS, 'utf8'
+  ClojureScript.compiledNodejsJS = -> compiledNodejsJS
+  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/nodejs.js' ), ClojureScript.compiledNodejsJS(), 'utf8'
 
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
 ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
@@ -70,4 +86,4 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
 
   options = @addBuildClasspath options, cp
 
-  @build.clojureBuild.invokeSync target, options
+  @clojureBuild.invokeSync target, options

@@ -22,7 +22,8 @@
   <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clojure-clojurescript/src/cljs&#39;</span> <span class="p">)</span>
   <span class="nx">java</span><span class="p">.</span><span class="nx">classpath</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/clj&#39;</span> <span class="p">)</span>
 
-<span class="nv">ClojureScript.initClojureCompiler = </span><span class="o">-&gt;</span>
+<span class="nv">ClojureScript.initClojureCompiler = </span><span class="nf">(javaOptions = ClojureScript.javaOptions) -&gt;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">@java</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">@initJava</span> <span class="nx">javaOptions</span>
   <span class="vi">@StringReader = </span><span class="nv">StringReader = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;java.io.StringReader&#39;</span>
   <span class="vi">@ClojureCompiler = </span><span class="nv">ClojureCompiler = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">import</span> <span class="s">&#39;clojure.lang.Compiler&#39;</span>
 
@@ -30,7 +31,16 @@
   <span class="nv">ncljscSR = </span><span class="k">new</span> <span class="nx">StringReader</span> <span class="nx">ncljsc</span>
   <span class="nx">ClojureCompiler</span><span class="p">.</span><span class="nx">loadSync</span> <span class="nx">ncljscSR</span>
 
-  <span class="vi">@build.clojureBuild = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
+  <span class="vi">@clojureAddClassPath = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;pom-add-classpath&#39;</span>
+
+  <span class="vi">@addClassPath = </span><span class="nf">(cp) -&gt;</span>
+    <span class="nx">@clojureAddClassPath</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">cp</span>
+
+  <span class="vi">@clojureBuild = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
+
+<span class="nv">ClojureScript.addClassPath = </span><span class="nf">(cp) -&gt;</span>
+  <span class="nx">@initClojureCompiler</span><span class="p">()</span>
+  <span class="nx">@addClassPath</span> <span class="nx">cp</span>
 
 <span class="nv">ClojureScript.defaultOptions = </span><span class="s">&quot;{:optimizations :simple :target :nodejs :pretty-print false}&quot;</span>
 <span class="nv">ClojureScript.options = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultOptions</span>
@@ -39,14 +49,20 @@
 <span class="nx">fs</span><span class="p">.</span><span class="nx">mkdirSync</span> <span class="p">(</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">path</span> <span class="o">+</span> <span class="s">&#39;/cljs&#39;</span> <span class="p">)</span>
 
 <span class="nv">pathCompiledCoreJS = </span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out/cljs/core.js&#39;</span>
+<span class="nv">compiledCoreJS = </span><span class="s">&#39;&#39;</span>
+<span class="nv">ClojureScript.compiledCoreJS = </span><span class="o">-&gt;</span> <span class="nx">compiledCoreJS</span>
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledCoreJS</span> <span class="p">)</span>
-  <span class="nv">ClojureScript.compiledCoreJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledCoreJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="p">(</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">path</span> <span class="o">+</span> <span class="s">&#39;/cljs/core.js&#39;</span> <span class="p">),</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledCoreJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nv">compiledCoreJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledCoreJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nv">ClojureScript.compiledCoreJS = </span><span class="o">-&gt;</span> <span class="nx">compiledCoreJS</span>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="p">(</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">path</span> <span class="o">+</span> <span class="s">&#39;/cljs/core.js&#39;</span> <span class="p">),</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledCoreJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
 
 <span class="nv">pathCompiledNodejsJS = </span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out/cljs/nodejs.js&#39;</span>
+<span class="nv">compiledNodejsJS = </span><span class="s">&#39;&#39;</span>
+<span class="nv">ClojureScript.compiledNodejsJS = </span><span class="o">-&gt;</span> <span class="nx">compiledNodejsJS</span>
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledNodejsJS</span> <span class="p">)</span>
-  <span class="nv">ClojureScript.compiledNodejsJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledNodejsJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="p">(</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">path</span> <span class="o">+</span> <span class="s">&#39;/cljs/nodejs.js&#39;</span> <span class="p">),</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledNodejsJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nv">compiledNodejsJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledNodejsJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nv">ClojureScript.compiledNodejsJS = </span><span class="o">-&gt;</span> <span class="nx">compiledNodejsJS</span>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="p">(</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">path</span> <span class="o">+</span> <span class="s">&#39;/cljs/nodejs.js&#39;</span> <span class="p">),</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledNodejsJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
 
 <span class="nv">ClojureScript.tmpOut = </span><span class="nf">(options) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :tmp-out \&quot;</span><span class="si">#{</span> <span class="nx">@tmp</span><span class="p">.</span><span class="nx">path</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
 <span class="nv">ClojureScript.addBuildClasspath = </span><span class="nf">(options, cp) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :add-classpath \&quot;</span><span class="si">#{</span> <span class="nx">cp</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
@@ -70,7 +86,7 @@
 
   <span class="nv">options = </span><span class="nx">@addBuildClasspath</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cp</span>
 
-  <span class="nx">@build</span><span class="p">.</span><span class="nx">clojureBuild</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
+  <span class="nx">@clojureBuild</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
