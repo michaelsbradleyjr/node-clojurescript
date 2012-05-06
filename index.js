@@ -26,56 +26,89 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, VERSION, addCp, build, exports, fs, java, path, tmpDir, tmpOut;
+  var ClojureScript, exports, fs, path, pathCompiledCoreJS, pathCompiledNodejsJS;
   
   fs = require('fs');
   
   path = require('path');
   
-  java = require('java');
-  
-  tmpDir = require('temporary/lib/dir');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/clojure.jar');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/compiler.jar');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/goog.jar');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/js.jar');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/src/clj');
-  
-  java.classpath.push(__dirname + '/support/clojure-clojurescript/src/cljs');
-  
-  java.classpath.push(__dirname + '/support/clj');
-  
   ClojureScript = {};
   
-  ClojureScript.VERSION = VERSION = '0.0.0-7-pre';
+  ClojureScript.VERSION = '0.0.0-7-pre';
   
-  ClojureScript.java = java;
+  ClojureScript.Tempdir = require('temporary/lib/dir');
+  
+  ClojureScript.defaultJavaOptions = "";
+  
+  ClojureScript.javaOptions = ClojureScript.defaultJavaOptions;
+  
+  ClojureScript.initJava = function(options) {
+    var java;
+    this.java = java = require('java');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/clojure.jar');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/compiler.jar');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/goog.jar');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/js.jar');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/src/clj');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/src/cljs');
+    return java.classpath.push(__dirname + '/support/clj');
+  };
+  
+  ClojureScript.initClojureCompiler = function() {
+    var ClojureCompiler, StringReader, ncljsc, ncljscSR;
+    this.StringReader = StringReader = this.java["import"]('java.io.StringReader');
+    this.ClojureCompiler = ClojureCompiler = this.java["import"]('clojure.lang.Compiler');
+    ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
+    ncljscSR = new StringReader(ncljsc);
+    ClojureCompiler.loadSync(ncljscSR);
+    return this.build.clojureBuild = this.java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
+  };
   
   ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}";
   
   ClojureScript.options = ClojureScript.defaultOptions;
   
-  ClojureScript.tmpDir = new tmpDir;
+  ClojureScript.tmp = new ClojureScript.Tempdir;
   
-  tmpOut = function(options) {
-    return options.slice(0, options.length - 1) + (" :tmp-out \"" + ClojureScript.tmpDir.path + "\"}");
+  fs.mkdirSync(ClojureScript.tmp.path + '/cljs');
+  
+  pathCompiledCoreJS = __dirname + '/support/out/cljs/core.js';
+  
+  if (path.existsSync(pathCompiledCoreJS)) {
+    ClojureScript.compiledCoreJS = fs.readFileSync(pathCompiledCoreJS, 'utf8');
+    fs.writeFileSync(ClojureScript.tmp.path + '/cljs/core.js', ClojureScript.compiledCoreJS, 'utf8');
+  }
+  
+  pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js';
+  
+  if (path.existsSync(pathCompiledNodejsJS)) {
+    ClojureScript.compiledNodejsJS = fs.readFileSync(pathCompiledNodejsJS, 'utf8');
+    fs.writeFileSync(ClojureScript.tmp.path + '/cljs/nodejs.js', ClojureScript.compiledNodejsJS, 'utf8');
+  }
+  
+  ClojureScript.tmpOut = function(options) {
+    return options.slice(0, options.length - 1) + (" :tmp-out \"" + this.tmp.path + "\"}");
   };
   
-  addCp = function(options, cp) {
+  ClojureScript.addBuildClasspath = function(options, cp) {
     return options.slice(0, options.length - 1) + (" :add-classpath \"" + cp + "\"}");
   };
   
-  ClojureScript.build = build = function(target, options) {
-    var ClojureCompiler, StringReader, cp, ncljsc, ncljscSR, resolved, stats;
+  ClojureScript.build = function(target, options, javaOptions) {
+    var cp, resolved, stats;
     if (options == null) {
       options = ClojureScript.options;
     }
-    options = tmpOut(options);
+    if (javaOptions == null) {
+      javaOptions = ClojureScript.javaOptions;
+    }
+    if (!this.java) {
+      this.initJava(javaOptions);
+    }
+    if (!this.ClojureCompiler) {
+      this.initClojureCompiler();
+    }
+    options = this.tmpOut(options);
     resolved = path.resolve(path.normalize(target));
     if (!(path.existsSync(resolved))) {
       throw new Error('target path must exist');
@@ -88,23 +121,14 @@
     } else {
       throw new Error('target path must be a file or a directory');
     }
-    options = addCp(options, cp);
-    if (!build.calledPreviously) {
-      StringReader = java["import"]('java.io.StringReader');
-      ClojureCompiler = java["import"]('clojure.lang.Compiler');
-      ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
-      ncljscSR = new StringReader(ncljsc);
-      ClojureCompiler.loadSync(ncljscSR);
-      build.clojureBuild = java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
-      build.calledPreviously = true;
-    }
-    return build.clojureBuild.invokeSync(target, options);
+    options = this.addBuildClasspath(options, cp);
+    return this.build.clojureBuild.invokeSync(target, options);
   };
   
   if (require.extensions) {
     require.extensions['.cljs'] = function(module, filename) {
       var content;
-      content = build(filename);
+      content = ClojureScript.build(filename);
       return module._compile(content, filename);
     };
   }
