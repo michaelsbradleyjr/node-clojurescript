@@ -52,6 +52,8 @@
   
   java.classpath.push(__dirname + '/support/cljs');
   
+  java.classpath.push(process.cwd());
+  
   StringReader = java["import"]('java.io.StringReader');
   
   Compiler = java["import"]('clojure.lang.Compiler');
