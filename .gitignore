@@ -12,5 +12,4 @@ node_modules/
 support/clojure-clojurescript/
 
 npm-debug.log
-support/clj/pomegranate-0.0.12.jar
 support/nodejuice/symlinks/node

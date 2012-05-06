@@ -1,3 +1,10 @@
+;   Copyright (c) 2011-2012 Chas Emerick and all other contributors.
+;   Licensed under the EPL. (See the file epl-v10.html.)
+
+;   Modified by Michael Bradley, Jr.
+;     as part of an attempt to better support ClojureScript modules
+;     within the NodeJS runtime
+
 (ns pomegranate
   (:import (clojure.lang DynamicClassLoader)
            (java.net URL URLClassLoader))
