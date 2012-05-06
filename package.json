@@ -3,8 +3,8 @@
   "name": "clojure-script",
   "description": "experimental NodeJS-require support for ClojureScript modules",
   "licenses": [{
-    "type": "MIT",
-    "url": "http://michaelsbradleyjr.github.com/node-clojurescript/LICENSE.txt"
+    "type": "EPL",
+    "url": "http://michaelsbradleyjr.github.com/node-clojurescript/licenses/epl-v10.html"
   }],
   "keywords": [
     "clojure",
