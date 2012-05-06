@@ -27,7 +27,7 @@ ClojureScript.tmpDir = new tmpDir
 
 tmpOut = -> " :tmp-out \"#{ ClojureScript.tmpDir.path }\" }"
 
-ClojureScript.compile = compile = (target, options = ClojureScript.options) ->
+ClojureScript.build = build = (target, options = ClojureScript.options) ->
   options = ( options[0...( options.length - 1 )] + tmpOut() )
 
   resolved = path.resolve ( path.normalize target )
@@ -40,14 +40,19 @@ ClojureScript.compile = compile = (target, options = ClojureScript.options) ->
     cp = path.dirname resolved
   else
     throw new Error 'target path must be a file or a directory'
-  java.classpath.push cp
+  if ( ( java.classpath.indexOf cp ) is -1 )
+    java.classpath.push cp
 
-  StringReader = java.import 'java.io.StringReader'
-  Compiler     = java.import 'clojure.lang.Compiler'
+  if ( not build.calledPreviously )
+    StringReader        = java.import 'java.io.StringReader'
+    ClojureCompiler     = java.import 'clojure.lang.Compiler'
 
-  ncljsc = fs.readFileSync ( __dirname + '/support/clj/ncljsc.clj' ), 'utf8'
-  ncljscSR = new StringReader ncljsc
-  Compiler.loadSync ncljscSR
+    ncljsc = fs.readFileSync ( __dirname + '/support/clj/ncljsc.clj' ), 'utf8'
+    ncljscSR = new StringReader ncljsc
+    ClojureCompiler.loadSync ncljscSR
 
-  build = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
-  build.invokeSync target, options
+    build.clojureBuild = java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
+
+    build.calledPreviously = true
+
+  build.clojureBuild.invokeSync target, options

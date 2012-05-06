@@ -10,6 +10,7 @@ fuse*
 docs_lib/
 node_modules/
 support/clojure-clojurescript/
-support/nodejuice/symlinks/node
 
 npm-debug.log
+support/clj/pomegranate-0.0.12.jar
+support/nodejuice/symlinks/node

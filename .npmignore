@@ -23,4 +23,5 @@ Cakefile
 manifest.coffee
 nodejuice.js
 npm-debug.log
+support/clj/pomegranate-0.0.12.jar
 TODO.txt
