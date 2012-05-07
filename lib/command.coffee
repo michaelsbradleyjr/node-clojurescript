@@ -21,22 +21,23 @@ BANNER = '''
 
 # The list of all the valid option flags that `ncljsc` knows how to handle.
 SWITCHES = [
-  ['-b', '--bare',            'compile without a top-level function wrapper']
-  ['-c', '--compile',         'compile to JavaScript and save as .js files']
-  ['-e', '--eval',            'pass a string from the command line as input']
-  ['-h', '--help',            'display this help message']
-  ['-i', '--interactive',     'run an interactive ClojureScript REPL']
-  ['-j', '--join [FILE]',     'concatenate the source ClojureScript before compiling']
-  ['-l', '--lint',            'pipe the compiled JavaScript through JavaScript Lint']
-  ['-n', '--nodes',           'print out the parse tree that the parser produces']
-  [      '--nodejs [ARGS]',   'pass options directly to the "node" binary']
-  ['-o', '--output [DIR]',    'set the output directory for compiled JavaScript']
-  ['-p', '--print',           'print out the compiled JavaScript']
-  ['-r', '--require [FILE*]', 'require a library before executing your script']
-  ['-s', '--stdio',           'listen for and compile scripts over stdio']
-  ['-t', '--tokens',          'print out the tokens that the lexer/rewriter produce']
-  ['-v', '--version',         'display the version number']
-  ['-w', '--watch',           'watch scripts for changes and rerun commands']
+  ['-b', '--bare',              'compile without a top-level function wrapper']
+  ['-c', '--compile',           'compile to JavaScript and save as .js files']
+  ['-e', '--eval',              'pass a string from the command line as input']
+  ['-h', '--help',              'display this help message']
+  ['-i', '--interactive',       'run an interactive ClojureScript REPL']
+  ['-j', '--join [FILE]',       'concatenate the source ClojureScript before compiling']
+  ['-l', '--lint',              'pipe the compiled JavaScript through JavaScript Lint']
+  ['-n', '--nodes',             'print out the parse tree that the parser produces']
+  [      '--nodejs [ARGS]',     'pass options directly to the "node" binary']
+  ['-o', '--output [DIR]',      'set the output directory for compiled JavaScript']
+  ['-O', '--options [HASHMAP]', 'pass options directly to the ClojureScript compiler']
+  ['-p', '--print',             'print out the compiled JavaScript']
+  ['-r', '--require [FILE*]',   'require a library before executing your script']
+  ['-s', '--stdio',             'listen for and compile scripts over stdio']
+  ['-t', '--tokens',            'print out the tokens that the lexer/rewriter produce']
+  ['-v', '--version',           'display the version number']
+  ['-w', '--watch',             'watch scripts for changes and rerun commands']
 ]
 
 # Top-level objects shared by all the functions.
@@ -327,4 +328,4 @@ usage = ->
 
 # Print the `--version` message and exit.
 version = ->
-  printLine "clojure-script version #{ClojureScript.VERSION}"
+  printLine "ncljsc version #{ClojureScript.VERSION}"
