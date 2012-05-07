@@ -53,6 +53,7 @@ ClojureScript.compiledCoreJS = -> compiledCoreJS
 if ( path.existsSync pathCompiledCoreJS )
   compiledCoreJS = fs.readFileSync pathCompiledCoreJS, 'utf8'
   ClojureScript.compiledCoreJS = -> compiledCoreJS
+  ClojureScript.compiledCoreJS.exists = true
 
 pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js'
 compiledNodejsJS = ''
@@ -60,6 +61,7 @@ ClojureScript.compiledNodejsJS = -> compiledNodejsJS
 if ( path.existsSync pathCompiledNodejsJS )
   compiledNodejsJS = fs.readFileSync pathCompiledNodejsJS, 'utf8'
   ClojureScript.compiledNodejsJS = -> compiledNodejsJS
+  ClojureScript.compiledNodejsJS.exists = true
 
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
 ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
@@ -101,12 +103,12 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
   if ( not ( path.existsSync outcljs ) )
     fs.mkdirSync outcljs
 
-  if @compiledCoreJS
+  if @compiledCoreJS.exists
     outcljscore = outcljs + '/core.js'
     if ( not ( path.existsSync outcljscore ) )
       fs.writeFileSync outcljscore, ClojureScript.compiledCoreJS(), 'utf8'
 
-  if @compiledNodejsJS
+  if @compiledNodejsJS.exists
     outcljsnodejs = outcljs + '/nodejs.js'
     if ( not ( path.existsSync outcljsnodejs ) )
       fs.writeFileSync outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8'

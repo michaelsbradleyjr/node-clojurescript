@@ -19,5 +19,8 @@
 (def interval (js* "setInterval"))
 (def clear-interval (js* "clearInterval"))
 
+; Have ClojureScript print using Node's process.stdout.write function
+(set! cljs.core/string-print (.-write (.-stdout process)))
+
 ; Have ClojureScript print using Node's console.log function
-(set! cljs.core/string-print (.-log console))
+; (set! cljs.core/string-print (.-log console))

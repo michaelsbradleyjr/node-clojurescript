@@ -98,6 +98,7 @@
     ClojureScript.compiledCoreJS = function() {
       return compiledCoreJS;
     };
+    ClojureScript.compiledCoreJS.exists = true;
   }
   
   pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js';
@@ -113,6 +114,7 @@
     ClojureScript.compiledNodejsJS = function() {
       return compiledNodejsJS;
     };
+    ClojureScript.compiledNodejsJS.exists = true;
   }
   
   ClojureScript.tmpOut = function(options) {
@@ -168,13 +170,13 @@
     if (!(path.existsSync(outcljs))) {
       fs.mkdirSync(outcljs);
     }
-    if (this.compiledCoreJS) {
+    if (this.compiledCoreJS.exists) {
       outcljscore = outcljs + '/core.js';
       if (!(path.existsSync(outcljscore))) {
         fs.writeFileSync(outcljscore, ClojureScript.compiledCoreJS(), 'utf8');
       }
     }
-    if (this.compiledNodejsJS) {
+    if (this.compiledNodejsJS.exists) {
       outcljsnodejs = outcljs + '/nodejs.js';
       if (!(path.existsSync(outcljsnodejs))) {
         fs.writeFileSync(outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8');

@@ -53,6 +53,7 @@
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledCoreJS</span> <span class="p">)</span>
   <span class="nv">compiledCoreJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledCoreJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
   <span class="nv">ClojureScript.compiledCoreJS = </span><span class="o">-&gt;</span> <span class="nx">compiledCoreJS</span>
+  <span class="nv">ClojureScript.compiledCoreJS.exists = </span><span class="kc">true</span>
 
 <span class="nv">pathCompiledNodejsJS = </span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out/cljs/nodejs.js&#39;</span>
 <span class="nv">compiledNodejsJS = </span><span class="s">&#39;&#39;</span>
@@ -60,6 +61,7 @@
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledNodejsJS</span> <span class="p">)</span>
   <span class="nv">compiledNodejsJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledNodejsJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
   <span class="nv">ClojureScript.compiledNodejsJS = </span><span class="o">-&gt;</span> <span class="nx">compiledNodejsJS</span>
+  <span class="nv">ClojureScript.compiledNodejsJS.exists = </span><span class="kc">true</span>
 
 <span class="nv">ClojureScript.tmpOut = </span><span class="nf">(options) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :tmp-out \&quot;</span><span class="si">#{</span> <span class="nx">@tmp</span><span class="p">.</span><span class="nx">path</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
 <span class="nv">ClojureScript.addBuildClasspath = </span><span class="nf">(options, cp) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :add-classpath \&quot;</span><span class="si">#{</span> <span class="nx">cp</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
@@ -101,12 +103,12 @@
   <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outcljs</span> <span class="p">)</span> <span class="p">)</span>
     <span class="nx">fs</span><span class="p">.</span><span class="nx">mkdirSync</span> <span class="nx">outcljs</span>
 
-  <span class="k">if</span> <span class="nx">@compiledCoreJS</span>
+  <span class="k">if</span> <span class="nx">@compiledCoreJS</span><span class="p">.</span><span class="nx">exists</span>
     <span class="nv">outcljscore = </span><span class="nx">outcljs</span> <span class="o">+</span> <span class="s">&#39;/core.js&#39;</span>
     <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outcljscore</span> <span class="p">)</span> <span class="p">)</span>
       <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljscore</span><span class="p">,</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledCoreJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
 
-  <span class="k">if</span> <span class="nx">@compiledNodejsJS</span>
+  <span class="k">if</span> <span class="nx">@compiledNodejsJS</span><span class="p">.</span><span class="nx">exists</span>
     <span class="nv">outcljsnodejs = </span><span class="nx">outcljs</span> <span class="o">+</span> <span class="s">&#39;/nodejs.js&#39;</span>
     <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outcljsnodejs</span> <span class="p">)</span> <span class="p">)</span>
       <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljsnodejs</span><span class="p">,</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledNodejsJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
