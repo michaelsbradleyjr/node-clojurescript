@@ -24,9 +24,9 @@
 /*//////////////////////////////////////////////////////////////////////
 
 
-;(function (exports, undefined) {
+;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printTokens, printWarn, readline, removeSource, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printTokens, printWarn, readline, removeSource, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -845,13 +845,8 @@
     return printLine("clojure-script version " + ClojureScript.VERSION);
   };
   
-  if ((typeof exports !== "undefined" && exports !== null)) {
-    if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
-      exports = module.exports = ClojureScript;
-    }
-    exports.ClojureScript = ClojureScript;
-  } else {
-    this['ClojureScript'] = ClojureScript;
-  }
+  module.exports = ClojureScript;
   
-}).call(this, (exports ? exports : undefined));
+  exports.ClojureScript = ClojureScript;
+  
+}).call(this);
