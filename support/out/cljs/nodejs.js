@@ -13,4 +13,4 @@ cljs.nodejs.timeout = setTimeout;
 cljs.nodejs.clear_timeout = clearTimeout;
 cljs.nodejs.interval = setInterval;
 cljs.nodejs.clear_interval = clearInterval;
-cljs.core.string_print = cljs.nodejs.process.stdout.write;
+cljs.core.string_print = cljs.nodejs.process.stdout.write.bind(cljs.nodejs.process.stdout);
