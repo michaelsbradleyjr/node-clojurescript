@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -410,7 +410,7 @@
       loadRequires();
     }
     if (opts.interactive) {
-      return require('./repl');
+      return repl.prompt();
     }
     if (opts.watch && !fs.watch) {
       return printWarn("The --watch feature depends on Node v0.6.0+. You are running " + process.version + ".");
@@ -824,6 +824,12 @@
   
   version = function() {
     return printLine("ncljsc version " + ClojureScript.VERSION);
+  };
+  
+  repl = {
+    prompt: function() {
+      return printLine('ncljsc REPL not yet implemented');
+    }
   };
   
   exports = module.exports = ClojureScript;

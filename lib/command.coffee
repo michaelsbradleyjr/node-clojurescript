@@ -55,7 +55,7 @@ ClojureScript.commandRun = ->
   return usage()                         if opts.help
   return version()                       if opts.version
   loadRequires()                         if opts.require
-  return require './repl'                if opts.interactive
+  return repl.prompt()                   if opts.interactive
   if opts.watch and !fs.watch
     return printWarn "The --watch feature depends on Node v0.6.0+. You are running #{process.version}."
   return compileStdio()                  if opts.stdio
