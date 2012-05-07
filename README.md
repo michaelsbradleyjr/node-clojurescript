@@ -2,12 +2,12 @@
 
 # node-clojurescript
 
-An experiment.
+This project is in an experimental state.
 
 
 ## Description
 
-[node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) provides experimental [NodeJS](http://nodejs.org/) `require` support for [ClojureScript](https://github.com/clojure/clojurescript) modules.
+[node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) aims to provide seamless integration between [NodeJS](http://nodejs.org/) and [ClojureScript](https://github.com/clojure/clojurescript).
 
 
 ## Credit

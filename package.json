@@ -1,7 +1,7 @@
 {
   "author": "Michael Bradley, Jr. <michaelsbradleyjr@gmail.com> (https://github.com/michaelsbradleyjr)",
   "name": "clojure-script",
-  "description": "experimental NodeJS-require support for ClojureScript modules",
+  "description": "seamless integration between NodeJS and ClojureScript",
   "licenses": [{
     "type": "EPL",
     "url": "http://michaelsbradleyjr.github.com/node-clojurescript/licenses/epl-v10.html"
@@ -12,7 +12,7 @@
     "clojure-script",
     "java"
   ],
-  "version": "0.0.0-7-pre",
+  "version": "0.0.0-7",
   "homepage": "http://michaelsbradleyjr.github.com/node-clojurescript",
   "repository": {
     "type": "git",
