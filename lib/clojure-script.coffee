@@ -13,7 +13,7 @@ vm             = require 'vm'
 
 ClojureScript = {}
 
-ClojureScript.VERSION = '0.0.0-7'
+ClojureScript.VERSION = '0.0.0-8-pre'
 
 ClojureScript.Tempdir = require 'temporary/lib/dir'
 
