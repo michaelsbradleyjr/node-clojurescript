@@ -26,7 +26,7 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, EventEmitter, Module, Script, compiledCoreJS, compiledNodejsJS, exec, exports, fs, inspect, path, pathCompiledCoreJS, pathCompiledNodejsJS, readline, spawn, vm, _ref;
+  var CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, Script, buildRuleCliOpt, buildRulesCliOpt, compiledCoreJS, compiledNodejsJS, exec, exports, extend, fs, inspect, normalizeArgumentsCliOpt, path, pathCompiledCoreJS, pathCompiledNodejsJS, readline, spawn, vm, _ref;
   
   fs = require('fs');
   
@@ -212,6 +212,15 @@
     return this.clojureBuild.invokeSync(target, options);
   };
   
+  ClojureScript.extend = extend = function(object, properties) {
+    var key, val;
+    for (key in properties) {
+      val = properties[key];
+      object[key] = val;
+    }
+    return object;
+  };
+  
   if (require.extensions) {
     require.extensions['.cljs'] = function(module, filename) {
       var content;
@@ -219,6 +228,141 @@
       return module._compile(content, filename);
     };
   }
+  
+  ClojureScript.CliOptionParser = CliOptionParser = (function() {
+  
+    CliOptionParser.name = 'CliOptionParser';
+  
+    function CliOptionParser(rules, banner) {
+      this.banner = banner;
+      this.rules = buildRulesCliOpt(rules);
+    }
+  
+    CliOptionParser.prototype.parse = function(args) {
+      var arg, i, isOption, matchedRule, options, originalArgs, pos, rule, seenNonOptionArg, skippingArgument, value, _i, _j, _len, _len1, _ref1;
+      options = {
+        "arguments": []
+      };
+      skippingArgument = false;
+      originalArgs = args;
+      args = normalizeArgumentsCliOpt(args);
+      for (i = _i = 0, _len = args.length; _i < _len; i = ++_i) {
+        arg = args[i];
+        if (skippingArgument) {
+          skippingArgument = false;
+          continue;
+        }
+        if (arg === '--') {
+          pos = originalArgs.indexOf('--');
+          options["arguments"] = options["arguments"].concat(originalArgs.slice(pos + 1));
+          break;
+        }
+        isOption = !!(arg.match(LONG_FLAG) || arg.match(SHORT_FLAG));
+        seenNonOptionArg = options["arguments"].length > 0;
+        if (!seenNonOptionArg) {
+          matchedRule = false;
+          _ref1 = this.rules;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            rule = _ref1[_j];
+            if (rule.shortFlag === arg || rule.longFlag === arg) {
+              value = true;
+              if (rule.hasArgument) {
+                skippingArgument = true;
+                value = args[i + 1];
+              }
+              options[rule.name] = rule.isList ? (options[rule.name] || []).concat(value) : value;
+              matchedRule = true;
+              break;
+            }
+          }
+          if (isOption && !matchedRule) {
+            throw new Error("unrecognized option: " + arg);
+          }
+        }
+        if (seenNonOptionArg || !isOption) {
+          options["arguments"].push(arg);
+        }
+      }
+      return options;
+    };
+  
+    CliOptionParser.prototype.help = function() {
+      var letPart, lines, rule, spaces, _i, _len, _ref1;
+      lines = [];
+      if (this.banner) {
+        lines.unshift("" + this.banner + "\n");
+      }
+      _ref1 = this.rules;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        rule = _ref1[_i];
+        spaces = 15 - rule.longFlag.length;
+        spaces = spaces > 0 ? Array(spaces + 1).join(' ') : '';
+        letPart = rule.shortFlag ? rule.shortFlag + ', ' : '    ';
+        lines.push('  ' + letPart + rule.longFlag + spaces + rule.description);
+      }
+      return "\n" + (lines.join('\n')) + "\n";
+    };
+  
+    return CliOptionParser;
+  
+  })();
+  
+  LONG_FLAG = /^(--\w[\w\-]*)/;
+  
+  SHORT_FLAG = /^(-\w)$/;
+  
+  MULTI_FLAG = /^-(\w{2,})/;
+  
+  OPTIONAL = /\[(\w+(\*?))\]/;
+  
+  buildRulesCliOpt = function(rules) {
+    var tuple, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = rules.length; _i < _len; _i++) {
+      tuple = rules[_i];
+      if (tuple.length < 3) {
+        tuple.unshift(null);
+      }
+      _results.push(buildRuleCliOpt.apply(null, tuple));
+    }
+    return _results;
+  };
+  
+  buildRuleCliOpt = function(shortFlag, longFlag, description, options) {
+    var match;
+    if (options == null) {
+      options = {};
+    }
+    match = longFlag.match(OPTIONAL);
+    longFlag = longFlag.match(LONG_FLAG)[1];
+    return {
+      name: longFlag.substr(2),
+      shortFlag: shortFlag,
+      longFlag: longFlag,
+      description: description,
+      hasArgument: !!(match && match[1]),
+      isList: !!(match && match[2])
+    };
+  };
+  
+  normalizeArgumentsCliOpt = function(args) {
+    var arg, l, match, result, _i, _j, _len, _len1, _ref1;
+    args = args.slice(0);
+    result = [];
+    for (_i = 0, _len = args.length; _i < _len; _i++) {
+      arg = args[_i];
+      if (match = arg.match(MULTI_FLAG)) {
+        _ref1 = match[1].split('');
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          l = _ref1[_j];
+          result.push('-' + l);
+        }
+      } else {
+        result.push(arg);
+      }
+    }
+    return result;
+  };
   
   if ((typeof exports !== "undefined" && exports !== null)) {
     if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
