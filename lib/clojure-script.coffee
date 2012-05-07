@@ -1,7 +1,7 @@
 ` // TOP `
 
-fs     = require 'fs'
-path   = require 'path'
+fs   = require 'fs'
+path = require 'path'
 
 ClojureScript = {}
 
@@ -9,7 +9,7 @@ ClojureScript.VERSION = '0.0.0-7-pre'
 
 ClojureScript.Tempdir = require 'temporary/lib/dir'
 
-ClojureScript.defaultJavaOptions = ""
+ClojureScript.defaultJavaOptions = ''
 ClojureScript.javaOptions = ClojureScript.defaultJavaOptions
 
 ClojureScript.initJava = (options) ->
@@ -42,7 +42,7 @@ ClojureScript.addClassPath = (cp) ->
   @initClojureCompiler()
   @addClassPath cp
 
-ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}"
+ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
 ClojureScript.options = ClojureScript.defaultOptions
 
 ClojureScript.tmp = new ClojureScript.Tempdir

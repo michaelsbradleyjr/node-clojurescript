@@ -38,7 +38,7 @@
   
   ClojureScript.Tempdir = require('temporary/lib/dir');
   
-  ClojureScript.defaultJavaOptions = "";
+  ClojureScript.defaultJavaOptions = '';
   
   ClojureScript.javaOptions = ClojureScript.defaultJavaOptions;
   
@@ -79,7 +79,7 @@
     return this.addClassPath(cp);
   };
   
-  ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-print false}";
+  ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}';
   
   ClojureScript.options = ClojureScript.defaultOptions;
   
