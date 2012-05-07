@@ -85,8 +85,6 @@
   
   ClojureScript.tmp = new ClojureScript.Tempdir;
   
-  fs.mkdirSync(ClojureScript.tmp.path + '/cljs');
-  
   pathCompiledCoreJS = __dirname + '/support/out/cljs/core.js';
   
   compiledCoreJS = '';
@@ -100,7 +98,6 @@
     ClojureScript.compiledCoreJS = function() {
       return compiledCoreJS;
     };
-    fs.writeFileSync(ClojureScript.tmp.path + '/cljs/core.js', ClojureScript.compiledCoreJS(), 'utf8');
   }
   
   pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js';
@@ -116,7 +113,6 @@
     ClojureScript.compiledNodejsJS = function() {
       return compiledNodejsJS;
     };
-    fs.writeFileSync(ClojureScript.tmp.path + '/cljs/nodejs.js', ClojureScript.compiledNodejsJS(), 'utf8');
   }
   
   ClojureScript.tmpOut = function(options) {
@@ -128,7 +124,7 @@
   };
   
   ClojureScript.build = function(target, options, javaOptions) {
-    var cp, resolved, stats;
+    var cp, outcljs, outcljscore, outcljsnodejs, outputdir, resolved, stats;
     if (options == null) {
       options = ClojureScript.options;
     }
@@ -141,7 +137,48 @@
     if (!this.ClojureCompiler) {
       this.initClojureCompiler();
     }
-    options = this.tmpOut(options);
+    if (options !== ClojureScript.options) {
+      options = options.match(/^\s*(\{.*\})\s*$/);
+      if (!options) {
+        throw new Error('malformed options string');
+      } else {
+        options = options[1];
+      }
+      if ((options.match(/\:output-dir\s*\'.*\'/)) || (options.match(/\:output-dir\s*[^\'\"]*(\:|(\}$))/)) || (options.match(/\:output-dir\s*\'[^\']*(\:|(\}$))/)) || (options.match(/\:output-dir\s*\"[^\"]*(\:|(\}$))/)) || (options.match(/\:output-dir\s*[^\']*\'\s*(\:|(\}$))/)) || (options.match(/\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/))) {
+        throw new Error('path specified as :output-dir must be wrapped in double-quotes');
+      }
+      outputdir = options.match(/\:output-dir\s*(\".*\")/);
+    }
+    if (outputdir != null) {
+      outputdir = outputdir[1];
+      outputdir = outputdir.slice(1, outputdir.length - 1);
+      outputdir = path.resolve(path.normalize(outputdir));
+      if (!path.existsSync(outputdir)) {
+        throw new Error('path specified as :output-dir must exist');
+      }
+      if (!(fs.statSync(outputdir)).isDirectory()) {
+        throw new Error('path specified as :output-dir must be a directory');
+      }
+    } else {
+      outputdir = this.tmp.path;
+      options = this.tmpOut(options);
+    }
+    outcljs = outputdir + '/cljs';
+    if (!(path.existsSync(outcljs))) {
+      fs.mkdirSync(outcljs);
+    }
+    if (this.compiledCoreJS) {
+      outcljscore = outcljs + '/core.js';
+      if (!(path.existsSync(outcljscore))) {
+        fs.writeFileSync(outcljscore, ClojureScript.compiledCoreJS(), 'utf8');
+      }
+    }
+    if (this.compiledNodejsJS) {
+      outcljsnodejs = outcljs + '/nodejs.js';
+      if (!(path.existsSync(outcljsnodejs))) {
+        fs.writeFileSync(outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8');
+      }
+    }
     resolved = path.resolve(path.normalize(target));
     if (!(path.existsSync(resolved))) {
       throw new Error('target path must exist');

@@ -46,7 +46,6 @@ ClojureScript.defaultOptions = "{:optimizations :simple :target :nodejs :pretty-
 ClojureScript.options = ClojureScript.defaultOptions
 
 ClojureScript.tmp = new ClojureScript.Tempdir
-fs.mkdirSync ( ClojureScript.tmp.path + '/cljs' )
 
 pathCompiledCoreJS = __dirname + '/support/out/cljs/core.js'
 compiledCoreJS = ''
@@ -54,7 +53,6 @@ ClojureScript.compiledCoreJS = -> compiledCoreJS
 if ( path.existsSync pathCompiledCoreJS )
   compiledCoreJS = fs.readFileSync pathCompiledCoreJS, 'utf8'
   ClojureScript.compiledCoreJS = -> compiledCoreJS
-  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/core.js' ), ClojureScript.compiledCoreJS(), 'utf8'
 
 pathCompiledNodejsJS = __dirname + '/support/out/cljs/nodejs.js'
 compiledNodejsJS = ''
@@ -62,7 +60,6 @@ ClojureScript.compiledNodejsJS = -> compiledNodejsJS
 if ( path.existsSync pathCompiledNodejsJS )
   compiledNodejsJS = fs.readFileSync pathCompiledNodejsJS, 'utf8'
   ClojureScript.compiledNodejsJS = -> compiledNodejsJS
-  fs.writeFileSync ( ClojureScript.tmp.path + '/cljs/nodejs.js' ), ClojureScript.compiledNodejsJS(), 'utf8'
 
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
 ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
@@ -71,7 +68,48 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
   if ( not @java ) then @initJava javaOptions
   if ( not @ClojureCompiler ) then @initClojureCompiler()
 
-  options = @tmpOut options
+  if ( options isnt ClojureScript.options )
+    options = options.match /^\s*(\{.*\})\s*$/
+    if ( not options )
+      throw new Error 'malformed options string'
+    else
+      options = options[1]
+
+    if ( ( options.match /\:output-dir\s*\'.*\'/ ) or \
+         ( options.match /\:output-dir\s*[^\'\"]*(\:|(\}$))/ ) or \
+         ( options.match /\:output-dir\s*\'[^\']*(\:|(\}$))/ ) or \
+         ( options.match /\:output-dir\s*\"[^\"]*(\:|(\}$))/ ) or \
+         ( options.match /\:output-dir\s*[^\']*\'\s*(\:|(\}$))/ ) or \
+         ( options.match /\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/ ) )
+      throw new Error 'path specified as :output-dir must be wrapped in double-quotes'
+
+    outputdir = options.match /\:output-dir\s*(\".*\")/
+
+  if outputdir?
+    outputdir = outputdir[1]
+    outputdir = outputdir[1...( outputdir.length - 1 )]
+    outputdir = path.resolve ( path.normalize outputdir )
+    if ( not path.existsSync outputdir )
+      throw new Error 'path specified as :output-dir must exist'
+    if ( not ( fs.statSync outputdir ).isDirectory() )
+      throw new Error 'path specified as :output-dir must be a directory'
+  else
+    outputdir = @tmp.path
+    options = @tmpOut options
+
+  outcljs = outputdir + '/cljs'
+  if ( not ( path.existsSync outcljs ) )
+    fs.mkdirSync outcljs
+
+  if @compiledCoreJS
+    outcljscore = outcljs + '/core.js'
+    if ( not ( path.existsSync outcljscore ) )
+      fs.writeFileSync outcljscore, ClojureScript.compiledCoreJS(), 'utf8'
+
+  if @compiledNodejsJS
+    outcljsnodejs = outcljs + '/nodejs.js'
+    if ( not ( path.existsSync outcljsnodejs ) )
+      fs.writeFileSync outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8'
 
   resolved = path.resolve ( path.normalize target )
   if ( not ( path.existsSync resolved ) )
