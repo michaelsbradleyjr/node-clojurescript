@@ -15,8 +15,8 @@ cp ./cljs/nodejs_externs.js ./clojure-clojurescript/src/cljs/cljs/nodejs_externs
 cp ./cljs/nodejscli.cljs ./clojure-clojurescript/src/cljs/cljs/nodejscli.cljs
 cd ./clojure-clojurescript/
 ./script/bootstrap
-echo "Compiling ClojureScript core..."
-./script/compile > /dev/null 2>&1
-echo "Finished!"
+#echo "Compiling ClojureScript core..."
+#./script/compile > /dev/null 2>&1
+echo "postinstall Finished!"
 
 fi
