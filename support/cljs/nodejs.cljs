@@ -18,6 +18,7 @@
 (def clear-timeout (js* "clearTimeout"))
 (def interval (js* "setInterval"))
 (def clear-interval (js* "clearInterval"))
+(def next-tick (.-nextTick process))
 
 ; Have ClojureScript print using Node's process.stdout.write function
 (set! cljs.core/string-print (.bind (.-write (.-stdout process)) (.-stdout process)))
