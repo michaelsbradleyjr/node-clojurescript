@@ -60,7 +60,7 @@ ClojureScript.commandRun = ->
     return printWarn "The --watch feature depends on Node v0.6.0+. You are running #{process.version}."
   return compileStdio()                  if opts.stdio
   return compileScript null, sources[0]  if opts.eval
-  return require './repl'                unless sources.length
+  return repl.prompt()                   unless sources.length
   literals = if opts.run then sources.splice 1 else []
   process.argv = process.argv[0..1].concat literals
   process.argv[0] = 'ncljsc'

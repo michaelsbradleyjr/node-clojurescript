@@ -422,7 +422,7 @@
       return compileScript(null, sources[0]);
     }
     if (!sources.length) {
-      return require('./repl');
+      return repl.prompt();
     }
     literals = opts.run ? sources.splice(1) : [];
     process.argv = process.argv.slice(0, 2).concat(literals);
