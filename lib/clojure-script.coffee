@@ -1,7 +1,15 @@
 ` // TOP `
 
-fs   = require 'fs'
-path = require 'path'
+fs             = require 'fs'
+Module         = require 'module'
+path           = require 'path'
+readline       = require 'readline'
+vm             = require 'vm'
+
+{EventEmitter} = require 'events'
+{inspect}      = require 'util'
+{Script}       = vm
+{spawn, exec}  = require 'child_process'
 
 ClojureScript = {}
 
