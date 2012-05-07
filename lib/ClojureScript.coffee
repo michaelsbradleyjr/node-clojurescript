@@ -84,16 +84,16 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
       throw new Error 'path specified as :output-dir must be wrapped in double-quotes'
 
     outputdir = options.match /\:output-dir\s*(\".*\")/
+    if outputdir
+      outputdir = outputdir[1]
+      outputdir = outputdir[1...( outputdir.length - 1 )]
+      outputdir = path.resolve ( path.normalize outputdir )
+      if ( not path.existsSync outputdir )
+        throw new Error 'path specified as :output-dir must exist'
+      if ( not ( fs.statSync outputdir ).isDirectory() )
+        throw new Error 'path specified as :output-dir must be a directory'
 
-  if outputdir?
-    outputdir = outputdir[1]
-    outputdir = outputdir[1...( outputdir.length - 1 )]
-    outputdir = path.resolve ( path.normalize outputdir )
-    if ( not path.existsSync outputdir )
-      throw new Error 'path specified as :output-dir must exist'
-    if ( not ( fs.statSync outputdir ).isDirectory() )
-      throw new Error 'path specified as :output-dir must be a directory'
-  else
+  if ( not outputdir? )
     outputdir = @tmp.path
     options = @tmpOut options
 

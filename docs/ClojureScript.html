@@ -84,16 +84,16 @@
       <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be wrapped in double-quotes&#39;</span>
 
     <span class="nv">outputdir = </span><span class="nx">options</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/\:output-dir\s*(\&quot;.*\&quot;)/</span>
+    <span class="k">if</span> <span class="nx">outputdir</span>
+      <span class="nv">outputdir = </span><span class="nx">outputdir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="nv">outputdir = </span><span class="nx">outputdir</span><span class="p">[</span><span class="mi">1</span><span class="p">...(</span> <span class="nx">outputdir</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span>
+      <span class="nv">outputdir = </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="nx">outputdir</span> <span class="p">)</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outputdir</span> <span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must exist&#39;</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">statSync</span> <span class="nx">outputdir</span> <span class="p">).</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be a directory&#39;</span>
 
-  <span class="k">if</span> <span class="nx">outputdir</span><span class="o">?</span>
-    <span class="nv">outputdir = </span><span class="nx">outputdir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="nv">outputdir = </span><span class="nx">outputdir</span><span class="p">[</span><span class="mi">1</span><span class="p">...(</span> <span class="nx">outputdir</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span>
-    <span class="nv">outputdir = </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="nx">outputdir</span> <span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outputdir</span> <span class="p">)</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must exist&#39;</span>
-    <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">statSync</span> <span class="nx">outputdir</span> <span class="p">).</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="p">)</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be a directory&#39;</span>
-  <span class="k">else</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">outputdir</span><span class="o">?</span> <span class="p">)</span>
     <span class="nv">outputdir = </span><span class="nx">@tmp</span><span class="p">.</span><span class="nx">path</span>
     <span class="nv">options = </span><span class="nx">@tmpOut</span> <span class="nx">options</span>
 

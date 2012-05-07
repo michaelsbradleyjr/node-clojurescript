@@ -148,18 +148,19 @@
         throw new Error('path specified as :output-dir must be wrapped in double-quotes');
       }
       outputdir = options.match(/\:output-dir\s*(\".*\")/);
+      if (outputdir) {
+        outputdir = outputdir[1];
+        outputdir = outputdir.slice(1, outputdir.length - 1);
+        outputdir = path.resolve(path.normalize(outputdir));
+        if (!path.existsSync(outputdir)) {
+          throw new Error('path specified as :output-dir must exist');
+        }
+        if (!(fs.statSync(outputdir)).isDirectory()) {
+          throw new Error('path specified as :output-dir must be a directory');
+        }
+      }
     }
-    if (outputdir != null) {
-      outputdir = outputdir[1];
-      outputdir = outputdir.slice(1, outputdir.length - 1);
-      outputdir = path.resolve(path.normalize(outputdir));
-      if (!path.existsSync(outputdir)) {
-        throw new Error('path specified as :output-dir must exist');
-      }
-      if (!(fs.statSync(outputdir)).isDirectory()) {
-        throw new Error('path specified as :output-dir must be a directory');
-      }
-    } else {
+    if (!(outputdir != null)) {
       outputdir = this.tmp.path;
       options = this.tmpOut(options);
     }
