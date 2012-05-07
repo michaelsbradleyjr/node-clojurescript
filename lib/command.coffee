@@ -28,14 +28,12 @@ SWITCHES = [
   ['-i', '--interactive',       'run an interactive ClojureScript REPL']
   ['-j', '--join [FILE]',       'concatenate the source ClojureScript before compiling']
   ['-l', '--lint',              'pipe the compiled JavaScript through JavaScript Lint']
-  ['-n', '--nodes',             'print out the parse tree that the parser produces']
-  [      '--nodejs [ARGS]',     'pass options directly to the "node" binary']
+  ['-n', '--nodejs [ARGS]',     'pass options directly to the "node" binary']
   ['-o', '--output [DIR]',      'set the output directory for compiled JavaScript']
   ['-O', '--options [HASHMAP]', 'pass options directly to the ClojureScript compiler']
   ['-p', '--print',             'print out the compiled JavaScript']
   ['-r', '--require [FILE*]',   'require a library before executing your script']
   ['-s', '--stdio',             'listen for and compile scripts over stdio']
-  ['-t', '--tokens',            'print out the tokens that the lexer/rewriter produce']
   ['-v', '--version',           'display the version number']
   ['-w', '--watch',             'watch scripts for changes and rerun commands']
 ]
@@ -115,9 +113,7 @@ compileScript = (file, input, base) ->
   try
     t = task = {file, input, options}
     ClojureScript.emit 'compile', task
-    if      o.tokens      then printTokens ClojureScript.tokens t.input
-    else if o.nodes       then printLine ClojureScript.nodes(t.input).toString().trim()
-    else if o.run         then ClojureScript.run t.input, t.options
+    if             o.run  then ClojureScript.run t.input, t.options
     else if o.join and t.file isnt o.join
       sourceCode[sources.indexOf(t.file)] = t.input
       compileJoin()
@@ -286,13 +282,6 @@ lint = (file, js) ->
   jsl.stderr.on 'data', printIt
   jsl.stdin.write js
   jsl.stdin.end()
-
-# Pretty-print a stream of tokens.
-printTokens = (tokens) ->
-  strings = for token in tokens
-    [tag, value] = [token[0], token[1].toString().replace(/\n/, '\\n')]
-    "[#{tag} #{value}]"
-  printLine strings.join(' ')
 
 # Use [CliOptionParser](optparse.html) to extract all options from
 # `process.argv` that are specified in `SWITCHES`.

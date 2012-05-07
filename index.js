@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printTokens, printWarn, readline, removeSource, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compilePath, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -380,7 +380,7 @@
   
   BANNER = 'Usage: ncljsc [options] path/to/script.cljs -- [args]\n\nIf called without options, `ncljsc` will run your script.';
   
-  SWITCHES = [['-b', '--bare', 'compile without a top-level function wrapper'], ['-c', '--compile', 'compile to JavaScript and save as .js files'], ['-e', '--eval', 'pass a string from the command line as input'], ['-h', '--help', 'display this help message'], ['-i', '--interactive', 'run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', 'concatenate the source ClojureScript before compiling'], ['-l', '--lint', 'pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodes', 'print out the parse tree that the parser produces'], ['--nodejs [ARGS]', 'pass options directly to the "node" binary'], ['-o', '--output [DIR]', 'set the output directory for compiled JavaScript'], ['-O', '--options [HASHMAP]', 'pass options directly to the ClojureScript compiler'], ['-p', '--print', 'print out the compiled JavaScript'], ['-r', '--require [FILE*]', 'require a library before executing your script'], ['-s', '--stdio', 'listen for and compile scripts over stdio'], ['-t', '--tokens', 'print out the tokens that the lexer/rewriter produce'], ['-v', '--version', 'display the version number'], ['-w', '--watch', 'watch scripts for changes and rerun commands']];
+  SWITCHES = [['-b', '--bare', 'compile without a top-level function wrapper'], ['-c', '--compile', 'compile to JavaScript and save as .js files'], ['-e', '--eval', 'pass a string from the command line as input'], ['-h', '--help', 'display this help message'], ['-i', '--interactive', 'run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', 'concatenate the source ClojureScript before compiling'], ['-l', '--lint', 'pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', 'pass options directly to the "node" binary'], ['-o', '--output [DIR]', 'set the output directory for compiled JavaScript'], ['-O', '--options [HASHMAP]', 'pass options directly to the ClojureScript compiler'], ['-p', '--print', 'print out the compiled JavaScript'], ['-r', '--require [FILE*]', 'require a library before executing your script'], ['-s', '--stdio', 'listen for and compile scripts over stdio'], ['-v', '--version', 'display the version number'], ['-w', '--watch', 'watch scripts for changes and rerun commands']];
   
   opts = {};
   
@@ -515,11 +515,7 @@
         options: options
       };
       ClojureScript.emit('compile', task);
-      if (o.tokens) {
-        return printTokens(ClojureScript.tokens(t.input));
-      } else if (o.nodes) {
-        return printLine(ClojureScript.nodes(t.input).toString().trim());
-      } else if (o.run) {
+      if (o.run) {
         return ClojureScript.run(t.input, t.options);
       } else if (o.join && t.file !== o.join) {
         sourceCode[sources.indexOf(t.file)] = t.input;
@@ -786,21 +782,6 @@
     jsl.stderr.on('data', printIt);
     jsl.stdin.write(js);
     return jsl.stdin.end();
-  };
-  
-  printTokens = function(tokens) {
-    var strings, tag, token, value;
-    strings = (function() {
-      var _i, _len, _ref1, _results;
-      _results = [];
-      for (_i = 0, _len = tokens.length; _i < _len; _i++) {
-        token = tokens[_i];
-        _ref1 = [token[0], token[1].toString().replace(/\n/, '\\n')], tag = _ref1[0], value = _ref1[1];
-        _results.push("[" + tag + " " + value + "]");
-      }
-      return _results;
-    })();
-    return printLine(strings.join(' '));
   };
   
   parseOptions = function() {
