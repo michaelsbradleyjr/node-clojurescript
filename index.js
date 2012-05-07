@@ -26,11 +26,25 @@
 
 ;(function (exports, undefined) {
   
-  var ClojureScript, compiledCoreJS, compiledNodejsJS, exports, fs, path, pathCompiledCoreJS, pathCompiledNodejsJS;
+  var ClojureScript, EventEmitter, Module, Script, compiledCoreJS, compiledNodejsJS, exec, exports, fs, inspect, path, pathCompiledCoreJS, pathCompiledNodejsJS, readline, spawn, vm, _ref;
   
   fs = require('fs');
   
+  Module = require('module');
+  
   path = require('path');
+  
+  readline = require('readline');
+  
+  vm = require('vm');
+  
+  EventEmitter = require('events').EventEmitter;
+  
+  inspect = require('util').inspect;
+  
+  Script = vm.Script;
+  
+  _ref = require('child_process'), spawn = _ref.spawn, exec = _ref.exec;
   
   ClojureScript = {};
   
