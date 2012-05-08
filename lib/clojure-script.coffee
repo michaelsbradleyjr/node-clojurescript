@@ -185,8 +185,7 @@ ClojureScript.run = (options = {}, cljscOptions = ClojureScript.options, javaOpt
     else
       'do what?'
 
-  #if path.extname(mainModule.filename) isnt '.cljs' or require.extensions
-  #  mainModule._compile ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename
-  #else
-  #  throw new Error 'run method does not yet support compiling directly from a source string'
-  #  #mainModule._compile code, mainModule.filename
+  # if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
+  #   mainModule._compile compile(code, options), mainModule.filename
+  # else
+  #   mainModule._compile code, mainModule.filename
