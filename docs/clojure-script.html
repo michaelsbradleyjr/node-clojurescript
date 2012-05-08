@@ -141,10 +141,22 @@
   <span class="nx">@clojureBuild</span><span class="p">.</span><span class="nx">invokeSync</span> <span class="nx">o</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">cljsOptions</span>
 
 <span class="nv">ClojureScript.eval = </span><span class="nf">(options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
-  <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&#39;eval method is not yet implemented&#39;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;eval method is not yet implemented&#39;</span>
 
 <span class="nv">ClojureScript.run = </span><span class="nf">(options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
-  <span class="s">&#39;do some amazing things&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>&nbsp;<br />
+  <span class="nv">mainModule = </span><span class="nx">require</span><span class="p">.</span><span class="nx">main</span>
+
+  <span class="nv">mainModule.filename = </span><span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>
+    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span> <span class="k">then</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">realpathSync</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">path</span><span class="p">)</span> <span class="k">else</span> <span class="s">&#39;.&#39;</span>
+
+  <span class="nx">mainModule</span><span class="p">.</span><span class="nx">moduleCache</span> <span class="o">and=</span> <span class="p">{}</span>
+
+  <span class="nv">mainModule.paths = </span><span class="nx">Module</span><span class="p">.</span><span class="nx">_nodeModulePaths</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">realpathSync</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span>
+
+  <span class="k">if</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">mainModule</span><span class="p">.</span><span class="nx">filename</span><span class="p">)</span> <span class="o">isnt</span> <span class="s">&#39;.cljs&#39;</span> <span class="o">or</span> <span class="nx">require</span><span class="p">.</span><span class="nx">extensions</span>
+    <span class="nx">mainModule</span><span class="p">.</span><span class="nx">_compile</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">cljsOptions</span><span class="p">,</span> <span class="nx">javaOptions</span><span class="p">),</span> <span class="nx">mainModule</span><span class="p">.</span><span class="nx">filename</span>
+  <span class="k">else</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;run method does not yet support compiling directly from a source string&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>mainModule._compile code, mainModule.filename</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />

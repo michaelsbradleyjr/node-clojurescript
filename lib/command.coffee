@@ -69,9 +69,7 @@ ClojureScript.commandRun = ->
   for source in sources
     buildPath source, yes, path.normalize source
 
-# Compile a path, which could be a script or a directory. If a directory
-# is passed, recursively compile all '.cljs' extension source files in it
-# and all subdirectories.
+# Compile a path, which could be a script or a directory.
 buildPath = (source, topLevel, base) ->
   fs.stat source, (err, stats) ->
     throw err if err and err.code isnt 'ENOENT'
@@ -106,14 +104,9 @@ buildPath = (source, topLevel, base) ->
       notSources[source] = yes
       removeSource source, base
 
-# Pass a directory to ClojureScript.build, so the ClojureScript compiler will
-# build all the sources in that directory
-buildDirectory = (dir, base) ->
-  'not yet implemented... takes additional args???'
-
-# Compile a single source script, containing the given code, according to the
-# requested options. If evaluating the script directly sets `__filename`,
-# `__dirname` and `module.filename` to be correct relative to the script's path.
+# Compile a single path, according to the requested options. If
+# evaluating the script directly sets `__filename`, `__dirname` and
+# `module.filename` to be correct relative to the script's path.
 buildFromDisk = (path, base) ->
   o = opts
   options = compileOptions path
@@ -121,15 +114,15 @@ buildFromDisk = (path, base) ->
     t = task = {path, options, cljsOptions: o.options, javaOptions: o.java}
     ClojureScript.emit 'compile', task
     if             o.run  then ClojureScript.run t.options, t.cljsOptions, t.javaOptions
-    else if o.join and t.file isnt o.join
-      #sourceCode[sources.indexOf(t.file)] = t.input
+    else if o.join and t.path isnt o.join
+      #sourceCode[sources.indexOf(t.path)] = t.input
       compileJoin()
     else
       t.output = ClojureScript.build t.options, t.cljsOptions, t.javaOptions
       ClojureScript.emit 'success', task
       if o.print          then printLine t.output.trim()
-      else if o.compile   then writeJs t.file, t.output, base
-      else if o.lint      then lint t.file, t.output
+      else if o.compile   then writeJs t.path, t.output, base
+      else if o.lint      then lint t.path, t.output
   catch err
     ClojureScript.emit 'failure', err, task
     return if ClojureScript.listeners('failure').length
@@ -138,12 +131,12 @@ buildFromDisk = (path, base) ->
     process.exit 1
 
 compileScript = (input) ->
-  return console.log 'ncljs --eval not yet implemented'
+  throw new Error 'ncljs --eval not yet implemented'
 
 # Attach the appropriate listeners to compile scripts incoming over **stdin**,
 # and write them back to **stdout**.
 compileStdio = ->
-  return console.log 'ncljs --stdio not yet implemented'
+  throw new Error 'ncljs --stdio not yet implemented'
   #code = ''
   #stdin = process.openStdin()
   #stdin.on 'data', (buffer) ->
@@ -155,7 +148,7 @@ compileStdio = ->
 # them together.
 joinTimeout = null
 compileJoin = ->
-  return console.log 'ncljs --join not yet implemented'
+  throw new Error 'ncljs --join not yet implemented'
   #return unless opts.join
   #unless sourceCode.some((code) -> code is null)
   #  clearTimeout joinTimeout

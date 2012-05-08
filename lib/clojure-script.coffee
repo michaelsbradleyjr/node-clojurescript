@@ -141,7 +141,20 @@ ClojureScript.build = (options = {}, cljsOptions = ClojureScript.options, javaOp
   @clojureBuild.invokeSync o.path, cljsOptions
 
 ClojureScript.eval = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
-  return console.log 'eval method is not yet implemented'
+  throw new Error 'eval method is not yet implemented'
 
 ClojureScript.run = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
-  'do some amazing things'
+  mainModule = require.main
+
+  mainModule.filename = process.argv[1] =
+    if options.path then fs.realpathSync(options.path) else '.'
+
+  mainModule.moduleCache and= {}
+
+  mainModule.paths = Module._nodeModulePaths path.dirname fs.realpathSync options.path
+
+  if path.extname(mainModule.filename) isnt '.cljs' or require.extensions
+    mainModule._compile ClojureScript.build(options, cljsOptions, javaOptions), mainModule.filename
+  else
+    throw new Error 'run method does not yet support compiling directly from a source string'
+    #mainModule._compile code, mainModule.filename

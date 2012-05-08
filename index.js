@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildDirectory, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -237,10 +237,11 @@
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
     }
-    return console.log('eval method is not yet implemented');
+    throw new Error('eval method is not yet implemented');
   };
   
   ClojureScript.run = function(options, cljsOptions, javaOptions) {
+    var mainModule;
     if (options == null) {
       options = {};
     }
@@ -250,7 +251,15 @@
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
     }
-    return 'do some amazing things';
+    mainModule = require.main;
+    mainModule.filename = process.argv[1] = options.path ? fs.realpathSync(options.path) : '.';
+    mainModule.moduleCache && (mainModule.moduleCache = {});
+    mainModule.paths = Module._nodeModulePaths(path.dirname(fs.realpathSync(options.path)));
+    if (path.extname(mainModule.filename) !== '.cljs' || require.extensions) {
+      return mainModule._compile(ClojureScript.build(options, cljsOptions, javaOptions), mainModule.filename);
+    } else {
+      throw new Error('run method does not yet support compiling directly from a source string');
+    }
   };
   
   ClojureScript.extend = extend = function(object, properties) {
@@ -512,10 +521,6 @@
     });
   };
   
-  buildDirectory = function(dir, base) {
-    return 'not yet implemented... takes additional args???';
-  };
-  
   buildFromDisk = function(path, base) {
     var o, options, t, task;
     o = opts;
@@ -530,7 +535,7 @@
       ClojureScript.emit('compile', task);
       if (o.run) {
         return ClojureScript.run(t.options, t.cljsOptions, t.javaOptions);
-      } else if (o.join && t.file !== o.join) {
+      } else if (o.join && t.path !== o.join) {
         return compileJoin();
       } else {
         t.output = ClojureScript.build(t.options, t.cljsOptions, t.javaOptions);
@@ -538,9 +543,9 @@
         if (o.print) {
           return printLine(t.output.trim());
         } else if (o.compile) {
-          return writeJs(t.file, t.output, base);
+          return writeJs(t.path, t.output, base);
         } else if (o.lint) {
-          return lint(t.file, t.output);
+          return lint(t.path, t.output);
         }
       }
     } catch (err) {
@@ -557,17 +562,17 @@
   };
   
   compileScript = function(input) {
-    return console.log('ncljs --eval not yet implemented');
+    throw new Error('ncljs --eval not yet implemented');
   };
   
   compileStdio = function() {
-    return console.log('ncljs --stdio not yet implemented');
+    throw new Error('ncljs --stdio not yet implemented');
   };
   
   joinTimeout = null;
   
   compileJoin = function() {
-    return console.log('ncljs --join not yet implemented');
+    throw new Error('ncljs --join not yet implemented');
   };
   
   loadRequires = function() {
