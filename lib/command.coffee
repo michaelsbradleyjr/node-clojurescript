@@ -79,17 +79,18 @@ printFlags = ->
 # `--` will be passed verbatim to your script as arguments in `process.argv`
 ClojureScript.commandRun = ->
   parseOptions()
-  printFlags()                           if opts['flags-print']
-  return forkNode()                      if opts.nodejs
-  return usage()                         if opts.help
-  return version()                       if opts.version
-  loadRequires()                         if opts.require
-  return repl.prompt()                   if opts.interactive
-  if opts.watch and !fs.watch
+  printFlags()                            if opts['flags-print']
+  return forkNode()                       if opts.nodejs
+  return usage()                          if opts.help
+  return version()                        if opts.version
+  loadRequires()                          if opts.require
+  return repl.prompt()                    if opts.interactive
+  if ( opts.watch or opts['watch-deps'] ) and !fs.watch
     return printWarn "The --watch feature depends on Node v0.6.0+. You are running #{process.version}."
-  return compileStdio()                  if opts.stdio
-  return compileScript null, sources[0]  if opts.eval
-  return repl.prompt()                   unless sources.length
+  return compileStdio()                   if opts.stdio
+  return compileScript null, sources[0]   if opts.eval
+  return repl.prompt()                    unless sources.length
+  watchDeps()                             if opts.watch
   literals = if opts.run then sources.splice 1 else []
   process.argv = process.argv[0..1].concat literals
   process.argv[0] = 'ncljsc'

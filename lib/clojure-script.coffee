@@ -17,10 +17,16 @@ ClojureScript.VERSION = '0.1.0-pre'
 
 ClojureScript.CLJS_VERSION = 'r1011'
 
+ClojureScript.depExts = [ '.cljs', '.js', '.coffee' ]
+
 ClojureScript.Tempdir = require 'temporary/lib/dir'
+ClojureScript.tmp = new ClojureScript.Tempdir
 
 ClojureScript.defaultJavaOptions = ''
 ClojureScript.javaOptions = ClojureScript.defaultJavaOptions
+
+ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
+ClojureScript.options = ClojureScript.defaultOptions
 
 
 ClojureScript.initJava = (options) ->
@@ -51,15 +57,10 @@ ClojureScript.initClojureCompiler = (javaOptions = ClojureScript.javaOptions) ->
 
   @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
 
+
 ClojureScript.addClassPath = (cp) ->
   @initClojureCompiler()
   @addClassPath cp
-
-
-ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
-ClojureScript.options = ClojureScript.defaultOptions
-
-ClojureScript.tmp = new ClojureScript.Tempdir
 
 
 pathCompiledCoreJS = __dirname + '/support/out/cljs/core.js'
