@@ -172,10 +172,21 @@ ClojureScript.run = (options = {}, cljscOptions = ClojureScript.options, javaOpt
 
   mainModule.moduleCache and= {}
 
-  mainModule.paths = Module._nodeModulePaths path.dirname fs.realpathSync options.path
+  mainModule.paths = require('module')._nodeModulePaths path.dirname fs.realpathSync options.path
 
-  if path.extname(mainModule.filename) isnt '.cljs' or require.extensions
-    mainModule._compile ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename
+  if ( ( path.extname mainModule.filename ) is '.cljs' )
+    if require.extensions
+      mainModule._compile ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename
+    else
+      'do what?'
   else
-    throw new Error 'run method does not yet support compiling directly from a source string'
-    #mainModule._compile code, mainModule.filename
+    if require.extensions
+      'do what?'
+    else
+      'do what?'
+
+  #if path.extname(mainModule.filename) isnt '.cljs' or require.extensions
+  #  mainModule._compile ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename
+  #else
+  #  throw new Error 'run method does not yet support compiling directly from a source string'
+  #  #mainModule._compile code, mainModule.filename
