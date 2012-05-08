@@ -31,12 +31,15 @@ SWITCHES = [
   ['-l', '--lint',              'pipe the compiled JavaScript through JavaScript Lint']
   ['-n', '--nodejs [ARGS]',     'pass options directly to the "node" binary']
   ['-o', '--output [DIR]',      'set the output directory for compiled JavaScript']
-  ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the ClojureScript compiler']
+  ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the \n' + \
+                                '                     ClojureScript compiler']
   ['-p', '--print',             'print out the compiled JavaScript']
   ['-r', '--require [FILE*]',   'require a library before executing your script']
   ['-s', '--stdio',             'listen for and compile scripts over stdio']
   ['-v', '--version',           'display the version number']
   ['-w', '--watch',             'watch scripts for changes and rerun commands']
+  ['-W', '--watch-deps',        'watch other ClojureScript dependencies not targeted by \n' + \
+                                '                     --watch, rerun commands on changes']
 ]
 
 # Top-level objects shared by all the functions.
@@ -322,4 +325,4 @@ usage = ->
 
 # Print the `--version` message and exit.
 version = ->
-  printLine "ncljsc version #{ClojureScript.VERSION}"
+  printLine "ncljsc v#{ClojureScript.VERSION} (ClojureScript #{ClojureScript.CLJS_VERSION})"

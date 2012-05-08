@@ -447,7 +447,7 @@
   
   BANNER = 'Usage: ncljsc [options] path/to/script.cljs -- [args]\n\nIf called without options, `ncljsc` will run your script.';
   
-  SWITCHES = [['-b', '--bare', 'compile without a top-level function wrapper'], ['-c', '--compile', 'compile to JavaScript and save as .js files'], ['-e', '--eval', 'pass a string from the command line as input'], ['-h', '--help', 'display this help message'], ['-i', '--interactive', 'run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', 'concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', 'pass a string of options to the JVM'], ['-l', '--lint', 'pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', 'pass options directly to the "node" binary'], ['-o', '--output [DIR]', 'set the output directory for compiled JavaScript'], ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the ClojureScript compiler'], ['-p', '--print', 'print out the compiled JavaScript'], ['-r', '--require [FILE*]', 'require a library before executing your script'], ['-s', '--stdio', 'listen for and compile scripts over stdio'], ['-v', '--version', 'display the version number'], ['-w', '--watch', 'watch scripts for changes and rerun commands']];
+  SWITCHES = [['-b', '--bare', 'compile without a top-level function wrapper'], ['-c', '--compile', 'compile to JavaScript and save as .js files'], ['-e', '--eval', 'pass a string from the command line as input'], ['-h', '--help', 'display this help message'], ['-i', '--interactive', 'run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', 'concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', 'pass a string of options to the JVM'], ['-l', '--lint', 'pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', 'pass options directly to the "node" binary'], ['-o', '--output [DIR]', 'set the output directory for compiled JavaScript'], ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the \n' + '                     ClojureScript compiler'], ['-p', '--print', 'print out the compiled JavaScript'], ['-r', '--require [FILE*]', 'require a library before executing your script'], ['-s', '--stdio', 'listen for and compile scripts over stdio'], ['-v', '--version', 'display the version number'], ['-w', '--watch', 'watch scripts for changes and rerun commands'], ['-W', '--watch-deps', 'watch other ClojureScript dependencies not targeted by \n' + '                     --watch, rerun commands on changes']];
   
   opts = {};
   
@@ -839,7 +839,7 @@
   };
   
   version = function() {
-    return printLine("ncljsc version " + ClojureScript.VERSION);
+    return printLine("ncljsc v" + ClojureScript.VERSION + " (ClojureScript " + ClojureScript.CLJS_VERSION + ")");
   };
   
   repl = {
