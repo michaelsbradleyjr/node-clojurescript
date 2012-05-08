@@ -21,25 +21,27 @@ BANNER = '''
 
 # The list of all the valid option flags that `ncljsc` knows how to handle.
 SWITCHES = [
-  ['-b', '--bare',              'compile without a top-level function wrapper']
-  ['-c', '--compile',           'compile to JavaScript and save as .js files']
-  ['-e', '--eval',              'pass a string from the command line as input']
-  ['-h', '--help',              'display this help message']
-  ['-i', '--interactive',       'run an interactive ClojureScript REPL']
-  ['-j', '--join [FILE]',       'concatenate the source ClojureScript before compiling']
-  ['-J', '--java [LIST]',       'pass a string of options to the JVM']
-  ['-l', '--lint',              'pipe the compiled JavaScript through JavaScript Lint']
-  ['-n', '--nodejs [ARGS]',     'pass options directly to the "node" binary']
-  ['-o', '--output [DIR]',      'set the output directory for compiled JavaScript']
-  ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the \n' + \
-                                '                     ClojureScript compiler']
-  ['-p', '--print',             'print out the compiled JavaScript']
-  ['-r', '--require [FILE*]',   'require a library before executing your script']
-  ['-s', '--stdio',             'listen for and compile scripts over stdio']
-  ['-v', '--version',           'display the version number']
-  ['-w', '--watch',             'watch scripts for changes and rerun commands']
-  ['-W', '--watch-deps',        'watch other ClojureScript dependencies not targeted by \n' + \
-                                '                     --watch, rerun commands on changes']
+  ['-b', '--bare',                    '  compile without a top-level function wrapper']
+  ['-c', '--compile',                 '  compile to JavaScript and save as .js files']
+  ['-e', '--eval',                    '  pass a string from the command line as input']
+  ['-F', '--flags-print',             '  print the options parsed by ncljsc and the contents of \n' + \
+                                      '                       process.argv']
+  ['-h', '--help',                    '  display this help message']
+  ['-i', '--interactive',             '  run an interactive ClojureScript REPL']
+  ['-j', '--join [FILE]',             '  concatenate the source ClojureScript before compiling']
+  ['-J', '--java [LIST]',             '  pass a string of options to the JVM']
+  ['-l', '--lint',                    '  pipe the compiled JavaScript through JavaScript Lint']
+  ['-n', '--nodejs [ARGS]',           '  pass options directly to the "node" binary']
+  ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the \n' + \
+                                      '                       ClojureScript compiler']
+  ['-o', '--output [DIR]',            '  set the output directory for compiled JavaScript']
+  ['-p', '--print',                   '  print out the compiled JavaScript']
+  ['-r', '--require [FILE*]',         '  require a library before executing your script']
+  ['-s', '--stdio',                   '  listen for and compile scripts over stdio']
+  ['-v', '--version',                 '  display the version number']
+  ['-W', '--watch-deps [FILE*]',      '  watch other dependencies not targeted by --watch, \n' + \
+                                      '                       rerun commands on changes']
+  ['-w', '--watch',                   '  watch scripts for changes and rerun commands']
 ]
 
 # Top-level objects shared by all the functions.
@@ -50,11 +52,34 @@ notSources   = {}
 watchers     = {}
 optionParser = null
 
+makePad = (l) ->
+  pad = ''
+  while l
+    pad = pad + ' '
+    l--
+  pad
+
+printFlags = ->
+  if ( ( forked = ( process.argv.indexOf '--ncljsc-print-options-once' ) ) is -1 )
+    printLine "\nncljsc parsed and/or set the following options (some may not be applied):\n"
+    longest = 0
+    for key, val of opts
+      if key.length > longest then longest = key.length
+    for key, val of opts
+      kL = key.length
+      pad = ''
+      if kL < longest then pad = makePad ( longest - kL )
+      printLine ( '  ' + key + pad + '     ' + ( val or '' ) )
+  printLine "\n#{ if ( forked isnt -1 ) then 'forked node\'s ' else '' }process.argv contained the following:\n"
+  for arg in process.argv
+    printLine ( '  ' + arg + ( if ( arg is '--ncljsc-printprint-options-once' ) then '    [ ignored by ncljsc ]' else '' ) )
+
 # Run `ncljsc` by parsing passed options and determining what action to take.
 # Many flags cause us to divert before compiling anything. Flags passed after
 # `--` will be passed verbatim to your script as arguments in `process.argv`
 ClojureScript.commandRun = ->
   parseOptions()
+  printFlags()                           if opts['flags-print']
   return forkNode()                      if opts.nodejs
   return usage()                         if opts.help
   return version()                       if opts.version
@@ -114,14 +139,14 @@ buildFromDisk = (path, base) ->
   o = opts
   options = compileOptions path
   try
-    t = task = {path, options, cljsOptions: o.options, javaOptions: o.java}
+    t = task = {path, options, cljscOptions: o['options-cljsc'], javaOptions: o.java}
     ClojureScript.emit 'compile', task
-    if             o.run  then ClojureScript.run t.options, t.cljsOptions, t.javaOptions
+    if             o.run  then ClojureScript.run t.options, t.cljscOptions, t.javaOptions
     else if o.join and t.path isnt o.join
       #sourceCode[sources.indexOf(t.path)] = t.input
       compileJoin()
     else
-      t.output = ClojureScript.build t.options, t.cljsOptions, t.javaOptions
+      t.output = ClojureScript.build t.options, t.cljscOptions, t.javaOptions
       ClojureScript.emit 'success', task
       if o.print          then printLine t.output.trim()
       else if o.compile   then writeJs t.path, t.output, base
@@ -134,12 +159,12 @@ buildFromDisk = (path, base) ->
     process.exit 1
 
 compileScript = (input) ->
-  throw new Error 'ncljs --eval not yet implemented'
+  throw new Error 'ncljsc --eval not yet implemented'
 
 # Attach the appropriate listeners to compile scripts incoming over **stdin**,
 # and write them back to **stdout**.
 compileStdio = ->
-  throw new Error 'ncljs --stdio not yet implemented'
+  throw new Error 'ncljsc --stdio not yet implemented'
   #code = ''
   #stdin = process.openStdin()
   #stdin.on 'data', (buffer) ->
@@ -151,7 +176,7 @@ compileStdio = ->
 # them together.
 joinTimeout = null
 compileJoin = ->
-  throw new Error 'ncljs --join not yet implemented'
+  throw new Error 'ncljsc --join not yet implemented'
   #return unless opts.join
   #unless sourceCode.some((code) -> code is null)
   #  clearTimeout joinTimeout
@@ -295,7 +320,9 @@ lint = (file, js) ->
 # `process.argv` that are specified in `SWITCHES`.
 parseOptions = ->
   optionParser  = new CliOptionParser SWITCHES, BANNER
-  o = opts      = optionParser.parse process.argv[2..]
+  po = process.argv[2..]
+  if ( ( i = ( po.indexOf '--ncljsc-printprint-options-once' ) ) isnt -1 ) then po.splice i, 1
+  o = opts      = optionParser.parse po
   o.compile     or=  !!o.output
   o.run         = not (o.compile or o.print or o.lint)
   o.print       = !!  (o.print or (o.eval or o.stdio and o.compile))
@@ -313,7 +340,7 @@ forkNode = ->
   nodeArgs = opts.nodejs.split /\s+/
   args     = process.argv[1..]
   args.splice args.indexOf('--nodejs'), 2
-  spawn process.execPath, nodeArgs.concat(args),
+  spawn process.execPath, nodeArgs.concat(args).concat('--ncljsc-printprint-options-once'),
     cwd:        process.cwd()
     env:        process.env
     customFds:  [0, 1, 2]
