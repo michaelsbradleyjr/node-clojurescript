@@ -174,16 +174,18 @@ ClojureScript.run = (options = {}, cljscOptions = ClojureScript.options, javaOpt
 
   mainModule.paths = require('module')._nodeModulePaths path.dirname fs.realpathSync options.path
 
+  # fairly certain this is the correct control flow, since this module
+  # does not attempt to support the deprecated `require.registerExtension`
+  # (coffee-script still supports it as of its version 1.3.1)
   if ( ( path.extname mainModule.filename ) is '.cljs' )
     if require.extensions
       mainModule._compile ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename
     else
-      'do what?'
+      throw new Error 'missing require.extensions, can\'t proceed'
   else
-    if require.extensions
-      'do what?'
-    else
-      'do what?'
+    throw new Error 'run method does not yet support compiling directly from a source string'
+
+  # original coffee-script control flow, for reference:
 
   # if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
   #   mainModule._compile compile(code, options), mainModule.filename

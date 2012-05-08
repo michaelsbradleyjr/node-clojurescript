@@ -269,9 +269,13 @@
     mainModule = require.main;
     mainModule.filename = process.argv[1] = options.path ? fs.realpathSync(options.path) : '.';
     mainModule.moduleCache && (mainModule.moduleCache = {});
-    mainModule.paths = Module._nodeModulePaths(path.dirname(fs.realpathSync(options.path)));
-    if (path.extname(mainModule.filename) !== '.cljs' || require.extensions) {
-      return mainModule._compile(ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename);
+    mainModule.paths = require('module')._nodeModulePaths(path.dirname(fs.realpathSync(options.path)));
+    if ((path.extname(mainModule.filename)) === '.cljs') {
+      if (require.extensions) {
+        return mainModule._compile(ClojureScript.build(options, cljscOptions, javaOptions), mainModule.filename);
+      } else {
+        throw new Error('missing require.extensions, can\'t proceed');
+      }
     } else {
       throw new Error('run method does not yet support compiling directly from a source string');
     }
