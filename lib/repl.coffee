@@ -1,1 +1,1 @@
-repl = prompt: -> printLine 'ncljsc REPL not yet implemented'
+repl = prompt: -> throw new Error 'ncljsc REPL not yet implemented'

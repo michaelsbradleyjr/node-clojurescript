@@ -829,7 +829,7 @@
   
   repl = {
     prompt: function() {
-      return printLine('ncljsc REPL not yet implemented');
+      throw new Error('ncljsc REPL not yet implemented');
     }
   };
   
