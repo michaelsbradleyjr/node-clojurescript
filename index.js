@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildDirectory, buildPath, buildRuleCliOpt, buildRulesCliOpt, buildScript, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildDirectory, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -158,7 +158,7 @@
       javaOptions = ClojureScript.javaOptions;
     }
     o = options;
-    if (!o.filename) {
+    if (!o.path) {
       throw new Error('no source path specified');
     }
     if (!this.java) {
@@ -211,7 +211,7 @@
         fs.writeFileSync(outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8');
       }
     }
-    resolved = path.resolve(path.normalize(o.filename));
+    resolved = path.resolve(path.normalize(o.path));
     if (!(path.existsSync(resolved))) {
       throw new Error('source path must exist');
     }
@@ -224,10 +224,32 @@
       throw new Error('source path must be a file or a directory');
     }
     cljsOptions = this.addBuildClasspath(cljsOptions, cp);
-    return this.clojureBuild.invokeSync(o.filename, cljsOptions);
+    return this.clojureBuild.invokeSync(o.path, cljsOptions);
   };
   
-  ClojureScript.run = function(file, options, cljsOptions, javaOptions) {
+  ClojureScript["eval"] = function(options, cljsOptions, javaOptions) {
+    if (options == null) {
+      options = {};
+    }
+    if (cljsOptions == null) {
+      cljsOptions = ClojureScript.options;
+    }
+    if (javaOptions == null) {
+      javaOptions = ClojureScript.javaOptions;
+    }
+    return console.log('eval method is not yet implemented');
+  };
+  
+  ClojureScript.run = function(options, cljsOptions, javaOptions) {
+    if (options == null) {
+      options = {};
+    }
+    if (cljsOptions == null) {
+      cljsOptions = ClojureScript.options;
+    }
+    if (javaOptions == null) {
+      javaOptions = ClojureScript.javaOptions;
+    }
     return 'do some amazing things';
   };
   
@@ -244,7 +266,7 @@
     require.extensions['.cljs'] = function(module, filename) {
       var content;
       content = ClojureScript.build({
-        filename: filename
+        path: filename
       });
       return module._compile(content, filename);
     };
@@ -477,12 +499,12 @@
         if (opts.watch) {
           watchDir(source, base);
         }
-        return buildDirectory(source, base);
+        return buildFromDisk(source, base);
       } else if (topLevel || path.extname(source) === '.cljs') {
         if (opts.watch) {
           watch(source, base);
         }
-        return buildScript(source, base);
+        return buildFromDisk(source, base);
       } else {
         notSources[source] = true;
         return removeSource(source, base);
@@ -494,24 +516,24 @@
     return 'not yet implemented... takes additional args???';
   };
   
-  buildScript = function(file, base) {
+  buildFromDisk = function(path, base) {
     var o, options, t, task;
     o = opts;
-    options = compileOptions(file);
+    options = compileOptions(path);
     try {
       t = task = {
-        file: file,
+        path: path,
         options: options,
         cljsOptions: o.options,
         javaOptions: o.java
       };
       ClojureScript.emit('compile', task);
       if (o.run) {
-        return ClojureScript.run(t.file, t.options, t.cljsOptions, t.javaOptions);
+        return ClojureScript.run(t.options, t.cljsOptions, t.javaOptions);
       } else if (o.join && t.file !== o.join) {
         return compileJoin();
       } else {
-        t.output = ClojureScript.build(t.file, t.options, t.cljsOptions, t.javaOptions);
+        t.output = ClojureScript.build(t.options, t.cljsOptions, t.javaOptions);
         ClojureScript.emit('success', task);
         if (o.print) {
           return printLine(t.output.trim());
@@ -772,9 +794,9 @@
     }
   };
   
-  compileOptions = function(filename) {
+  compileOptions = function(path) {
     return {
-      filename: filename,
+      path: path,
       bare: opts.bare,
       header: opts.compile
     };

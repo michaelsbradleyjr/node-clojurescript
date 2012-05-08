@@ -94,10 +94,10 @@ buildPath = (source, topLevel, base) ->
       #  sourceCode[index..index] = files.map -> null
       #  files.forEach (file) ->
       #    compilePath (path.join source, file), no, base
-      buildDirectory source, base
+      buildFromDisk source, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
-      buildScript source, base
+      buildFromDisk source, base
       #fs.readFile source, (err, code) ->
       #  throw err if err and err.code isnt 'ENOENT'
       #  return if err?.code is 'ENOENT'
@@ -114,18 +114,18 @@ buildDirectory = (dir, base) ->
 # Compile a single source script, containing the given code, according to the
 # requested options. If evaluating the script directly sets `__filename`,
 # `__dirname` and `module.filename` to be correct relative to the script's path.
-buildScript = (file, base) ->
+buildFromDisk = (path, base) ->
   o = opts
-  options = compileOptions file
+  options = compileOptions path
   try
-    t = task = {file, options, cljsOptions: o.options, javaOptions: o.java}
+    t = task = {path, options, cljsOptions: o.options, javaOptions: o.java}
     ClojureScript.emit 'compile', task
-    if             o.run  then ClojureScript.run t.file, t.options, t.cljsOptions, t.javaOptions
+    if             o.run  then ClojureScript.run t.options, t.cljsOptions, t.javaOptions
     else if o.join and t.file isnt o.join
       #sourceCode[sources.indexOf(t.file)] = t.input
       compileJoin()
     else
-      t.output = ClojureScript.build t.file, t.options, t.cljsOptions, t.javaOptions
+      t.output = ClojureScript.build t.options, t.cljsOptions, t.javaOptions
       ClojureScript.emit 'success', task
       if o.print          then printLine t.output.trim()
       else if o.compile   then writeJs t.file, t.output, base
@@ -308,8 +308,8 @@ parseOptions = ->
   return
 
 # The compile-time options to pass to the ClojureScript compiler.
-compileOptions = (filename) ->
-  {filename, bare: opts.bare, header: opts.compile}
+compileOptions = (path) ->
+  {path, bare: opts.bare, header: opts.compile}
 
 # Start up a new Node.js instance with the arguments in `--nodejs` passed to
 # the `node` binary, preserving the other options.

@@ -19,9 +19,9 @@ describe 'ClojureScript.build', ->
     should build a ClojureScript file into a JavaScript string
   ''', (done) ->
 
-    filename = ( __dirname + '/cljs/hello.cljs' )
+    path = ( __dirname + '/cljs/hello.cljs' )
 
-    out = ClojureScript.build {filename}
+    out = ClojureScript.build {path}
 
     #console.log out
 

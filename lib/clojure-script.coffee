@@ -77,7 +77,7 @@ ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length 
 
 ClojureScript.build = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
   o = options
-  if not o.filename then throw new Error 'no source path specified'
+  if not o.path then throw new Error 'no source path specified'
   if ( not @java ) then @initJava javaOptions
   if ( not @ClojureCompiler ) then @initClojureCompiler()
 
@@ -125,7 +125,7 @@ ClojureScript.build = (options = {}, cljsOptions = ClojureScript.options, javaOp
     if ( not ( path.existsSync outcljsnodejs ) )
       fs.writeFileSync outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8'
 
-  resolved = path.resolve ( path.normalize o.filename )
+  resolved = path.resolve ( path.normalize o.path )
   if ( not ( path.existsSync resolved ) )
     throw new Error 'source path must exist'
   stats = fs.statSync resolved
@@ -138,7 +138,10 @@ ClojureScript.build = (options = {}, cljsOptions = ClojureScript.options, javaOp
 
   cljsOptions = @addBuildClasspath cljsOptions, cp
 
-  @clojureBuild.invokeSync o.filename, cljsOptions
+  @clojureBuild.invokeSync o.path, cljsOptions
 
-ClojureScript.run = (file, options, cljsOptions, javaOptions) ->
+ClojureScript.eval = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+  return console.log 'eval method is not yet implemented'
+
+ClojureScript.run = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
   'do some amazing things'
