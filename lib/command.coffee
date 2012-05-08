@@ -27,10 +27,11 @@ SWITCHES = [
   ['-h', '--help',              'display this help message']
   ['-i', '--interactive',       'run an interactive ClojureScript REPL']
   ['-j', '--join [FILE]',       'concatenate the source ClojureScript before compiling']
+  ['-J', '--java [LIST]',       'pass a string of options to the JVM']
   ['-l', '--lint',              'pipe the compiled JavaScript through JavaScript Lint']
   ['-n', '--nodejs [ARGS]',     'pass options directly to the "node" binary']
   ['-o', '--output [DIR]',      'set the output directory for compiled JavaScript']
-  ['-O', '--options [HASHMAP]', 'pass options directly to the ClojureScript compiler']
+  ['-O', '--options [HASHMAP]', 'pass a hash-map of options (as a string) to the ClojureScript compiler']
   ['-p', '--print',             'print out the compiled JavaScript']
   ['-r', '--require [FILE*]',   'require a library before executing your script']
   ['-s', '--stdio',             'listen for and compile scripts over stdio']
@@ -66,59 +67,65 @@ ClojureScript.commandRun = ->
   process.argv[0] = 'ncljsc'
   process.execPath = require.main.filename
   for source in sources
-    compilePath source, yes, path.normalize source
+    buildPath source, yes, path.normalize source
 
 # Compile a path, which could be a script or a directory. If a directory
 # is passed, recursively compile all '.cljs' extension source files in it
 # and all subdirectories.
-compilePath = (source, topLevel, base) ->
+buildPath = (source, topLevel, base) ->
   fs.stat source, (err, stats) ->
     throw err if err and err.code isnt 'ENOENT'
     if err?.code is 'ENOENT'
-      if topLevel and source[-7..] isnt '.cljs'
+      if topLevel and source[-5..] isnt '.cljs'
         source = sources[sources.indexOf(source)] = "#{source}.cljs"
-        return compilePath source, topLevel, base
+        return buildPath source, topLevel, base
       if topLevel
         console.error "File not found: #{source}"
         process.exit 1
       return
     if stats.isDirectory()
       watchDir source, base if opts.watch
-      fs.readdir source, (err, files) ->
-        throw err if err and err.code isnt 'ENOENT'
-        return if err?.code is 'ENOENT'
-        index = sources.indexOf source
-        files = files.filter (file) -> not hidden file
-        sources[index..index] = (path.join source, file for file in files)
-        sourceCode[index..index] = files.map -> null
-        files.forEach (file) ->
-          compilePath (path.join source, file), no, base
+      #fs.readdir source, (err, files) ->
+      #  throw err if err and err.code isnt 'ENOENT'
+      #  return if err?.code is 'ENOENT'
+      #  index = sources.indexOf source
+      #  files = files.filter (file) -> not hidden file
+      #  sources[index..index] = (path.join source, file for file in files)
+      #  sourceCode[index..index] = files.map -> null
+      #  files.forEach (file) ->
+      #    compilePath (path.join source, file), no, base
+      buildDirectory source, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
-      fs.readFile source, (err, code) ->
-        throw err if err and err.code isnt 'ENOENT'
-        return if err?.code is 'ENOENT'
-        compileScript(source, code.toString(), base)
+      buildScript source, base
+      #fs.readFile source, (err, code) ->
+      #  throw err if err and err.code isnt 'ENOENT'
+      #  return if err?.code is 'ENOENT'
+      #  compileScript(source, code.toString(), base)
     else
       notSources[source] = yes
       removeSource source, base
 
+# Pass a directory to ClojureScript.build, so the ClojureScript compiler will
+# build all the sources in that directory
+buildDirectory = (dir, base) ->
+  'not yet implemented... takes additional args???'
 
 # Compile a single source script, containing the given code, according to the
 # requested options. If evaluating the script directly sets `__filename`,
 # `__dirname` and `module.filename` to be correct relative to the script's path.
-compileScript = (file, input, base) ->
+buildScript = (file, base) ->
   o = opts
   options = compileOptions file
   try
-    t = task = {file, input, options}
+    t = task = {file, options, cljsOptions: o.options, javaOptions: o.java}
     ClojureScript.emit 'compile', task
-    if             o.run  then ClojureScript.run t.input, t.options
+    if             o.run  then ClojureScript.run t.file, t.options, t.cljsOptions, t.javaOptions
     else if o.join and t.file isnt o.join
-      sourceCode[sources.indexOf(t.file)] = t.input
+      #sourceCode[sources.indexOf(t.file)] = t.input
       compileJoin()
     else
-      t.output = ClojureScript.compile t.input, t.options
+      t.output = ClojureScript.build t.file, t.options, t.cljsOptions, t.javaOptions
       ClojureScript.emit 'success', task
       if o.print          then printLine t.output.trim()
       else if o.compile   then writeJs t.file, t.output, base
@@ -130,25 +137,30 @@ compileScript = (file, input, base) ->
     printWarn err instanceof Error and err.stack or "ERROR: #{err}"
     process.exit 1
 
+compileScript = (input) ->
+  return console.log 'ncljs --eval not yet implemented'
+
 # Attach the appropriate listeners to compile scripts incoming over **stdin**,
 # and write them back to **stdout**.
 compileStdio = ->
-  code = ''
-  stdin = process.openStdin()
-  stdin.on 'data', (buffer) ->
-    code += buffer.toString() if buffer
-  stdin.on 'end', ->
-    compileScript null, code
+  return console.log 'ncljs --stdio not yet implemented'
+  #code = ''
+  #stdin = process.openStdin()
+  #stdin.on 'data', (buffer) ->
+  #  code += buffer.toString() if buffer
+  #stdin.on 'end', ->
+  #  compileScript null, code
 
 # If all of the source files are done being read, concatenate and compile
 # them together.
 joinTimeout = null
 compileJoin = ->
-  return unless opts.join
-  unless sourceCode.some((code) -> code is null)
-    clearTimeout joinTimeout
-    joinTimeout = wait 100, ->
-      compileScript opts.join, sourceCode.join('\n'), opts.join
+  return console.log 'ncljs --join not yet implemented'
+  #return unless opts.join
+  #unless sourceCode.some((code) -> code is null)
+  #  clearTimeout joinTimeout
+  #  joinTimeout = wait 100, ->
+  #    compileScript opts.join, sourceCode.join('\n'), opts.join
 
 # Load files that are to-be-required before compilation occurs.
 loadRequires = ->

@@ -22,6 +22,7 @@ ClojureScript.javaOptions = ClojureScript.defaultJavaOptions
 
 ClojureScript.initJava = (options) ->
   @java = java = require 'java'
+  if options then java.options.push jo for jo in ( options.split ' ' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/clojure.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/compiler.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' )
@@ -74,26 +75,28 @@ if ( path.existsSync pathCompiledNodejsJS )
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
 ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
 
-ClojureScript.build = (target, options = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+ClojureScript.build = (options = {}, cljsOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+  o = options
+  if not o.filename then throw new Error 'no source path specified'
   if ( not @java ) then @initJava javaOptions
   if ( not @ClojureCompiler ) then @initClojureCompiler()
 
-  if ( options isnt ClojureScript.options )
-    options = options.match /^\s*(\{.*\})\s*$/
-    if ( not options )
-      throw new Error 'malformed options string'
+  if ( cljsOptions isnt ClojureScript.options )
+    cljsOptions = cljsOptions.match /^\s*(\{.*\})\s*$/
+    if ( not cljsOptions )
+      throw new Error 'malformed ClojureScript options hash-map'
     else
-      options = options[1]
+      cljsOptions = cljsOptions[1]
 
-    if ( ( options.match /\:output-dir\s*\'.*\'/ ) or \
-         ( options.match /\:output-dir\s*[^\'\"]*(\:|(\}$))/ ) or \
-         ( options.match /\:output-dir\s*\'[^\']*(\:|(\}$))/ ) or \
-         ( options.match /\:output-dir\s*\"[^\"]*(\:|(\}$))/ ) or \
-         ( options.match /\:output-dir\s*[^\']*\'\s*(\:|(\}$))/ ) or \
-         ( options.match /\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/ ) )
+    if ( ( cljsOptions.match /\:output-dir\s*\'.*\'/ ) or \
+         ( cljsOptions.match /\:output-dir\s*[^\'\"]*(\:|(\}$))/ ) or \
+         ( cljsOptions.match /\:output-dir\s*\'[^\']*(\:|(\}$))/ ) or \
+         ( cljsOptions.match /\:output-dir\s*\"[^\"]*(\:|(\}$))/ ) or \
+         ( cljsOptions.match /\:output-dir\s*[^\']*\'\s*(\:|(\}$))/ ) or \
+         ( cljsOptions.match /\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/ ) )
       throw new Error 'path specified as :output-dir must be wrapped in double-quotes'
 
-    outputdir = options.match /\:output-dir\s*(\".*\")/
+    outputdir = cljsOptions.match /\:output-dir\s*(\".*\")/
     if outputdir
       outputdir = outputdir[1]
       outputdir = outputdir[1...( outputdir.length - 1 )]
@@ -102,10 +105,11 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
         throw new Error 'path specified as :output-dir must exist'
       if ( not ( fs.statSync outputdir ).isDirectory() )
         throw new Error 'path specified as :output-dir must be a directory'
+      @['output-dir'] = outputdir
 
   if ( not outputdir? )
-    outputdir = @tmp.path
-    options = @tmpOut options
+    @['output-dir'] = outputdir = @tmp.path
+    cljsOptions = @tmpOut cljsOptions
 
   outcljs = outputdir + '/cljs'
   if ( not ( path.existsSync outcljs ) )
@@ -121,17 +125,20 @@ ClojureScript.build = (target, options = ClojureScript.options, javaOptions = Cl
     if ( not ( path.existsSync outcljsnodejs ) )
       fs.writeFileSync outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8'
 
-  resolved = path.resolve ( path.normalize target )
+  resolved = path.resolve ( path.normalize o.filename )
   if ( not ( path.existsSync resolved ) )
-    throw new Error 'target path must exist'
+    throw new Error 'source path must exist'
   stats = fs.statSync resolved
   if ( stats.isDirectory() )
     cp = resolved
   else if ( stats.isFile() )
     cp = path.dirname resolved
   else
-    throw new Error 'target path must be a file or a directory'
+    throw new Error 'source path must be a file or a directory'
 
-  options = @addBuildClasspath options, cp
+  cljsOptions = @addBuildClasspath cljsOptions, cp
 
-  @clojureBuild.invokeSync target, options
+  @clojureBuild.invokeSync o.filename, cljsOptions
+
+ClojureScript.run = (file, options, cljsOptions, javaOptions) ->
+  'do some amazing things'
