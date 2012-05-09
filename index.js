@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -459,6 +459,8 @@
   
   sources = [];
   
+  outFiles = {};
+  
   sourceCode = [];
   
   notSources = {};
@@ -573,12 +575,17 @@
         return;
       }
       if (stats.isDirectory()) {
-        if (opts.watch) {
-          watchDir(source, base);
-        }
         if (opts.run) {
+          if (opts.watch) {
+            watch(source, base);
+          }
           return buildPath(path.normalize(source + '/index.cljs'), true, base);
         } else {
+          if (!watchers[source]) {
+            if (opts.watch) {
+              watchDir(source, base);
+            }
+          }
           return buildFromDisk(source, base);
         }
       } else if (topLevel || path.extname(source) === '.cljs') {
@@ -680,6 +687,9 @@
       }
     };
     compile = function() {
+      if (!opts.print) {
+        timeLog("file watcher : filename - " + source);
+      }
       clearTimeout(compileTimeout);
       return compileTimeout = wait(25, function() {
         return fs.stat(source, function(err, stats) {
@@ -716,38 +726,15 @@
     var readdirTimeout, watcher;
     readdirTimeout = null;
     try {
-      return watcher = fs.watch(source, function() {
-        clearTimeout(readdirTimeout);
-        return readdirTimeout = wait(25, function() {
-          return fs.readdir(source, function(err, files) {
-            var file, _i, _len, _results;
-            if (err) {
-              if (err.code !== 'ENOENT') {
-                throw err;
-              }
-              watcher.close();
-              return unwatchDir(source, base);
-            }
-            _results = [];
-            for (_i = 0, _len = files.length; _i < _len; _i++) {
-              file = files[_i];
-              if (!(!hidden(file) && !notSources[file])) {
-                continue;
-              }
-              file = path.join(source, file);
-              if (sources.some(function(s) {
-                return s.indexOf(file) >= 0;
-              })) {
-                continue;
-              }
-              sources.push(file);
-              sourceCode.push(null);
-              _results.push(compilePath(file, false, base));
-            }
-            return _results;
-          });
-        });
+      watcher = fs.watch(source, function(event, filename) {
+        if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
+          if (!opts.print) {
+            timeLog("dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
+          }
+          return buildPath(source, true, base);
+        }
       });
+      return watchers[source] = watcher;
     } catch (e) {
       if (e.code !== 'ENOENT') {
         throw e;
@@ -816,6 +803,9 @@
   outputPath = function(source, base) {
     var baseDir, dir, filename, srcDir;
     filename = path.basename(source, path.extname(source)) + '.js';
+    if (filename[0] === '.') {
+      filename = 'out.js';
+    }
     srcDir = path.dirname(source);
     baseDir = base === '.' ? srcDir : srcDir.substring(base.length);
     dir = opts.output ? path.join(opts.output, baseDir) : srcDir;
@@ -825,6 +815,7 @@
   writeJs = function(source, js, base) {
     var compile, jsDir, jsPath;
     jsPath = outputPath(source, base);
+    outFiles[jsPath] = true;
     jsDir = path.dirname(jsPath);
     compile = function() {
       if (js.length <= 0) {

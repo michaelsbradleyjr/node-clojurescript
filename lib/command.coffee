@@ -47,6 +47,7 @@ SWITCHES = [
 # Top-level objects shared by all the functions.
 opts         = {}
 sources      = []
+outFiles     = {}
 sourceCode   = []
 notSources   = {}
 watchers     = {}
@@ -111,10 +112,12 @@ buildPath = (source, topLevel, base) ->
         process.exit 1
       return
     if stats.isDirectory()
-      watchDir source, base if opts.watch
       if opts.run
+        watch source, base if opts.watch
         buildPath ( path.normalize ( source + '/index.cljs' ) ), yes, base
       else
+        if not watchers[source]
+          watchDir source, base if opts.watch
         buildFromDisk source, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
@@ -201,6 +204,7 @@ watch = (source, base) ->
     else throw e
 
   compile = ->
+    timeLog "file watcher : filename - #{source}" unless opts.print
     clearTimeout compileTimeout
     compileTimeout = wait 25, ->
       fs.stat source, (err, stats) ->
@@ -232,20 +236,26 @@ watch = (source, base) ->
 watchDir = (source, base) ->
   readdirTimeout = null
   try
-    watcher = fs.watch source, ->
-      clearTimeout readdirTimeout
-      readdirTimeout = wait 25, ->
-        fs.readdir source, (err, files) ->
-          if err
-            throw err unless err.code is 'ENOENT'
-            watcher.close()
-            return unwatchDir source, base
-          for file in files when not hidden(file) and not notSources[file]
-            file = path.join source, file
-            continue if sources.some (s) -> s.indexOf(file) >= 0
-            sources.push file
-            sourceCode.push null
-            compilePath file, no, base
+    watcher = fs.watch source, (event, filename) ->
+      if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
+        timeLog "dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless opts.print
+        buildPath source, yes, base
+
+      # clearTimeout readdirTimeout
+      # readdirTimeout = wait 25, ->
+      #   fs.readdir source, (err, files) ->
+      #     if err
+      #       throw err unless err.code is 'ENOENT'
+      #       watcher.close()
+      #       return unwatchDir source, base
+      #     for file in files when not hidden(file) and not notSources[file]
+      #       file = path.join source, file
+      #       continue if sources.some (s) -> s.indexOf(file) >= 0
+      #       sources.push file
+      #       sourceCode.push null
+      #       compilePath file, no, base
+
+    watchers[source] = watcher
   catch e
     throw e unless e.code is 'ENOENT'
 
@@ -281,11 +291,13 @@ removeSource = (source, base, removeJs) ->
       if exists
         fs.unlink jsPath, (err) ->
           throw err if err and err.code isnt 'ENOENT'
+          # should this timeLog the jsPath instead of the source path?
           timeLog "removed #{source}"
 
 # Get the corresponding output JavaScript path for a source file.
 outputPath = (source, base) ->
   filename  = path.basename(source, path.extname(source)) + '.js'
+  if filename[0] is '.' then filename = 'out.js'
   srcDir    = path.dirname source
   baseDir   = if base is '.' then srcDir else srcDir.substring base.length
   dir       = if opts.output then path.join opts.output, baseDir else srcDir
@@ -296,6 +308,7 @@ outputPath = (source, base) ->
 # directory can be customized with `--output`.
 writeJs = (source, js, base) ->
   jsPath = outputPath source, base
+  outFiles[jsPath] = true
   jsDir  = path.dirname jsPath
   compile = ->
     js = ' ' if js.length <= 0
