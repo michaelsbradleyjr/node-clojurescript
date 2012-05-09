@@ -21,7 +21,9 @@
 (def next-tick (.-nextTick process))
 
 ; Have ClojureScript print using Node's process.stdout.write function
-(set! cljs.core/string-print (.bind (.-write (.-stdout process)) (.-stdout process)))
+(set! cljs.core/string-print (defn string-print [s]
+  (.call (.-write (.-stdout process)) (.-stdout process) s)))
 
 ; cljs.core/string-print does not append a newline. To print strings
 ; with a newline automatically appended use cljs.core/println
+

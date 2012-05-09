@@ -14,4 +14,6 @@ cljs.nodejs.clear_timeout = clearTimeout;
 cljs.nodejs.interval = setInterval;
 cljs.nodejs.clear_interval = clearInterval;
 cljs.nodejs.next_tick = cljs.nodejs.process.nextTick;
-cljs.core.string_print = cljs.nodejs.process.stdout.write.bind(cljs.nodejs.process.stdout);
+cljs.core.string_print = cljs.core.string_print = (function string_print(s){
+return cljs.nodejs.process.stdout.write.call(cljs.nodejs.process.stdout,s);
+});
