@@ -690,13 +690,12 @@
             return rewatch();
           }
           prevStats = stats;
-          return fs.readFile(source, function(err, code) {
-            if (err) {
-              return watchErr(err);
-            }
-            compileScript(source, code.toString(), base);
+          try {
+            buildFromDisk(source, base);
             return rewatch();
-          });
+          } catch (err) {
+            return watchErr(err);
+          }
         });
       });
     };

@@ -208,10 +208,15 @@ watch = (source, base) ->
         return rewatch() if prevStats and stats.size is prevStats.size and
           stats.mtime.getTime() is prevStats.mtime.getTime()
         prevStats = stats
-        fs.readFile source, (err, code) ->
-          return watchErr err if err
-          compileScript(source, code.toString(), base)
+        try
+          buildFromDisk source, base
           rewatch()
+        catch err
+          watchErr err
+        #fs.readFile source, (err, code) ->
+        #  return watchErr err if err
+        #  compileScript(source, code.toString(), base)
+        #  rewatch()
 
   try
     watcher = fs.watch source, compile
