@@ -329,7 +329,7 @@ watchDepsDir = (dir) ->
     throw e unless e.code is 'ENOENT'
 
 # Remove a file from our source list, and source code cache. Optionally remove
-# the cnompiled JS version as well.
+# the compiled JS version as well.
 removeSource = (source, base, removeJs) ->
   index = sources.indexOf source
   sources.splice index, 1
@@ -380,7 +380,7 @@ timeLog = (message) ->
 # any errors or warnings that arise.
 lint = (file, js) ->
   printIt = (buffer) -> printLine file + ':\t' + buffer.toString().trim()
-  conf = __dirname + '/../../extras/jsl.conf'
+  conf = __dirname + '/extras/jsl.conf'
   jsl = spawn 'jsl', ['-nologo', '-stdin', '-conf', conf]
   jsl.stdout.on 'data', printIt
   jsl.stderr.on 'data', printIt
