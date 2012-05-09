@@ -14,7 +14,7 @@ vm             = require 'vm'
 
 ClojureScript = {}
 
-ClojureScript.VERSION = '0.1.3'
+ClojureScript.VERSION = '0.1.4-pre'
 
 ClojureScript.CLJS_VERSION = 'r1011'
 
