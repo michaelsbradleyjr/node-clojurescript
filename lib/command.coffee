@@ -77,7 +77,7 @@ printFlags = ->
       printLine ( '  ' + key + pad + '     ' + ( val or '' ) )
   printLine "\n#{ if ( forked isnt -1 ) then 'forked node\'s ' else '' }process.argv contained the following:\n"
   for arg in process.argv
-    printLine ( '  ' + arg + ( if ( arg is '--ncljsc-printprint-options-once' ) then '    [ ignored by ncljsc ]' else '' ) )
+    printLine ( '  ' + arg + ( if ( arg is '--ncljsc-print-options-once' ) then '    [ ignored by ncljsc ]' else '' ) )
 
 # Run `ncljsc` by parsing passed options and determining what action to take.
 # Many flags cause us to divert before compiling anything. Flags passed after
@@ -393,7 +393,7 @@ lint = (file, js) ->
 parseOptions = ->
   optionParser  = new CliOptionParser SWITCHES, BANNER
   po = process.argv[2..]
-  if ( ( i = ( po.indexOf '--ncljsc-printprint-options-once' ) ) isnt -1 ) then po.splice i, 1
+  if ( ( i = ( po.indexOf '--ncljsc-print-options-once' ) ) isnt -1 ) then po.splice i, 1
   o = opts      = optionParser.parse po
   o.compile     or=  !!o.output
   o.run         = not (o.compile or o.print or o.lint)
@@ -413,7 +413,7 @@ forkNode = ->
   nodeArgs = opts.nodejs.split /\s+/
   args     = process.argv[1..]
   args.splice args.indexOf('--nodejs'), 2
-  spawn process.execPath, nodeArgs.concat(args).concat('--ncljsc-printprint-options-once'),
+  spawn process.execPath, nodeArgs.concat(args).concat('--ncljsc-print-options-once'),
     cwd:        process.cwd()
     env:        process.env
     customFds:  [0, 1, 2]
