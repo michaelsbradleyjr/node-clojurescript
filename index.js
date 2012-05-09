@@ -672,7 +672,7 @@
   };
   
   watch = function(source, base) {
-    var compile, compileTimeout, prevStats, rewatch, watchErr, watcher;
+    var blockCompile, compile, compileTimeout, prevStats, rewatch, watchErr, watcher;
     prevStats = null;
     compileTimeout = null;
     watchErr = function(e) {
@@ -691,7 +691,12 @@
         throw e;
       }
     };
+    blockCompile = false;
     compile = function() {
+      if (blockCompile) {
+        return;
+      }
+      blockCompile = true;
       if (!(opts.print || opts.run)) {
         timeLog("file watcher : filename - " + source);
       }
@@ -723,18 +728,33 @@
       if (watcher != null) {
         watcher.close();
       }
+      blockCompile = false;
       return watcher = fs.watch(source, compile);
     };
   };
   
   watchDir = function(source, base) {
-    var watcher;
+    var block, watcher;
+    block = false;
     try {
       watcher = fs.watch(source, function(event, filename) {
-        if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
+        var possibleWatchDeps, w, _i, _len, _ref1;
+        possibleWatchDeps = [];
+        _ref1 = opts['watch-deps'];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          w = _ref1[_i];
+          if ((path.extname(w)) !== '') {
+            possibleWatchDeps.push(path.basename(w));
+          }
+        }
+        if ((!filename || (!hidden(filename) && !notSources[filename] && !outFiles[filename] && ((possibleWatchDeps.indexOf(filename)) === -1))) && !block) {
+          block = true;
           if (!(opts.print || opts.run)) {
             timeLog("dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
           }
+          wait(25, function() {
+            return block = false;
+          });
           return buildPath(source, true, base);
         }
       });
@@ -798,7 +818,7 @@
   };
   
   watchDepsFile = function(file) {
-    var prevStats, rewatch, trigger, triggerTimeout, watchErr, watcher;
+    var blockTrigger, prevStats, rewatch, trigger, triggerTimeout, watchErr, watcher;
     prevStats = null;
     triggerTimeout = null;
     watchErr = function(e) {
@@ -813,13 +833,19 @@
         throw e;
       }
     };
+    blockTrigger = false;
     trigger = function() {
+      if (blockTrigger) {
+        return;
+      }
+      blockTrigger = true;
       if (!(opts.print || opts.run)) {
         timeLog("deps file watcher : filename - " + file);
       }
       clearTimeout(triggerTimeout);
       return triggerTimeout = wait(25, function() {
         return fs.stat(file, function(err, stats) {
+          var s, touchfiles, _i, _len, _ref1;
           if (err) {
             return watchErr(err);
           }
@@ -828,10 +854,17 @@
           }
           prevStats = stats;
           try {
-            exec("touch " + sources[0], function(err) {
+            touchfiles = sources[0];
+            _ref1 = sources.slice(1);
+            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+              s = _ref1[_i];
+              touchfiles = touchfiles + (" " + s);
+            }
+            exec("touch " + touchfiles, function(err) {
               if (err) {
                 throw err;
               }
+              return blockTrigger = false;
             });
             return rewatch();
           } catch (err) {
@@ -854,18 +887,35 @@
   };
   
   watchDepsDir = function(dir) {
-    var watcher;
+    var block, watcher;
+    block = false;
     try {
       return watcher = fs.watch(dir, function(event, filename) {
-        if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
+        var possibleSources, s, touchfiles, _i, _j, _len, _len1, _ref1;
+        possibleSources = [];
+        for (_i = 0, _len = sources.length; _i < _len; _i++) {
+          s = sources[_i];
+          if ((path.extname(s)) !== '') {
+            possibleSources.push(path.basename(s));
+          }
+        }
+        if ((!filename || (!hidden(filename) && !outFiles[filename] && ((possibleSources.indexOf(filename)) === -1))) && !block) {
+          block = true;
           if (!(opts.print || opts.run)) {
             timeLog("deps dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
           }
           try {
-            return exec("touch " + sources[0], function(err) {
+            touchfiles = sources[0];
+            _ref1 = sources.slice(1);
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              s = _ref1[_j];
+              touchfiles = touchfiles + (" " + s);
+            }
+            return exec("touch " + touchfiles, function(err) {
               if (err) {
                 throw err;
               }
+              return block = false;
             });
           } catch (err) {
             if (err) {

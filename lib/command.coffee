@@ -206,7 +206,11 @@ watch = (source, base) ->
         compileJoin()
     else throw e
 
+  blockCompile = false
+
   compile = ->
+    if blockCompile then return
+    blockCompile = true
     timeLog "file watcher : filename - #{source}" unless ( opts.print or opts.run )
     clearTimeout compileTimeout
     compileTimeout = wait 25, ->
@@ -232,15 +236,23 @@ watch = (source, base) ->
 
   rewatch = ->
     watcher?.close()
+    blockCompile = false
     watcher = fs.watch source, compile
 
 
 # Watch a directory of files for new additions.
 watchDir = (source, base) ->
+  block = false
   try
     watcher = fs.watch source, (event, filename) ->
-      if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
+      possibleWatchDeps = []
+      for w in opts['watch-deps']
+        if ( ( path.extname w ) isnt '' )
+          possibleWatchDeps.push path.basename w
+      if ( ( not filename or ( not hidden(filename) and not notSources[filename] and not outFiles[filename] and ( ( possibleWatchDeps.indexOf filename ) is -1 ) ) ) and not block )
+        block = true
         timeLog "dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless ( opts.print or opts.run )
+        wait 25, -> block = false
         buildPath source, yes, base
 
       # clearTimeout readdirTimeout
@@ -290,7 +302,11 @@ watchDepsFile = (file) ->
         'fail silently?'
     else throw e
 
+  blockTrigger = false
+
   trigger = ->
+    if blockTrigger then return
+    blockTrigger = true
     timeLog "deps file watcher : filename - #{file}" unless ( opts.print or opts.run )
     clearTimeout triggerTimeout
     triggerTimeout = wait 25, ->
@@ -300,8 +316,11 @@ watchDepsFile = (file) ->
           stats.mtime.getTime() is prevStats.mtime.getTime()
         prevStats = stats
         try
-          exec "touch #{sources[0]}", (err) ->
+          touchfiles = sources[0]
+          ( touchfiles = touchfiles + " #{s}") for s in sources[1..]
+          exec "touch #{touchfiles}", (err) ->
             throw err if err
+            blockTrigger = false
           rewatch()
         catch err
           watchErr err
@@ -316,13 +335,22 @@ watchDepsFile = (file) ->
     watcher = fs.watch file, trigger
 
 watchDepsDir = (dir) ->
+  block = false
   try
     watcher = fs.watch dir, (event, filename) ->
-      if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
+      possibleSources = []
+      for s in sources
+        if ( ( path.extname s ) isnt '' )
+          possibleSources.push path.basename s
+      if ( ( not filename or ( not hidden(filename) and not outFiles[filename] and ( ( possibleSources.indexOf filename ) is -1 ) ) ) and not block )
+        block = true
         timeLog "deps dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless ( opts.print or opts.run )
         try
-          exec "touch #{sources[0]}", (err) ->
+          touchfiles = sources[0]
+          ( touchfiles = touchfiles + " #{s}") for s in sources[1..]
+          exec "touch #{touchfiles}", (err) ->
             throw err if err
+            block = false
         catch err
           throw err if err
 
