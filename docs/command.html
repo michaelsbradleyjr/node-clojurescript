@@ -94,7 +94,10 @@ Many flags cause us to divert before compiling anything. Flags passed after
       <span class="k">return</span>
     <span class="k">if</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">()</span>
       <span class="nx">watchDir</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span> <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">watch</span>
-      <span class="nx">buildDirFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>fs.readdir source, (err, files) ->
+      <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">run</span>
+        <span class="nx">buildPath</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="p">(</span> <span class="nx">source</span> <span class="o">+</span> <span class="s">&#39;/index.cljs&#39;</span> <span class="p">)</span> <span class="p">),</span> <span class="kc">yes</span><span class="p">,</span> <span class="nx">base</span>
+      <span class="k">else</span>
+        <span class="nx">buildFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>fs.readdir source, (err, files) ->
  throw err if err and err.code isnt 'ENOENT'
  return if err?.code is 'ENOENT'
  index = sources.indexOf source
@@ -104,17 +107,14 @@ Many flags cause us to divert before compiling anything. Flags passed after
  files.forEach (file) ->
    compilePath (path.join source, file), no, base</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">else</span> <span class="k">if</span> <span class="nx">topLevel</span> <span class="o">or</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">source</span><span class="p">)</span> <span class="o">is</span> <span class="s">&#39;.cljs&#39;</span>
       <span class="nx">watch</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span> <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">watch</span>
-      <span class="nx">buildFileFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>fs.readFile source, (err, code) ->
+      <span class="nx">buildFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>fs.readFile source, (err, code) ->
  throw err if err and err.code isnt 'ENOENT'
  return if err?.code is 'ENOENT'
  compileScript(source, code.toString(), base)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">else</span>
       <span class="nx">notSources</span><span class="p">[</span><span class="nx">source</span><span class="p">]</span> <span class="o">=</span> <span class="kc">yes</span>
-      <span class="nx">removeSource</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span>
-
-<span class="nv">buildDirFromDisk = </span><span class="nf">(path, base) -&gt;</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;not implemented yet, should have cljsc build the specified dir&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Compile a single path, according to the requested options. If
+      <span class="nx">removeSource</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Compile a single path, according to the requested options. If
 evaluating the script directly sets <code>__filename</code>, <code>__dirname</code> and
-<code>module.filename</code> to be correct relative to the script's path.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">buildFileFromDisk = </span><span class="nf">(path, base) -&gt;</span>
+<code>module.filename</code> to be correct relative to the script's path.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">buildFromDisk = </span><span class="nf">(path, base) -&gt;</span>
   <span class="nv">o = </span><span class="nx">opts</span>
   <span class="nv">options = </span><span class="nx">compileOptions</span> <span class="nx">path</span>
   <span class="k">try</span>

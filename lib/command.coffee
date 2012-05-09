@@ -112,7 +112,10 @@ buildPath = (source, topLevel, base) ->
       return
     if stats.isDirectory()
       watchDir source, base if opts.watch
-      buildDirFromDisk source, base
+      if opts.run
+        buildPath ( path.normalize ( source + '/index.cljs' ) ), yes, base
+      else
+        buildFromDisk source, base
       #fs.readdir source, (err, files) ->
       #  throw err if err and err.code isnt 'ENOENT'
       #  return if err?.code is 'ENOENT'
@@ -124,7 +127,7 @@ buildPath = (source, topLevel, base) ->
       #    compilePath (path.join source, file), no, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
-      buildFileFromDisk source, base
+      buildFromDisk source, base
       #fs.readFile source, (err, code) ->
       #  throw err if err and err.code isnt 'ENOENT'
       #  return if err?.code is 'ENOENT'
@@ -133,13 +136,10 @@ buildPath = (source, topLevel, base) ->
       notSources[source] = yes
       removeSource source, base
 
-buildDirFromDisk = (path, base) ->
-  throw new Error 'not implemented yet, should have cljsc build the specified dir'
-
 # Compile a single path, according to the requested options. If
 # evaluating the script directly sets `__filename`, `__dirname` and
 # `module.filename` to be correct relative to the script's path.
-buildFileFromDisk = (path, base) ->
+buildFromDisk = (path, base) ->
   o = opts
   options = compileOptions path
   try
