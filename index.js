@@ -692,7 +692,7 @@
       }
     };
     compile = function() {
-      if (!opts.print) {
+      if (!(opts.print || opts.run)) {
         timeLog("file watcher : filename - " + source);
       }
       clearTimeout(compileTimeout);
@@ -732,7 +732,7 @@
     try {
       watcher = fs.watch(source, function(event, filename) {
         if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
-          if (!opts.print) {
+          if (!(opts.print || opts.run)) {
             timeLog("dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
           }
           return buildPath(source, true, base);
@@ -814,7 +814,7 @@
       }
     };
     trigger = function() {
-      if (!opts.print) {
+      if (!(opts.print || opts.run)) {
         timeLog("deps file watcher : filename - " + file);
       }
       clearTimeout(triggerTimeout);
@@ -858,7 +858,7 @@
     try {
       return watcher = fs.watch(dir, function(event, filename) {
         if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
-          if (!opts.print) {
+          if (!(opts.print || opts.run)) {
             timeLog("deps dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
           }
           try {

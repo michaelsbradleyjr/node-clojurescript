@@ -207,7 +207,7 @@ watch = (source, base) ->
     else throw e
 
   compile = ->
-    timeLog "file watcher : filename - #{source}" unless opts.print
+    timeLog "file watcher : filename - #{source}" unless ( opts.print or opts.run )
     clearTimeout compileTimeout
     compileTimeout = wait 25, ->
       fs.stat source, (err, stats) ->
@@ -240,7 +240,7 @@ watchDir = (source, base) ->
   try
     watcher = fs.watch source, (event, filename) ->
       if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
-        timeLog "dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless opts.print
+        timeLog "dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless ( opts.print or opts.run )
         buildPath source, yes, base
 
       # clearTimeout readdirTimeout
@@ -291,7 +291,7 @@ watchDepsFile = (file) ->
     else throw e
 
   trigger = ->
-    timeLog "deps file watcher : filename - #{file}" unless opts.print
+    timeLog "deps file watcher : filename - #{file}" unless ( opts.print or opts.run )
     clearTimeout triggerTimeout
     triggerTimeout = wait 25, ->
       fs.stat file, (err, stats) ->
@@ -319,7 +319,7 @@ watchDepsDir = (dir) ->
   try
     watcher = fs.watch dir, (event, filename) ->
       if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
-        timeLog "deps dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless opts.print
+        timeLog "deps dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless ( opts.print or opts.run )
         try
           exec "touch #{sources[0]}", (err) ->
             throw err if err
