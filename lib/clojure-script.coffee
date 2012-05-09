@@ -32,7 +32,7 @@ ClojureScript.options = ClojureScript.defaultOptions
 
 ClojureScript.initJava = (options) ->
   @java = java = require 'java'
-  if options then java.options.push jo for jo in ( options.split ' ' )
+  if options then java.options.push ( '-' + jo ) for jo in ( options.split ' ' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/clojure.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/compiler.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' )

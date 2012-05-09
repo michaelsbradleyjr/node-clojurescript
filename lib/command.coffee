@@ -29,7 +29,8 @@ SWITCHES = [
   ['-h', '--help',                    '  display this help message']
   ['-i', '--interactive',             '  run an interactive ClojureScript REPL']
   ['-j', '--join [FILE]',             '  concatenate the source ClojureScript before compiling']
-  ['-J', '--java [LIST]',             '  pass a string of options to the JVM']
+  ['-J', '--java [LIST]',             '  pass a string of options to the JVM, space separated,\n' + \
+                                      '                       leave off the leading dashes']
   ['-l', '--lint',                    '  pipe the compiled JavaScript through JavaScript Lint']
   ['-n', '--nodejs [ARGS]',           '  pass options directly to the "node" binary']
   ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the\n' + \
