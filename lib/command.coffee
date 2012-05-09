@@ -40,7 +40,7 @@ SWITCHES = [
   ['-s', '--stdio',                   '  listen for and compile scripts over stdio']
   ['-v', '--version',                 '  display the version number']
   ['-W', '--watch-deps [FILE*]',      '  watch other dependencies not targeted by --watch, \n' + \
-                                      '                       rerun commands on changes']
+                                      '                       rerun commands on changes (requires --watch)']
   ['-w', '--watch',                   '  watch scripts for changes and rerun commands']
 ]
 
@@ -90,7 +90,7 @@ ClojureScript.commandRun = ->
   return compileStdio()                   if opts.stdio
   return compileScript null, sources[0]   if opts.eval
   return repl.prompt()                    unless sources.length
-  watchDeps()                             if opts.watch
+  watchDeps()                             if opts['watch-deps'] and opts.watch
   literals = if opts.run then sources.splice 1 else []
   process.argv = process.argv[0..1].concat literals
   process.argv[0] = 'ncljsc'
@@ -261,8 +261,19 @@ unwatchDir = (source, base) ->
   return unless sources.some (s, i) -> prevSources[i] isnt s
   compileJoin()
 
+# Watch dependencies (may be directories or files)
+watchDeps = ->
+  'watch them'
+
+watchDepsFile = ->
+  'watch'
+
+watchDepsDir = ->
+  'watch the files in this dir which have extensions matching those in ClojureScript.depExts'
+
+
 # Remove a file from our source list, and source code cache. Optionally remove
-# the compiled JS version as well.
+# the cnompiled JS version as well.
 removeSource = (source, base, removeJs) ->
   index = sources.indexOf source
   sources.splice index, 1

@@ -17,10 +17,16 @@
 
 <span class="nv">ClojureScript.CLJS_VERSION = </span><span class="s">&#39;r1011&#39;</span>
 
+<span class="nv">ClojureScript.depExts = </span><span class="p">[</span> <span class="s">&#39;.cljs&#39;</span><span class="p">,</span> <span class="s">&#39;.js&#39;</span><span class="p">,</span> <span class="s">&#39;.coffee&#39;</span> <span class="p">]</span>
+
 <span class="nv">ClojureScript.Tempdir = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/dir&#39;</span>
+<span class="nv">ClojureScript.tmp = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempdir</span>
 
 <span class="nv">ClojureScript.defaultJavaOptions = </span><span class="s">&#39;&#39;</span>
 <span class="nv">ClojureScript.javaOptions = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultJavaOptions</span>
+
+<span class="nv">ClojureScript.defaultOptions = </span><span class="s">&#39;{:optimizations :simple :target :nodejs :pretty-print false}&#39;</span>
+<span class="nv">ClojureScript.options = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultOptions</span>
 
 
 <span class="nv">ClojureScript.initJava = </span><span class="nf">(options) -&gt;</span>
@@ -51,15 +57,10 @@
 
   <span class="vi">@clojureBuild = </span><span class="nx">@java</span><span class="p">.</span><span class="nx">callStaticMethodSync</span> <span class="s">&#39;clojure.lang.RT&#39;</span><span class="p">,</span> <span class="s">&#39;var&#39;</span><span class="p">,</span> <span class="s">&#39;ncljsc&#39;</span><span class="p">,</span> <span class="s">&#39;build&#39;</span>
 
+
 <span class="nv">ClojureScript.addClassPath = </span><span class="nf">(cp) -&gt;</span>
   <span class="nx">@initClojureCompiler</span><span class="p">()</span>
   <span class="nx">@addClassPath</span> <span class="nx">cp</span>
-
-
-<span class="nv">ClojureScript.defaultOptions = </span><span class="s">&#39;{:optimizations :simple :target :nodejs :pretty-print false}&#39;</span>
-<span class="nv">ClojureScript.options = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultOptions</span>
-
-<span class="nv">ClojureScript.tmp = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempdir</span>
 
 
 <span class="nv">pathCompiledCoreJS = </span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/out/cljs/core.js&#39;</span>
