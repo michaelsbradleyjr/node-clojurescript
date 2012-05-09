@@ -510,7 +510,7 @@
     _results = [];
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       arg = _ref1[_i];
-      _results.push(printLine('  ' + arg + (arg === '--ncljsc-printprint-options-once' ? '    [ ignored by ncljsc ]' : '')));
+      _results.push(printLine('  ' + arg + (arg === '--ncljsc-print-options-once' ? '    [ ignored by ncljsc ]' : '')));
     }
     return _results;
   };
@@ -964,7 +964,7 @@
     var i, o, po, source, _i, _len;
     optionParser = new CliOptionParser(SWITCHES, BANNER);
     po = process.argv.slice(2);
-    if ((i = po.indexOf('--ncljsc-printprint-options-once')) !== -1) {
+    if ((i = po.indexOf('--ncljsc-print-options-once')) !== -1) {
       po.splice(i, 1);
     }
     o = opts = optionParser.parse(po);
@@ -992,7 +992,7 @@
     nodeArgs = opts.nodejs.split(/\s+/);
     args = process.argv.slice(1);
     args.splice(args.indexOf('--nodejs'), 2);
-    return spawn(process.execPath, nodeArgs.concat(args).concat('--ncljsc-printprint-options-once'), {
+    return spawn(process.execPath, nodeArgs.concat(args).concat('--ncljsc-print-options-once'), {
       cwd: process.cwd(),
       env: process.env,
       customFds: [0, 1, 2]
