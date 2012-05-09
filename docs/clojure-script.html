@@ -162,7 +162,7 @@
 
 
 <span class="nv">ClojureScript.eval = </span><span class="nf">(options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;eval method is not yet implemented&#39;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;ClojureScript.eval method is not yet implemented&#39;</span>
 
 
 <span class="nv">ClojureScript.run = </span><span class="nf">(options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
@@ -181,7 +181,7 @@ does not attempt to support the deprecated <code>require.registerExtension</code
     <span class="k">else</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;missing require.extensions, can\&#39;t proceed&#39;</span>
   <span class="k">else</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;run method does not yet support compiling directly from a source string&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>original coffee-script control flow, for reference:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;ClojureScript.run method does not yet support compiling directly from a source string&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>original coffee-script control flow, for reference:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
   mainModule.<em>compile compile(code, options), mainModule.filename
 else
   mainModule.</em>compile code, mainModule.filename</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>&nbsp;<br />

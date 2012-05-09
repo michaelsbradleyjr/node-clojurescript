@@ -253,14 +253,14 @@ unwatchDir = (source, base) ->
 
 # Watch dependencies (may be directories or files)
 watchDeps = ->
-  throw new Error 'not implemented yet, should setup \'watches\' for the dependencies (dirs or files)' + \
+  throw new Error 'watchDeps not implemented yet, should setup \'watches\' for the dependencies (dirs or files) ' + \
                   'specified in opts[\'watch-deps\']'
 
 watchDepsFile = (file) ->
-  throw new Error 'not implemented yet, should setup a \'watch\' for the specified dependency file'
+  throw new Error 'watchDepsFile not implemented yet, should setup a \'watch\' for the specified dependency file'
 
 watchDepsDir = (dir) ->
-  throw new Error 'not implemented yet, should call watchDepsFile for files in the specified dir' + \
+  throw new Error 'watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir ' + \
                   'which have extensions matching those in ClojureScript.depExts'
 
 

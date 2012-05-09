@@ -254,7 +254,7 @@
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
     }
-    throw new Error('eval method is not yet implemented');
+    throw new Error('ClojureScript.eval method is not yet implemented');
   };
   
   ClojureScript.run = function(options, cljscOptions, javaOptions) {
@@ -279,7 +279,7 @@
         throw new Error('missing require.extensions, can\'t proceed');
       }
     } else {
-      throw new Error('run method does not yet support compiling directly from a source string');
+      throw new Error('ClojureScript.run method does not yet support compiling directly from a source string');
     }
   };
   
@@ -783,15 +783,15 @@
   };
   
   watchDeps = function() {
-    throw new Error('not implemented yet, should setup \'watches\' for the dependencies (dirs or files)' + 'specified in opts[\'watch-deps\']');
+    throw new Error('watchDeps not implemented yet, should setup \'watches\' for the dependencies (dirs or files) ' + 'specified in opts[\'watch-deps\']');
   };
   
   watchDepsFile = function(file) {
-    throw new Error('not implemented yet, should setup a \'watch\' for the specified dependency file');
+    throw new Error('watchDepsFile not implemented yet, should setup a \'watch\' for the specified dependency file');
   };
   
   watchDepsDir = function(dir) {
-    throw new Error('not implemented yet, should call watchDepsFile for files in the specified dir' + 'which have extensions matching those in ClojureScript.depExts');
+    throw new Error('watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir ' + 'which have extensions matching those in ClojureScript.depExts');
   };
   
   removeSource = function(source, base, removeJs) {

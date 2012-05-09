@@ -162,7 +162,7 @@ ClojureScript.build = (options = {}, cljscOptions = ClojureScript.options, javaO
 
 
 ClojureScript.eval = (options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
-  throw new Error 'eval method is not yet implemented'
+  throw new Error 'ClojureScript.eval method is not yet implemented'
 
 
 ClojureScript.run = (options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
@@ -184,7 +184,7 @@ ClojureScript.run = (options = {}, cljscOptions = ClojureScript.options, javaOpt
     else
       throw new Error 'missing require.extensions, can\'t proceed'
   else
-    throw new Error 'run method does not yet support compiling directly from a source string'
+    throw new Error 'ClojureScript.run method does not yet support compiling directly from a source string'
 
   # original coffee-script control flow, for reference:
 
