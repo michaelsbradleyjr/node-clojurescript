@@ -4,4 +4,5 @@ var path = require('path');
 var fs   = require('fs');
 var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../');
 
-require(pkg).commandRun();
+var ncljsc = require(pkg);
+ncljsc.commandRun();

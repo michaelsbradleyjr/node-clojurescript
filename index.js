@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildDirFromDisk, buildFileFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -576,12 +576,12 @@
         if (opts.watch) {
           watchDir(source, base);
         }
-        return buildFromDisk(source, base);
+        return buildDirFromDisk(source, base);
       } else if (topLevel || path.extname(source) === '.cljs') {
         if (opts.watch) {
           watch(source, base);
         }
-        return buildFromDisk(source, base);
+        return buildFileFromDisk(source, base);
       } else {
         notSources[source] = true;
         return removeSource(source, base);
@@ -589,7 +589,11 @@
     });
   };
   
-  buildFromDisk = function(path, base) {
+  buildDirFromDisk = function(path, base) {
+    throw new Error('not implemented yet, should have cljsc build the specified dir');
+  };
+  
+  buildFileFromDisk = function(path, base) {
     var o, options, t, task;
     o = opts;
     options = compileOptions(path);
@@ -779,15 +783,15 @@
   };
   
   watchDeps = function() {
-    return 'watch them';
+    throw new Error('not implemented yet, should setup \'watches\' for the dependencies (dirs or files)' + 'specified in opts[\'watch-deps\']');
   };
   
-  watchDepsFile = function() {
-    return 'watch';
+  watchDepsFile = function(file) {
+    throw new Error('not implemented yet, should setup a \'watch\' for the specified dependency file');
   };
   
-  watchDepsDir = function() {
-    return 'watch the files in this dir which have extensions matching those in ClojureScript.depExts';
+  watchDepsDir = function(dir) {
+    throw new Error('not implemented yet, should call watchDepsFile for files in the specified dir' + 'which have extensions matching those in ClojureScript.depExts');
   };
   
   removeSource = function(source, base, removeJs) {

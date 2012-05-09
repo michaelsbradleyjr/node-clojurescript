@@ -112,6 +112,7 @@ buildPath = (source, topLevel, base) ->
       return
     if stats.isDirectory()
       watchDir source, base if opts.watch
+      buildDirFromDisk source, base
       #fs.readdir source, (err, files) ->
       #  throw err if err and err.code isnt 'ENOENT'
       #  return if err?.code is 'ENOENT'
@@ -121,10 +122,9 @@ buildPath = (source, topLevel, base) ->
       #  sourceCode[index..index] = files.map -> null
       #  files.forEach (file) ->
       #    compilePath (path.join source, file), no, base
-      buildFromDisk source, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
-      buildFromDisk source, base
+      buildFileFromDisk source, base
       #fs.readFile source, (err, code) ->
       #  throw err if err and err.code isnt 'ENOENT'
       #  return if err?.code is 'ENOENT'
@@ -133,10 +133,13 @@ buildPath = (source, topLevel, base) ->
       notSources[source] = yes
       removeSource source, base
 
+buildDirFromDisk = (path, base) ->
+  throw new Error 'not implemented yet, should have cljsc build the specified dir'
+
 # Compile a single path, according to the requested options. If
 # evaluating the script directly sets `__filename`, `__dirname` and
 # `module.filename` to be correct relative to the script's path.
-buildFromDisk = (path, base) ->
+buildFileFromDisk = (path, base) ->
   o = opts
   options = compileOptions path
   try
@@ -263,13 +266,15 @@ unwatchDir = (source, base) ->
 
 # Watch dependencies (may be directories or files)
 watchDeps = ->
-  'watch them'
+  throw new Error 'not implemented yet, should setup \'watches\' for the dependencies (dirs or files)' + \
+                  'specified in opts[\'watch-deps\']'
 
-watchDepsFile = ->
-  'watch'
+watchDepsFile = (file) ->
+  throw new Error 'not implemented yet, should setup a \'watch\' for the specified dependency file'
 
-watchDepsDir = ->
-  'watch the files in this dir which have extensions matching those in ClojureScript.depExts'
+watchDepsDir = (dir) ->
+  throw new Error 'not implemented yet, should call watchDepsFile for files in the specified dir' + \
+                  'which have extensions matching those in ClojureScript.depExts'
 
 
 # Remove a file from our source list, and source code cache. Optionally remove

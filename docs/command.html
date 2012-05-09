@@ -93,7 +93,8 @@ Many flags cause us to divert before compiling anything. Flags passed after
         <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="mi">1</span>
       <span class="k">return</span>
     <span class="k">if</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">()</span>
-      <span class="nx">watchDir</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span> <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">watch</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>fs.readdir source, (err, files) ->
+      <span class="nx">watchDir</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span> <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">watch</span>
+      <span class="nx">buildDirFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>fs.readdir source, (err, files) ->
  throw err if err and err.code isnt 'ENOENT'
  return if err?.code is 'ENOENT'
  index = sources.indexOf source
@@ -101,17 +102,19 @@ Many flags cause us to divert before compiling anything. Flags passed after
  sources[index..index] = (path.join source, file for file in files)
  sourceCode[index..index] = files.map -> null
  files.forEach (file) ->
-   compilePath (path.join source, file), no, base</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">buildFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="nx">topLevel</span> <span class="o">or</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">source</span><span class="p">)</span> <span class="o">is</span> <span class="s">&#39;.cljs&#39;</span>
+   compilePath (path.join source, file), no, base</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">else</span> <span class="k">if</span> <span class="nx">topLevel</span> <span class="o">or</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">source</span><span class="p">)</span> <span class="o">is</span> <span class="s">&#39;.cljs&#39;</span>
       <span class="nx">watch</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span> <span class="k">if</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">watch</span>
-      <span class="nx">buildFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>fs.readFile source, (err, code) ->
+      <span class="nx">buildFileFromDisk</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>fs.readFile source, (err, code) ->
  throw err if err and err.code isnt 'ENOENT'
  return if err?.code is 'ENOENT'
  compileScript(source, code.toString(), base)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">else</span>
       <span class="nx">notSources</span><span class="p">[</span><span class="nx">source</span><span class="p">]</span> <span class="o">=</span> <span class="kc">yes</span>
-      <span class="nx">removeSource</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Compile a single path, according to the requested options. If
+      <span class="nx">removeSource</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">base</span>
+
+<span class="nv">buildDirFromDisk = </span><span class="nf">(path, base) -&gt;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;not implemented yet, should have cljsc build the specified dir&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Compile a single path, according to the requested options. If
 evaluating the script directly sets <code>__filename</code>, <code>__dirname</code> and
-<code>module.filename</code> to be correct relative to the script's path.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">buildFromDisk = </span><span class="nf">(path, base) -&gt;</span>
+<code>module.filename</code> to be correct relative to the script's path.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">buildFileFromDisk = </span><span class="nf">(path, base) -&gt;</span>
   <span class="nv">o = </span><span class="nx">opts</span>
   <span class="nv">options = </span><span class="nx">compileOptions</span> <span class="nx">path</span>
   <span class="k">try</span>
@@ -215,13 +218,15 @@ such as <code>--lint</code> or <code>--print</code>.</p>             </td>      
   <span class="nx">removeSource</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">base</span><span class="p">,</span> <span class="kc">yes</span> <span class="k">for</span> <span class="nx">file</span> <span class="k">in</span> <span class="nx">toRemove</span>
   <span class="k">return</span> <span class="nx">unless</span> <span class="nx">sources</span><span class="p">.</span><span class="nx">some</span> <span class="nf">(s, i) -&gt;</span> <span class="nx">prevSources</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">isnt</span> <span class="nx">s</span>
   <span class="nx">compileJoin</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>Watch dependencies (may be directories or files)</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">watchDeps = </span><span class="o">-&gt;</span>
-  <span class="s">&#39;watch them&#39;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;not implemented yet, should setup \&#39;watches\&#39; for the dependencies (dirs or files)&#39;</span> <span class="o">+</span> <span class="o">\</span>
+                  <span class="s">&#39;specified in opts[\&#39;watch-deps\&#39;]&#39;</span>
 
-<span class="nv">watchDepsFile = </span><span class="o">-&gt;</span>
-  <span class="s">&#39;watch&#39;</span>
+<span class="nv">watchDepsFile = </span><span class="nf">(file) -&gt;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;not implemented yet, should setup a \&#39;watch\&#39; for the specified dependency file&#39;</span>
 
-<span class="nv">watchDepsDir = </span><span class="o">-&gt;</span>
-  <span class="s">&#39;watch the files in this dir which have extensions matching those in ClojureScript.depExts&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>Remove a file from our source list, and source code cache. Optionally remove
+<span class="nv">watchDepsDir = </span><span class="nf">(dir) -&gt;</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;not implemented yet, should call watchDepsFile for files in the specified dir&#39;</span> <span class="o">+</span> <span class="o">\</span>
+                  <span class="s">&#39;which have extensions matching those in ClojureScript.depExts&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>Remove a file from our source list, and source code cache. Optionally remove
 the cnompiled JS version as well.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">removeSource = </span><span class="nf">(source, base, removeJs) -&gt;</span>
   <span class="nv">index = </span><span class="nx">sources</span><span class="p">.</span><span class="nx">indexOf</span> <span class="nx">source</span>
   <span class="nx">sources</span><span class="p">.</span><span class="nx">splice</span> <span class="nx">index</span><span class="p">,</span> <span class="mi">1</span>
