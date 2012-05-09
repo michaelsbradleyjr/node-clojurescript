@@ -191,7 +191,6 @@ loadRequires = ->
 # time the file is updated. May be used in combination with other options,
 # such as `--lint` or `--print`.
 watch = (source, base) ->
-
   prevStats = null
   compileTimeout = null
 
@@ -237,7 +236,6 @@ watch = (source, base) ->
 
 # Watch a directory of files for new additions.
 watchDir = (source, base) ->
-  readdirTimeout = null
   try
     watcher = fs.watch source, (event, filename) ->
       if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
@@ -271,16 +269,54 @@ unwatchDir = (source, base) ->
 
 # Watch dependencies (may be directories or files)
 watchDeps = ->
-  throw new Error 'watchDeps not implemented yet, should setup \'watches\' for the dependencies (dirs or files) ' + \
-                  'specified in opts[\'watch-deps\']'
+  for wD in opts['watch-deps']
+    do (wD) ->
+      fs.stat wD, (err, stats) ->
+        if err then throw err unless err.code is 'ENOENT'
+        if stats.isDirectory() then watchDepsDir wD
+        if stats.isFile() then watchDepsFile wD
 
 watchDepsFile = (file) ->
-  throw new Error 'watchDepsFile not implemented yet, should setup a \'watch\' for the specified dependency file'
+  prevStats = null
+  triggerTimeout = null
+
+  watchErr = (e) ->
+    if e.code is 'ENOENT'
+      try
+        rewatch()
+        trigger()
+      catch e
+        'fail silently?'
+    else throw e
+
+  trigger = ->
+    timeLog "deps file watcher : filename - #{file}" unless opts.print
+    clearTimeout triggerTimeout
+    triggerTimeout = wait 25, ->
+      fs.stat file, (err, stats) ->
+        return watchErr err if err
+        return rewatch() if prevStats and stats.size is prevStats.size and
+          stats.mtime.getTime() is prevStats.mtime.getTime()
+        prevStats = stats
+        try
+          exec "touch #{sources[0]}", (err) ->
+            throw err if err
+          rewatch()
+        catch err
+          watchErr err
+
+  try
+    watcher = fs.watch file, trigger
+  catch e
+    watchErr e
+
+  rewatch = ->
+    watcher?.close()
+    watcher = fs.watch file, trigger
 
 watchDepsDir = (dir) ->
   throw new Error 'watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir ' + \
                   'which have extensions matching those in ClojureScript.depExts'
-
 
 # Remove a file from our source list, and source code cache. Optionally remove
 # the cnompiled JS version as well.

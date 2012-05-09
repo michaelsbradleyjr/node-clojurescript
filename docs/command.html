@@ -154,7 +154,6 @@ unless sourceCode.some((code) -> code is null)
   <span class="nv">module.filename = </span><span class="nx">realFilename</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>Watch a source ClojureScript file using <code>fs.watch</code>, recompiling it every
 time the file is updated. May be used in combination with other options,
 such as <code>--lint</code> or <code>--print</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">watch = </span><span class="nf">(source, base) -&gt;</span>
-
   <span class="nv">prevStats = </span><span class="kc">null</span>
   <span class="nv">compileTimeout = </span><span class="kc">null</span>
 
@@ -193,7 +192,6 @@ such as <code>--lint</code> or <code>--print</code>.</p>             </td>      
   <span class="nv">rewatch = </span><span class="o">-&gt;</span>
     <span class="nx">watcher</span><span class="o">?</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
     <span class="nv">watcher = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">compile</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <p>Watch a directory of files for new additions.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">watchDir = </span><span class="nf">(source, base) -&gt;</span>
-  <span class="nv">readdirTimeout = </span><span class="kc">null</span>
   <span class="k">try</span>
     <span class="nv">watcher = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span> <span class="nx">source</span><span class="p">,</span> <span class="nf">(event, filename) -&gt;</span>
       <span class="k">if</span> <span class="o">not</span> <span class="nx">filename</span> <span class="o">or</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">hidden</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">notSource</span><span class="p">[</span><span class="nx">filename</span><span class="p">]</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">outFiles</span><span class="p">[</span><span class="nx">filename</span><span class="p">]</span> <span class="p">)</span>
@@ -220,11 +218,50 @@ readdirTimeout = wait 25, ->
   <span class="nx">removeSource</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">base</span><span class="p">,</span> <span class="kc">yes</span> <span class="k">for</span> <span class="nx">file</span> <span class="k">in</span> <span class="nx">toRemove</span>
   <span class="k">return</span> <span class="nx">unless</span> <span class="nx">sources</span><span class="p">.</span><span class="nx">some</span> <span class="nf">(s, i) -&gt;</span> <span class="nx">prevSources</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">isnt</span> <span class="nx">s</span>
   <span class="nx">compileJoin</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>Watch dependencies (may be directories or files)</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">watchDeps = </span><span class="o">-&gt;</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;watchDeps not implemented yet, should setup \&#39;watches\&#39; for the dependencies (dirs or files) &#39;</span> <span class="o">+</span> <span class="o">\</span>
-                  <span class="s">&#39;specified in opts[\&#39;watch-deps\&#39;]&#39;</span>
+  <span class="k">for</span> <span class="nx">wD</span> <span class="k">in</span> <span class="nx">opts</span><span class="p">[</span><span class="s">&#39;watch-deps&#39;</span><span class="p">]</span>
+    <span class="nx">do</span> <span class="nf">(wD) -&gt;</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">stat</span> <span class="nx">wD</span><span class="p">,</span> <span class="nf">(err, stats) -&gt;</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="k">then</span> <span class="k">throw</span> <span class="nx">err</span> <span class="nx">unless</span> <span class="nx">err</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="s">&#39;ENOENT&#39;</span>
+        <span class="k">if</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="k">then</span> <span class="nx">watchDepsDir</span> <span class="nx">wD</span>
+        <span class="k">if</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isFile</span><span class="p">()</span> <span class="k">then</span> <span class="nx">watchDepsFile</span> <span class="nx">wD</span>
 
 <span class="nv">watchDepsFile = </span><span class="nf">(file) -&gt;</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;watchDepsFile not implemented yet, should setup a \&#39;watch\&#39; for the specified dependency file&#39;</span>
+  <span class="nv">prevStats = </span><span class="kc">null</span>
+  <span class="nv">triggerTimeout = </span><span class="kc">null</span>
+
+  <span class="nv">watchErr = </span><span class="nf">(e) -&gt;</span>
+    <span class="k">if</span> <span class="nx">e</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="s">&#39;ENOENT&#39;</span>
+      <span class="k">try</span>
+        <span class="nx">rewatch</span><span class="p">()</span>
+        <span class="nx">trigger</span><span class="p">()</span>
+      <span class="k">catch</span> <span class="nx">e</span>
+        <span class="s">&#39;fail silently?&#39;</span>
+    <span class="k">else</span> <span class="k">throw</span> <span class="nx">e</span>
+
+  <span class="nv">trigger = </span><span class="o">-&gt;</span>
+    <span class="nx">timeLog</span> <span class="s">&quot;deps file watcher : filename - </span><span class="si">#{</span><span class="nx">file</span><span class="si">}</span><span class="s">&quot;</span> <span class="nx">unless</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">print</span>
+    <span class="nx">clearTimeout</span> <span class="nx">triggerTimeout</span>
+    <span class="nv">triggerTimeout = </span><span class="nx">wait</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-&gt;</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">stat</span> <span class="nx">file</span><span class="p">,</span> <span class="nf">(err, stats) -&gt;</span>
+        <span class="k">return</span> <span class="nx">watchErr</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+        <span class="k">return</span> <span class="nx">rewatch</span><span class="p">()</span> <span class="k">if</span> <span class="nx">prevStats</span> <span class="o">and</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">size</span> <span class="o">is</span> <span class="nx">prevStats</span><span class="p">.</span><span class="nx">size</span> <span class="o">and</span>
+          <span class="nx">stats</span><span class="p">.</span><span class="nx">mtime</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">is</span> <span class="nx">prevStats</span><span class="p">.</span><span class="nx">mtime</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
+        <span class="nv">prevStats = </span><span class="nx">stats</span>
+        <span class="k">try</span>
+          <span class="nx">exec</span> <span class="s">&quot;touch </span><span class="si">#{</span><span class="nx">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nf">(err) -&gt;</span>
+            <span class="k">throw</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+          <span class="nx">rewatch</span><span class="p">()</span>
+        <span class="k">catch</span> <span class="nx">err</span>
+          <span class="nx">watchErr</span> <span class="nx">err</span>
+
+  <span class="k">try</span>
+    <span class="nv">watcher = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">trigger</span>
+  <span class="k">catch</span> <span class="nx">e</span>
+    <span class="nx">watchErr</span> <span class="nx">e</span>
+
+  <span class="nv">rewatch = </span><span class="o">-&gt;</span>
+    <span class="nx">watcher</span><span class="o">?</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+    <span class="nv">watcher = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">trigger</span>
 
 <span class="nv">watchDepsDir = </span><span class="nf">(dir) -&gt;</span>
   <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir &#39;</span> <span class="o">+</span> <span class="o">\</span>

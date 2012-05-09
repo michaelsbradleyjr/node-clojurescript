@@ -728,8 +728,7 @@
   };
   
   watchDir = function(source, base) {
-    var readdirTimeout, watcher;
-    readdirTimeout = null;
+    var watcher;
     try {
       watcher = fs.watch(source, function(event, filename) {
         if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
@@ -774,11 +773,84 @@
   };
   
   watchDeps = function() {
-    throw new Error('watchDeps not implemented yet, should setup \'watches\' for the dependencies (dirs or files) ' + 'specified in opts[\'watch-deps\']');
+    var wD, _i, _len, _ref1, _results;
+    _ref1 = opts['watch-deps'];
+    _results = [];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      wD = _ref1[_i];
+      _results.push((function(wD) {
+        return fs.stat(wD, function(err, stats) {
+          if (err) {
+            if (err.code !== 'ENOENT') {
+              throw err;
+            }
+          }
+          if (stats.isDirectory()) {
+            watchDepsDir(wD);
+          }
+          if (stats.isFile()) {
+            return watchDepsFile(wD);
+          }
+        });
+      })(wD));
+    }
+    return _results;
   };
   
   watchDepsFile = function(file) {
-    throw new Error('watchDepsFile not implemented yet, should setup a \'watch\' for the specified dependency file');
+    var prevStats, rewatch, trigger, triggerTimeout, watchErr, watcher;
+    prevStats = null;
+    triggerTimeout = null;
+    watchErr = function(e) {
+      if (e.code === 'ENOENT') {
+        try {
+          rewatch();
+          return trigger();
+        } catch (e) {
+          return 'fail silently?';
+        }
+      } else {
+        throw e;
+      }
+    };
+    trigger = function() {
+      if (!opts.print) {
+        timeLog("deps file watcher : filename - " + file);
+      }
+      clearTimeout(triggerTimeout);
+      return triggerTimeout = wait(25, function() {
+        return fs.stat(file, function(err, stats) {
+          if (err) {
+            return watchErr(err);
+          }
+          if (prevStats && stats.size === prevStats.size && stats.mtime.getTime() === prevStats.mtime.getTime()) {
+            return rewatch();
+          }
+          prevStats = stats;
+          try {
+            exec("touch " + sources[0], function(err) {
+              if (err) {
+                throw err;
+              }
+            });
+            return rewatch();
+          } catch (err) {
+            return watchErr(err);
+          }
+        });
+      });
+    };
+    try {
+      watcher = fs.watch(file, trigger);
+    } catch (e) {
+      watchErr(e);
+    }
+    return rewatch = function() {
+      if (watcher != null) {
+        watcher.close();
+      }
+      return watcher = fs.watch(file, trigger);
+    };
   };
   
   watchDepsDir = function(dir) {
