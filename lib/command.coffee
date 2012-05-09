@@ -24,7 +24,7 @@ SWITCHES = [
   ['-b', '--bare',                    '  compile without a top-level function wrapper']
   ['-c', '--compile',                 '  compile to JavaScript and save as .js files']
   ['-e', '--eval',                    '  pass a string from the command line as input']
-  ['-F', '--flags-print',             '  print the options parsed by ncljsc and the contents of \n' + \
+  ['-F', '--flags-print',             '  print the options parsed by "ncljsc" and the contents of\n' + \
                                       '                       process.argv']
   ['-h', '--help',                    '  display this help message']
   ['-i', '--interactive',             '  run an interactive ClojureScript REPL']
@@ -32,15 +32,17 @@ SWITCHES = [
   ['-J', '--java [LIST]',             '  pass a string of options to the JVM']
   ['-l', '--lint',                    '  pipe the compiled JavaScript through JavaScript Lint']
   ['-n', '--nodejs [ARGS]',           '  pass options directly to the "node" binary']
-  ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the \n' + \
+  ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the\n' + \
                                       '                       ClojureScript compiler']
-  ['-o', '--output [DIR]',            '  set the output directory for compiled JavaScript']
+  ['-o', '--output [DIR]',            '  set the "ncljsc" output directory for compiled JavaScript\n' + \
+                                      '                       (distinct from :output-dir specified with -O)']
   ['-p', '--print',                   '  print out the compiled JavaScript']
   ['-r', '--require [FILE*]',         '  require a library before executing your script']
   ['-s', '--stdio',                   '  listen for and compile scripts over stdio']
-  ['-v', '--version',                 '  display the version number']
-  ['-W', '--watch-deps [FILE*]',      '  watch other dependencies not targeted by --watch, \n' + \
-                                      '                       rerun commands on changes (requires --watch)']
+  ['-v', '--version',                 '  display the version numbers of "ncljsc" and ClojureScript']
+  ['-W', '--watch-deps [FILE]',       '  watch other dependencies not targeted by --watch,\n' + \
+                                      '                       rerun commands on changes, supply as colon separated\n' + \
+                                      '                       path list (requires --watch)']
   ['-w', '--watch',                   '  watch scripts for changes and rerun commands']
 ]
 
@@ -70,6 +72,7 @@ printFlags = ->
       kL = key.length
       pad = ''
       if kL < longest then pad = makePad ( longest - kL )
+      if val instanceof Array then val = util.inspect val
       printLine ( '  ' + key + pad + '     ' + ( val or '' ) )
   printLine "\n#{ if ( forked isnt -1 ) then 'forked node\'s ' else '' }process.argv contained the following:\n"
   for arg in process.argv
@@ -348,6 +351,7 @@ parseOptions = ->
   o.compile     or=  !!o.output
   o.run         = not (o.compile or o.print or o.lint)
   o.print       = !!  (o.print or (o.eval or o.stdio and o.compile))
+  o['watch-deps'] and= o['watch-deps'].split ':'
   sources       = o.arguments
   sourceCode[i] = null for source, i in sources
   return

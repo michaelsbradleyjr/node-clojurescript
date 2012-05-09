@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, util, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -35,6 +35,8 @@
   path = require('path');
   
   readline = require('readline');
+  
+  util = require('util');
   
   vm = require('vm');
   
@@ -453,7 +455,7 @@
   
   BANNER = 'Usage: ncljsc [options] path/to/script.cljs -- [args]\n\nIf called without options, `ncljsc` will run your script.';
   
-  SWITCHES = [['-b', '--bare', '  compile without a top-level function wrapper'], ['-c', '--compile', '  compile to JavaScript and save as .js files'], ['-e', '--eval', '  pass a string from the command line as input'], ['-F', '--flags-print', '  print the options parsed by ncljsc and the contents of \n' + '                       process.argv'], ['-h', '--help', '  display this help message'], ['-i', '--interactive', '  run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', '  concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', '  pass a string of options to the JVM'], ['-l', '--lint', '  pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', '  pass options directly to the "node" binary'], ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the \n' + '                       ClojureScript compiler'], ['-o', '--output [DIR]', '  set the output directory for compiled JavaScript'], ['-p', '--print', '  print out the compiled JavaScript'], ['-r', '--require [FILE*]', '  require a library before executing your script'], ['-s', '--stdio', '  listen for and compile scripts over stdio'], ['-v', '--version', '  display the version number'], ['-W', '--watch-deps [FILE*]', '  watch other dependencies not targeted by --watch, \n' + '                       rerun commands on changes (requires --watch)'], ['-w', '--watch', '  watch scripts for changes and rerun commands']];
+  SWITCHES = [['-b', '--bare', '  compile without a top-level function wrapper'], ['-c', '--compile', '  compile to JavaScript and save as .js files'], ['-e', '--eval', '  pass a string from the command line as input'], ['-F', '--flags-print', '  print the options parsed by "ncljsc" and the contents of\n' + '                       process.argv'], ['-h', '--help', '  display this help message'], ['-i', '--interactive', '  run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', '  concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', '  pass a string of options to the JVM'], ['-l', '--lint', '  pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', '  pass options directly to the "node" binary'], ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the\n' + '                       ClojureScript compiler'], ['-o', '--output [DIR]', '  set the "ncljsc" output directory for compiled JavaScript\n' + '                       (distinct from :output-dir specified with -O)'], ['-p', '--print', '  print out the compiled JavaScript'], ['-r', '--require [FILE*]', '  require a library before executing your script'], ['-s', '--stdio', '  listen for and compile scripts over stdio'], ['-v', '--version', '  display the version numbers of "ncljsc" and ClojureScript'], ['-W', '--watch-deps [FILE]', '  watch other dependencies not targeted by --watch,\n' + '                       rerun commands on changes, supply as colon separated\n' + '                       path list (requires --watch)'], ['-w', '--watch', '  watch scripts for changes and rerun commands']];
   
   opts = {};
   
@@ -496,6 +498,9 @@
         pad = '';
         if (kL < longest) {
           pad = makePad(longest - kL);
+        }
+        if (val instanceof Array) {
+          val = util.inspect(val);
         }
         printLine('  ' + key + pad + '     ' + (val || ''));
       }
@@ -870,6 +875,7 @@
     o.compile || (o.compile = !!o.output);
     o.run = !(o.compile || o.print || o.lint);
     o.print = !!(o.print || (o["eval"] || o.stdio && o.compile));
+    o['watch-deps'] && (o['watch-deps'] = o['watch-deps'].split(':'));
     sources = o["arguments"];
     for (i = _i = 0, _len = sources.length; _i < _len; i = ++_i) {
       source = sources[i];

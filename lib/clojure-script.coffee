@@ -4,6 +4,7 @@ fs             = require 'fs'
 Module         = require 'module'
 path           = require 'path'
 readline       = require 'readline'
+util           = require 'util'
 vm             = require 'vm'
 
 {EventEmitter} = require 'events'
