@@ -854,7 +854,31 @@
   };
   
   watchDepsDir = function(dir) {
-    throw new Error('watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir ' + 'which have extensions matching those in ClojureScript.depExts');
+    var watcher;
+    try {
+      return watcher = fs.watch(dir, function(event, filename) {
+        if (!filename || (!hidden(filename) && !notSource[filename] && !outFiles[filename])) {
+          if (!opts.print) {
+            timeLog("deps dir watcher : event - " + event + " : " + (filename || 'filename not provided'));
+          }
+          try {
+            return exec("touch " + sources[0], function(err) {
+              if (err) {
+                throw err;
+              }
+            });
+          } catch (err) {
+            if (err) {
+              throw err;
+            }
+          }
+        }
+      });
+    } catch (e) {
+      if (e.code !== 'ENOENT') {
+        throw e;
+      }
+    }
   };
   
   removeSource = function(source, base, removeJs) {

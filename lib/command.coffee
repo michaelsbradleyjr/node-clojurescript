@@ -315,8 +315,18 @@ watchDepsFile = (file) ->
     watcher = fs.watch file, trigger
 
 watchDepsDir = (dir) ->
-  throw new Error 'watchDepsDir not implemented yet, should call watchDepsFile for files in the specified dir ' + \
-                  'which have extensions matching those in ClojureScript.depExts'
+  try
+    watcher = fs.watch dir, (event, filename) ->
+      if not filename or ( not hidden(filename) and not notSource[filename] and not outFiles[filename] )
+        timeLog "deps dir watcher : event - #{event} : #{ filename or 'filename not provided' }" unless opts.print
+        try
+          exec "touch #{sources[0]}", (err) ->
+            throw err if err
+        catch err
+          throw err if err
+
+  catch e
+    throw e unless e.code is 'ENOENT'
 
 # Remove a file from our source list, and source code cache. Optionally remove
 # the cnompiled JS version as well.
