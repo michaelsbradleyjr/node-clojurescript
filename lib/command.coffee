@@ -116,22 +116,9 @@ buildPath = (source, topLevel, base) ->
         buildPath ( path.normalize ( source + '/index.cljs' ) ), yes, base
       else
         buildFromDisk source, base
-      #fs.readdir source, (err, files) ->
-      #  throw err if err and err.code isnt 'ENOENT'
-      #  return if err?.code is 'ENOENT'
-      #  index = sources.indexOf source
-      #  files = files.filter (file) -> not hidden file
-      #  sources[index..index] = (path.join source, file for file in files)
-      #  sourceCode[index..index] = files.map -> null
-      #  files.forEach (file) ->
-      #    compilePath (path.join source, file), no, base
     else if topLevel or path.extname(source) is '.cljs'
       watch source, base if opts.watch
       buildFromDisk source, base
-      #fs.readFile source, (err, code) ->
-      #  throw err if err and err.code isnt 'ENOENT'
-      #  return if err?.code is 'ENOENT'
-      #  compileScript(source, code.toString(), base)
     else
       notSources[source] = yes
       removeSource source, base
