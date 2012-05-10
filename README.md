@@ -32,7 +32,7 @@ Now paste in something like:
 (ns hello
   (:require [cljs.nodejs :as nodejs]))
 
-(defn ^:export greet [n]
+(defn greet [n]
   (println (str "Hello, " n)))
   
 (nodejs/next-tick
@@ -101,10 +101,10 @@ So now what you should do is read up on Clojure and ClojureScript and *get to bu
 
 ### Note
 
-For long-running scripts, e.g. ones that listen on network ports, naive use of the `-w` flag will result in an `Error: listen EADDRINUSE` exception being thrown upon recompile. This is not a bug with `ncljsc`, you will encounter the same if you do the equivalent with `coffee -w`. In which case you can instead use a NodeJS tool like [forever](https://github.com/nodejitsu/forever):
+For long-running scripts, e.g. ones that listen on network ports, naive use of the `-w` flag will result in an `Error: listen EADDRINUSE` exception being thrown upon recompile. This is not a bug with `ncljsc`, you will encounter the same error if you do the equivalent with `coffee -w`. In which case you can instead use a NodeJS tool like [forever](https://github.com/nodejitsu/forever):
 
 ```bash
-$ forever -w -c ncljsc ./hello.cljs
+$ forever -w -c ncljsc hello.cljs
 ```
 
 When you make changes to `hello.cljs`, the script will be restarted automatically and you should not get an error like you would with `ncljsc -w`. However, this reintroduces the problem of the *slow* startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.
@@ -123,7 +123,7 @@ You'll also need to export the proper value for `JAVA_HOME` into your environmen
 
 ### NodeJS
 
-If you're new to NodeJS and don't have it setup, that will be your next first step. I highly recommend Tim Caswell's [Node Version Manager](https://github.com/creationix/nvm) (nvm). It's easy to install and, and makes working-experimenting with multiple `node` versions dead simple. For example:
+If you're new to NodeJS and don't have it setup, that will be your next step. I highly recommend Tim Caswell's [Node Version Manager](https://github.com/creationix/nvm) (nvm). It's easy to install and, and makes working with multiple `node` versions dead simple. For example:
 
 ```bash
 $ nvm install v0.6.17
@@ -204,24 +204,25 @@ Time to compile:
 $ ncljsc -c -p foo.cljs > compiled.js
 ```
 
-When that's finished, it's time to run `greet.js`!
+When that's finished, it's time to run `greet.js`:
 
 ```bash
 $ node greet.js
 Hello, Mr. Amazing ClojureScript developer!
 ```
 
-Examining the plentiful contents of `compiled.js`, you'll see (toward the bottom) the both `foo.cljs` and `bar.cljs` were compiled into the stand-alone JS script.
+Examining the plentiful contents of `compiled.js`, you'll see (toward the bottom) the both `foo.cljs` and `bar.cljs` were compiled into the stand-alone JS file.
 
 ## Coming Soon
 
-There are several things that need to be accomplished in short order:
+There are several goals that need to be accomplished in short order:
 
 * The tooling developed in CoffeeScript needs to be re-implemented in ClojureScript so that this library will be pseudo self-hosting.
-* A plugin for [Leiningen](https://github.com/technomancy/leiningen) build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.
+* A plugin for the [Leiningen](https://github.com/technomancy/leiningen) build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.
 * Missing features of `ncljsc` need to be implemented, the most important being a [REPL](https://github.com/clojure/clojurescript/wiki/The-REPL-and-Evaluation-Environments).
+* More and better documentation and examples.
 
-Help in accomplishing these additional goals is more than welcome.
+Help in accomplishing these and future goals is more than welcome.
 
 ## Resources
 
@@ -235,7 +236,7 @@ $ ncljsc --help
 
 Google Groups: [clojure](https://groups.google.com/forum/?fromgroups#!forum/clojure), &nbsp;[nodejs](https://groups.google.com/forum/?fromgroups#!forum/nodejs)
 
-[NodeJS] Documentation](http://nodejs.org/api)
+[NodeJS Documentation](http://nodejs.org/api)
 
 `#clojure`, `#clojurescript` and `#node.js` channels on Freenode.
 
