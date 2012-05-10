@@ -140,7 +140,7 @@ $ npm install -g clojure-script
 ...
 ```
 
-That's it! Installing `clojure-script` (the npm package name for this library) will automatically perform a package-localized installation of Clojure 1.3.0, Google Closure Compiler, etc.
+That's it! Installing `clojure-script` (the npm package name for this library) will automatically perform a package-localized installation of Clojure 1.3.0, ClojureScript r1011, Google Closure Compiler, etc.
 
 If you get an error during installation, look closely at the error message. Maybe you made a typo while following the steps above? If you can't figure it out, feel free to submit an [issue](https://github.com/michaelsbradleyjr/node-clojurescript/issues).
 
@@ -211,7 +211,7 @@ $ node greet.js
 Hello, Mr. Amazing ClojureScript developer!
 ```
 
-Examining the plentiful contents of `compiled.js`, you'll see (toward the bottom) the both `foo.cljs` and `bar.cljs` were compiled into the stand-alone JS file.
+Examining the plentiful contents of `compiled.js`, you'll see (toward the bottom) that both `foo.cljs` and `bar.cljs` were compiled into the stand-alone JS file.
 
 ## Coming Soon
 
