@@ -20,7 +20,7 @@ Want to get started? There are some prerequisites, but if you'd prefer to troubl
 $ npm install -g clojure-script
 ```
 
-If you get an error message from npm, it means you need to review the *Prerequisites* section of this README.<br />Let's continue...
+If you get an error message from npm, it means you need to review the *[Prerequisites](#prerequisites)* section of this README.<br />Let's continue...
 
 ```bash
 $ touch hello.cljs && vim hello.cljs
@@ -96,7 +96,7 @@ With `ncljsc` still running, replace the contents of `hello.cljs` with:
 
 Did it work? Cool! &nbsp;(maybe submit an [issue](https://github.com/michaelsbradleyjr/node-clojurescript/issues) if it didn't)
 
-So now what you should do is read up on Clojure and ClojureScript and *get to busy!* &nbsp;See the *Resources* section below.
+So now what you should do is read up on Clojure and ClojureScript and *get to busy!* &nbsp;See the *[Resources](#resources)* section below.
 
 
 ### Note
@@ -110,7 +110,7 @@ $ forever -w -c ncljsc hello.cljs
 When you make changes to `hello.cljs`, the script will be restarted automatically and you should not get an error like you would with `ncljsc -w`. However, this reintroduces the problem of the *slow* startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.
 
 
-## Prerequities
+## Prerequisites
 
 ### Java
 
@@ -149,7 +149,7 @@ If you get an error during installation, look closely at the error message. Mayb
 
 With a local (vs. global) `node_modules` installation of `clojure-script`, you can load `.cljs` modules from other scripts without having to compile them beforehand.
 
-With respect to the *Quick Start* examples above: create a script `other.js` in the same directory as `hello.cljs`, then paste in the following and save it:
+With respect to the *[Quick Start](#quick-start)* examples above: create a script `other.js` in the same directory as `hello.cljs`, then paste in the following and save it:
 
 ```javascript
 require('clojure-script');

@@ -25,7 +25,8 @@
 <div class='highlight'><pre><code>$ npm install -g clojure-script
 </code></pre></div>
 
-<p>If you get an error message from npm, it means you need to review the <em>Prerequisites</em> section of this README.<br />Let's continue...</p>
+<p>If you get an error message from npm, it means you need to review
+  the <em><a href="#prerequisites">Prerequisites</a></em> section of this README.<br />Let's continue...</p>
 
 <div class='highlight'><pre><code>$ touch hello.cljs &amp;&amp; vim hello.cljs
 </code></pre></div>
@@ -96,7 +97,8 @@ Hello, World!
 
 <p>Did it work? Cool! &nbsp;(maybe submit an <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">issue</a> if it didn't)</p>
 
-<p>So now what you should do is read up on Clojure and ClojureScript and <em>get to busy!</em> &nbsp;See the <em>Resources</em> section below.</p>
+<p>So now what you should do is read up on Clojure and ClojureScript
+  and <em>get to busy!</em> &nbsp;See the <em><a href="#resources">Resources</a></em> section below.</p>
 
 <h3>Note</h3>
 
@@ -107,7 +109,7 @@ Hello, World!
 
 <p>When you make changes to <code>hello.cljs</code>, the script will be restarted automatically and you should not get an error like you would with <code>ncljsc -w</code>. However, this reintroduces the problem of the <em>slow</em> startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.</p>
 
-<h2>Prerequities</h2>
+<h2>Prerequisites</h2>
 
 <h3>Java</h3>
 
@@ -142,7 +144,7 @@ $ nvm use v0.6.17
 
 <p>With a local (vs. global) <code>node_modules</code> installation of <code>clojure-script</code>, you can load <code>.cljs</code> modules from other scripts without having to compile them beforehand.</p>
 
-<p>With respect to the <em>Quick Start</em> examples above: create a script <code>other.js</code> in the same directory as <code>hello.cljs</code>, then paste in the following and save it:</p>
+<p>With respect to the <em><a href="#quick-start">Quick Start</a></em> examples above: create a script <code>other.js</code> in the same directory as <code>hello.cljs</code>, then paste in the following and save it:</p>
 
 <div class='highlight'><pre><code>require('clojure-script');
 
