@@ -1,24 +1,244 @@
 
 <!DOCTYPE html><html><head><title>README.md - Github Flavored Markdown
       Server</title><link rel="stylesheet"
-                          href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github-2d8bce43bd5f202dc2eff96f5a7591b32745b5fb.css"><link rel="stylesheet"
-                                                                                                                                                           href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github2-5ab64ac97650d8573ae90dab55d0169f7850d0f9.css"><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<style type="text/css">#content{padding:50px 0}
-#content{width:920px;margin:0 auto}</style></head><body><div id="content"><div id="readme" class="announce instapaper_body md"><span class="name"><span class="icon"></span>README.md</span><div class="markdown-body"><p><a href="http://travis-ci.org/michaelsbradleyjr/node-clojurescript"><img src="https://secure.travis-ci.org/michaelsbradleyjr/node-clojurescript.png?branch=master" alt="Build Status" title="" /></a></p>
+                          href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github-7c372a292745323c14c18e58c1d046031f9243c2.css"><link rel="stylesheet"
+                                                                                                                                                           href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github2-2f631983b042cbba70e616b31fb2f3e192cc8db8.css"><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<style type="text/css">
+  #content{padding:50px 0}
+  #content{width:920px;margin:0 auto}
+</style></head><body><div id="content"><div id="readme" class="announce instapaper_body md"><span class="name"><span class="icon"></span>README.md</span><div class="markdown-body"><p><a href="http://travis-ci.org/michaelsbradleyjr/node-clojurescript"><img src="https://secure.travis-ci.org/michaelsbradleyjr/node-clojurescript.png?branch=master" alt="Build Status" title="" /></a></p>
 
 <h1>node-clojurescript</h1>
 
-<p><p>This project is in an experimental state.</p></p>
+<p><a href="https://github.com/michaelsbradleyjr/node-clojurescript">node-clojurescript</a> aims to provide seamless integration between <a href="http://nodejs.org/">NodeJS</a> and <a href="https://github.com/clojure/clojurescript">ClojureScript</a>. This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and Clojure communities.</p>
+
+<p>Working packages are available on the <a href="http://npmjs.org/">npm</a> registry: &nbsp;<a href="http://search.npmjs.org/#/clojure-script">clojure-script</a>.</p>
 
 <h2>Description</h2>
 
-<p><a href="https://github.com/michaelsbradleyjr/node-clojurescript">node-clojurescript</a> aims to provide seamless integration between <a href="http://nodejs.org/">NodeJS</a> and <a href="https://github.com/clojure/clojurescript">ClojureScript</a>.</p>
+<p>The ClojureScript library ships with some basic mechanisms for creating compiled scripts suitable for use with NodeJS. But more is possible, and this library aims to make compiling, loading and running <code>.cljs</code> scripts a breeze, in the same manner that <a href="http://coffeescript.org">CoffeeScript</a> <code>.coffee</code> files can be used transparently in the development of NodeJS-backed applications.</p>
+
+<h2>Quick Start</h2>
+
+<p>Want to get started? There are some prerequisites, but if you'd prefer to trouble with those later:</p>
+
+<div class='highlight'><pre><code>$ npm install -g clojure-script
+</code></pre></div>
+
+<p>If you get an error message from npm, it means you need to review the <em>Prerequisites</em> section of this README.<br />Let's continue...</p>
+
+<div class='highlight'><pre><code>$ touch hello.cljs &amp;&amp; vim hello.cljs
+</code></pre></div>
+
+<p>Now paste in something like:</p>
+
+<div class='highlight'><pre><code>(ns hello
+  (:require [cljs.nodejs :as nodejs]))
+
+(defn greet [n]
+  (println (str "Hello, " n)))
+
+(nodejs/next-tick
+  (fn []
+    (greet "World!")))
+</code></pre></div>
+
+<p>Save it, and leave the editor open. In another terminal, navigate to the directory where you created <code>hello.cljs</code> and do:</p>
+
+<div class='highlight'><pre><code>$ ncljsc -w hello.cljs
+</code></pre></div>
+
+<p>When you first invoke <code>ncljsc</code>, it fires up the JVM, the ClojureScript compiler and the <a href="https://developers.google.com/closure/compiler">Google Closure Compiler</a>. This means the first-round compilation will be <em>slow</em>, even <em>really slow</em>. That's expected.</p>
+
+<p><strong>N.B.</strong> the compiled JavaScript will be evaluated by the NodeJS (V8) runtime, not by the JVM.</p>
+
+<p>You should eventually see printed in your terminal:</p>
+
+<div class='highlight'><pre><code>$ ncljsc -w hello.cljs
+Hello, World!
+</code></pre></div>
+
+<p>Notice that we passed the <code>-w</code> flag to <code>ncljsc</code>. That tells it to keep running, watch for changes in the source file and re-compile automatically. Since the JVM is already up and running, re-compiles should be much faster.</p>
+
+<p>With <code>ncljsc</code> still running, replace the contents of <code>hello.cljs</code> with:</p>
+
+<div class='highlight'><pre><code>(ns hello
+  (:require [cljs.nodejs :as nodejs]
+            [clojure.string :as string]))
+
+(def http
+  (nodejs/require "http"))
+
+(def server (.createServer http
+   (fn [req, res]
+     (.writeHead res 200 (clj-&gt;js {:Content-Type "text/plain"}))
+     (.end res "Hello, World\n"))))
+
+(.listen server 4242 "127.0.0.1")
+
+(println "Server running at <a href='http://127.0.0.1:4242'>http://127.0.0.1:4242</a>")
+
+;; Helper
+(defn clj-&gt;js
+  "Recursively transforms ClojureScript maps into Javascript objects,
+   other ClojureScript colls into JavaScript arrays, and ClojureScript
+   keywords into JavaScript strings. Credit:
+   <a href='http://mmcgrana.github.com/2011/09/clojurescript-nodejs.html'>http://mmcgrana.github.com/2011/09/clojurescript-nodejs.html</a>"
+  [x]
+  (cond
+    (string? x) x
+    (keyword? x) (name x)
+    (map? x) (.-strobj (reduce (fn [m [k v]]
+               (assoc m (clj-&gt;js k) (clj-&gt;js v))) {} x))
+    (coll? x) (apply array (map clj-&gt;js x))
+    :else x))
+</code></pre></div>
+
+<p>Did it work? Cool! &nbsp;(maybe submit an <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">issue</a> if it didn't)</p>
+
+<p>So now what you should do is read up on Clojure and ClojureScript and <em>get to busy!</em> &nbsp;See the <em>Resources</em> section below.</p>
+
+<h3>Note</h3>
+
+<p>For long-running scripts, e.g. ones that listen on network ports, naive use of the <code>-w</code> flag will result in an <code>Error: listen EADDRINUSE</code> exception being thrown upon recompile. This is not a bug with <code>ncljsc</code>, you will encounter the same error if you do the equivalent with <code>coffee -w</code>. In which case you can instead use a NodeJS tool like <a href="https://github.com/nodejitsu/forever">forever</a>:</p>
+
+<div class='highlight'><pre><code>$ forever -w -c ncljsc hello.cljs
+</code></pre></div>
+
+<p>When you make changes to <code>hello.cljs</code>, the script will be restarted automatically and you should not get an error like you would with <code>ncljsc -w</code>. However, this reintroduces the problem of the <em>slow</em> startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.</p>
+
+<h2>Prerequities</h2>
+
+<h3>Java</h3>
+
+<p>This library wraps a NodeJS front-end around the ClojureScript compiler, which is written in the Clojure language, which is hosted on the <a href="http://en.wikipedia.org/wiki/Java_virtual_machine">Java Virtual Machine</a> (JVM). That means you <em>must</em> have Java setup to successfully install <code>clojure-script</code> with npm.</p>
+
+<p>More specifically, you'll need JDK 1.6 (Java SE 6): &nbsp;<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Windows</a>, &nbsp;<a href="https://developer.apple.com/library/mac/#documentation/Java/Conceptual/Java14Development/02-JavaDevTools/JavaDevTools.html">Mac</a>, &nbsp;<a href="https://github.com/flexiondotorg/oab-java6">debian / ubuntu</a></p>
+
+<p>You'll also need to export the proper value for <code>JAVA_HOME</code> into your environment. The <a href="https://github.com/nearinfinity/node-java">installation instructions</a> for the <code>node-java</code> package are quite helpful in this regard, though note that installing <code>clojure-script</code> with npm will automatically install <code>node-java</code> as well (i.e. you don't need to do that separately).</p>
+
+<h3>NodeJS</h3>
+
+<p>If you're new to NodeJS and don't have it setup, that will be your next step. I highly recommend Tim Caswell's <a href="https://github.com/creationix/nvm">Node Version Manager</a> (nvm). It's easy to install and, and makes working with multiple <code>node</code> versions dead simple. For example:</p>
+
+<div class='highlight'><pre><code>$ nvm install v0.6.17
+...
+$ nvm install v0.6.10
+...
+$ nvm use v0.6.17
+</code></pre></div>
+
+<p>When you install <code>node</code>, the <code>npm</code> tool will get installed along with it. So as long you have Java in place (see above), you should be ready to run:</p>
+
+<div class='highlight'><pre><code>$ npm install -g clojure-script
+...
+</code></pre></div>
+
+<p>That's it! Installing <code>clojure-script</code> (the npm package name for this library) will automatically perform a package-localized installation of Clojure 1.3.0, Google Closure Compiler, etc.</p>
+
+<p>If you get an error during installation, look closely at the error message. Maybe you made a typo while following the steps above? If you can't figure it out, feel free to submit an <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">issue</a>.</p>
+
+<h2>NodeJS <code>require</code> support</h2>
+
+<p>With a local (vs. global) <code>node_modules</code> installation of <code>clojure-script</code>, you can load <code>.cljs</code> modules from other scripts without having to compile them beforehand.</p>
+
+<p>With respect to the <em>Quick Start</em> examples above: create a script <code>other.js</code> in the same directory as <code>hello.cljs</code>, then paste in the following and save it:</p>
+
+<div class='highlight'><pre><code>require('clojure-script');
+
+require('./hello');
+// or require('./hello.cljs');
+</code></pre></div>
+
+<p>Then you can do:</p>
+
+<div class='highlight'><pre><code>$ node other.js
+</code></pre></div>
+
+<p><strong><span style="color:red;">N.B.</span></strong> This is a handy feature for development purposes. But it would be a terrible idea to publish a package on the npm registry which makes use of this technique. Modules <em>developed</em> in ClojureScript should be <em>published</em> with <em>only</em> compiled JavaScript loaded at runtime (via NodeJS's <code>require</code>).</p>
+
+<h2>Namespaces</h2>
+
+<p>Clojure and ClojureScript support the notion of <a href="http://clojure.org/namespaces">namespaces</a>. Unlike loading <a href="http://nodejs.org/api/modules.html">modules</a> with NodeJS's <code>require</code>, using ClojureScript's namespace <code>:require</code> will result in the namespaced module being <em>inlined</em> as part of the compiled JavaScript (scope is carefully preserved).</p>
+
+<p>Try creating two scripts, <code>foo.cljs</code> and <code>bar.cljs</code>:</p>
+
+<p><strong>foo.cljs</strong></p>
+
+<div class='highlight'><pre><code>(ns foo
+  (:require [bar :as bar]))
+
+(defn ^:export greet [name, title]
+  (str "Hello, " (bar/title title) " " name))
+</code></pre></div>
+
+<p><strong>bar.cljs</strong></p>
+
+<div class='highlight'><pre><code>(ns bar)
+
+(defn ^:export title [t]
+  (str t " Amazing" ))
+</code></pre></div>
+
+<p>Now create a third script, <code>greet.js</code>:</p>
+
+<p><strong>greet.js</strong></p>
+
+<div class='highlight'><pre><code>var foo = require('./compiled.js').foo;
+
+console.log(foo.greet('ClojureScript developer!', 'Mr.'));
+</code></pre></div>
+
+<p>Time to compile:</p>
+
+<div class='highlight'><pre><code>$ ncljsc -c -p foo.cljs &gt; compiled.js
+</code></pre></div>
+
+<p>When that's finished, it's time to run <code>greet.js</code>:</p>
+
+<div class='highlight'><pre><code>$ node greet.js
+Hello, Mr. Amazing ClojureScript developer!
+</code></pre></div>
+
+<p>Examining the plentiful contents of <code>compiled.js</code>, you'll see (toward the bottom) the both <code>foo.cljs</code> and <code>bar.cljs</code> were compiled into the stand-alone JS file.</p>
+
+<h2>Coming Soon</h2>
+
+<p>There are several goals that need to be accomplished in short order:</p>
+
+<ul>
+<li>The tooling developed in CoffeeScript needs to be re-implemented in ClojureScript so that this library will be pseudo self-hosting.</li>
+<li>A plugin for the <a href="https://github.com/technomancy/leiningen">Leiningen</a> build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.</li>
+<li>Missing features of <code>ncljsc</code> need to be implemented, the most important being a <a href="https://github.com/clojure/clojurescript/wiki/The-REPL-and-Evaluation-Environments">REPL</a>.</li>
+<li>More and better documentation and examples.</li>
+</ul>
+
+<p>Help in accomplishing these and future goals is more than welcome.</p>
+
+<h2>Resources</h2>
+
+<div class='highlight'><pre><code>$ ncljsc --help
+</code></pre></div>
+
+<p><a href="http://himera.herokuapp.com/synonym.html">ClojureScript: Translations from JavaScript</a></p>
+
+<p><a href="http://clojuredocs.org">ClojureDocs</a></p>
+
+<p>Google Groups: <a href="https://groups.google.com/forum/?fromgroups#!forum/clojure">clojure</a>, &nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/nodejs">nodejs</a></p>
+
+<p><a href="http://nodejs.org/api">NodeJS Documentation</a></p>
+
+<p><code>#clojure</code>, <code>#clojurescript</code> and <code>#node.js</code> channels on Freenode.</p>
+
+<p><a href="https://github.com/bbatsov/prelude">prelude</a>, &nbsp;<a href="https://github.com/bbatsov/prelude-modules">prelude-modules</a>, &nbsp;and <a href="http://emacsformacosx.com/">Emacs for OS X</a> (latest pretest)</p>
 
 <h2>Credit</h2>
 
 <p>This software is derived from and incorporates existing works:</p>
 
 <p><a href="https://github.com/jashkenas/coffee-script">CoffeeScript</a>,&nbsp; <a href="https://github.com/clojure/clojurescript">ClojureScript</a>,&nbsp; <a href="https://github.com/cemerick/pomegranate">Pomegranate</a></p>
+
+<p>In particular, many thanks are owed to <a href="https://github.com/jashkenas">Jeremy Ashkenas</a> and the other <a href="https://github.com/jashkenas/coffee-script">CoffeeScript</a> maintainers. Using the CoffeeScript tooling as a template, it was possible to whip together a useable NodeJS front-end in one intense week. It would have otherwise been much more slow-going.</p>
 
 <h2>Copyright and License</h2>
 
