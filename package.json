@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "java": ">=0.0.3",
+    "shelljs": "0.0.5pre4",
     "temporary": ">=0.0.2"
   },
   "devDependencies": {
