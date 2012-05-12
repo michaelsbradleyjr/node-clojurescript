@@ -60,7 +60,7 @@ then
 
 mkdir -p ./support/out
 echo "Compiling core.cljs and nodejs.cljs..."
-node ./scripts/postinstall_build.js 2>/dev/null
+node ./scripts/postinstall_build.js
 
 if [ ! $? = 0 ]
 then
@@ -77,5 +77,5 @@ fi
 fi
 
 echo ""
-echo "clojure-script postinstall completed!"
+echo "clojure-script postinstall completed successfully!"
 echo ""
