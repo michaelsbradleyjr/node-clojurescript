@@ -28,7 +28,6 @@ mv `ls` ../../clojure-clojurescript
 cd ..
 cd ..
 echo "Bootstrapping Clojure..."
-cp ./script/compile.sh ./clojure-clojurescript/script/compile
 cp ./cljs/nodejs.cljs ./clojure-clojurescript/src/cljs/cljs/nodejs.cljs
 cp ./cljs/nodejs_externs.js ./clojure-clojurescript/src/cljs/cljs/nodejs_externs.js
 cp ./cljs/nodejscli.cljs ./clojure-clojurescript/src/cljs/cljs/nodejscli.cljs
