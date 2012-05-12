@@ -1,12 +1,17 @@
 ;   Copyright (c) Rich Hickey. All rights reserved.
 ;   The use and distribution terms for this software are covered by the
 ;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-;   which can be found in the file epl-v10.html at the root of this distribution.
+;   which can be found in the file epl-v10.html under the licenses
+;   directory at the root of this distribution.
 ;   By using this software in any fashion, you are agreeing to be bound by
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cljs.closure
+;   Modified by Michael Bradley, Jr.
+;     as part of an attempt to better support ClojureScript modules
+;     within the NodeJS runtime
+
+(ns ncljsc
   "Compile ClojureScript to JavaScript with optimizations from Google
    Closure Compiler producing runnable JavaScript.
 
@@ -35,7 +40,8 @@
   "
   (:require [cljs.compiler :as comp]
             [clojure.java.io :as io]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [pomegranate :as pomegranate])
   (:import java.io.File
            java.io.BufferedInputStream
            java.net.URL
@@ -49,6 +55,10 @@
            com.google.javascript.jscomp.Result
            com.google.javascript.jscomp.JSError
            com.google.javascript.jscomp.CommandLineRunner))
+
+(defn pom-add-classpath
+  [cp]
+  (pomegranate/add-classpath cp))
 
 (def name-chars (map char (concat (range 48 57) (range 65 90) (range 97 122))))
 
@@ -108,7 +118,7 @@
   (doall
     (map #(io/resource %)
          (filter #(do
-                    (and 
+                    (and
                       (.startsWith % lib-path)
                       (.endsWith % ".js")))
                  (jar-entry-names jar-path)))))
@@ -121,7 +131,7 @@
       (map to-url (filter #(.endsWith (.getName %) ".js") (file-seq (io/file path)))))))
 
 
-(defn find-js-classpath 
+(defn find-js-classpath
   "finds all js files on the classpath matching the path provided"
   [path]
   (let [process-entry #(if (.endsWith % ".jar")
@@ -165,7 +175,7 @@
                   (map #(js-source-file (.getFile %) (slurp %)) ext))]
     (let [js-sources (-> externs filter-js add-target load-js)
           ups-sources (-> ups-externs filter-cp-js load-js)
-          all-sources (concat js-sources ups-sources)] 
+          all-sources (concat js-sources ups-sources)]
       (if use-only-custom-externs
         all-sources
         (into all-sources (CommandLineRunner/getDefaultExterns))))))
@@ -221,14 +231,14 @@
   (-source [this] "The JavaScript source string."))
 
 (extend-protocol IJavaScript
-  
+
   String
   (-foreign? [this] false)
   (-url [this] nil)
   (-provides [this] (:provides (parse-js-ns (string/split-lines this))))
   (-requires [this] (:requires (parse-js-ns (string/split-lines this))))
   (-source [this] this)
-  
+
   clojure.lang.IPersistentMap
   (-foreign? [this] (:foreign this))
   (-url [this] (or (:url this)
@@ -327,7 +337,7 @@
           (comp/emit (comp/analyze (empty-env) form)))))))
 
 (defn output-directory [opts]
-  (or (:output-dir opts) "out"))
+  (or (:output-dir opts) (or (:tmp-out opts) "out")))
 
 (def compiled-cljs (atom {}))
 
@@ -375,7 +385,7 @@
 (defn jar-file-to-disk
   "Copy a file contained within a jar to disk. Return the created file."
   [url out-dir]
-  (let [out-file (io/file out-dir (path-from-jarfile url)) 
+  (let [out-file (io/file out-dir (path-from-jarfile url))
         content (slurp (io/reader url))]
     (do (comp/mkdirs out-file)
         (spit out-file content)
@@ -404,14 +414,14 @@
     (case (.getProtocol this)
       "file" (-compile (io/file this) opts)
       "jar" (compile-from-jar this opts)))
-  
+
   clojure.lang.PersistentList
   (-compile [this opts]
     (compile-form-seq [this]))
-  
+
   String
   (-compile [this opts] (-compile (io/file this) opts))
-  
+
   clojure.lang.PersistentVector
   (-compile [this opts] (compile-form-seq this))
   )
@@ -455,7 +465,7 @@
   and :provides), returns a map containing :provides, :requires, :file
   and :url"
   ([lib-spec] (load-foreign-library* lib-spec false))
-  ([lib-spec cp-only?] 
+  ([lib-spec cp-only?]
     (let [find-func (if cp-only? io/resource find-url)]
       (merge lib-spec {:foreign true
                        :url (find-func (:file lib-spec))}))))
@@ -687,7 +697,7 @@
 
   ;; optimize a ClojureScript form
   (optimize {:optimizations :simple} (-compile '(def x 3) {}))
-  
+
   ;; optimize a project
   (println (->> (-compile "samples/hello/src" {})
                 (apply add-dependencies {})
@@ -825,7 +835,7 @@
           (output-deps-file opts (remove #(= (:group %) :goog) disk-sources))))))
 
 (comment
-  
+
   ;; output unoptimized alone
   (output-unoptimized {} "goog.provide('test');\ngoog.require('cljs.core');\nalert('hello');\n")
   ;; output unoptimized with all dependencies
@@ -842,7 +852,7 @@
   )
 
 
-(defn get-upstream-deps* 
+(defn get-upstream-deps*
   "returns a merged map containing all upstream dependencies defined by libraries on the classpath"
   []
   (let [classloader (. (Thread/currentThread) (getContextClassLoader))
@@ -855,40 +865,42 @@
 
 (defn add-header [{:keys [hashbang target]} js]
   (if (= :nodejs target)
-    (str "#!" (or hashbang "/usr/bin/nodejs") "\n" js)
+    (str "" js)
     js))
 
 (defn build
   "Given a source which can be compiled, produce runnable JavaScript."
   [source opts]
   (comp/reset-namespaces!)
-  (let [opts (if (= :nodejs (:target opts))
-               (merge {:optimizations :simple} opts)
-               opts)
-        ups-deps (get-upstream-deps)
-        all-opts (assoc opts 
-                   :ups-libs (:libs ups-deps)
-                   :ups-foreign-libs (:foreign-libs ups-deps)
-                   :ups-externs (:externs ups-deps))]
-    (binding [comp/*cljs-static-fns*
-              (or (and (= (opts :optimizations) :advanced))
-                  (:static-fns opts)
-                  comp/*cljs-static-fns*)]
-      (let [compiled (-compile source all-opts)
-            compiled (concat
-                      (if (coll? compiled) compiled [compiled])
-                      (when (= :nodejs (:target all-opts))
-                        [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
-            js-sources (if (coll? compiled)
-                         (binding []
-                           (apply add-dependencies all-opts compiled))
-                         (add-dependencies all-opts compiled))]
-        (if (:optimizations all-opts)
-          (->> js-sources
-               (apply optimize all-opts)
-               (add-header all-opts)
-               (output-one-file all-opts))
-          (apply output-unoptimized all-opts js-sources))))))
+  (let [opts (if (= java.lang.String (type opts))
+                 (read-string opts)
+                 opts)]
+    (if (not (nil? (:add-classpath opts)))
+      (pom-add-classpath (:add-classpath opts)))
+    (let [ups-deps (get-upstream-deps)
+          all-opts (assoc opts
+                     :ups-libs (:libs ups-deps)
+                     :ups-foreign-libs (:foreign-libs ups-deps)
+                     :ups-externs (:externs ups-deps))]
+      (binding [comp/*cljs-static-fns*
+                (or (and (= (opts :optimizations) :advanced))
+                    (:static-fns opts)
+                    comp/*cljs-static-fns*)]
+        (let [compiled (-compile source all-opts)
+              compiled (concat
+                        (if (coll? compiled) compiled [compiled])
+                        (when (= :nodejs (:target all-opts))
+                          [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
+              js-sources (if (coll? compiled)
+                           (binding []
+                             (apply add-dependencies all-opts compiled))
+                           (add-dependencies all-opts compiled))]
+          (if (:optimizations all-opts)
+            (->> js-sources
+                 (apply optimize all-opts)
+                 (add-header all-opts)
+                 (output-one-file all-opts))
+          (apply output-unoptimized all-opts js-sources)))))))
 
 (comment
 
@@ -901,12 +913,12 @@
   (build "samples/hello/src" {:optimizations :advanced})
   (build "samples/hello/src" {:optimizations :advanced :output-to "samples/hello/hello.js"})
   ;; open 'samples/hello/hello.html' to see the result in action
-  
+
   ;; build a project without optimizations
   (build "samples/hello/src" {:output-dir "samples/hello/out" :output-to "samples/hello/hello.js"})
   ;; open 'samples/hello/hello-dev.html' to see the result in action
   ;; notice how each script was loaded individually
-  
+
   ;; build unoptimized from raw ClojureScript
   (build '[(ns hello.core)
            (defn ^{:export greet} greet [n] (str "Hola " n))
