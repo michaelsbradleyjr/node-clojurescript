@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PKG_ROOT=$PWD
+
 if [ \( ! -e ./support/clojure-clojurescript \) -o \( -e ./npm-debug.log \) ]
 then
 
@@ -53,6 +55,8 @@ fi
 fi
 fi
 
+cd $PKG_ROOT
+
 if [ \( ! -e ./support/out/cljs/core.js \) -o \( ! -e ./support/out/cljs/nodejs.js \) -o \( -e ./npm-debug.log \) ]
 then
 
@@ -73,6 +77,8 @@ echo "Finished compiling"
 
 fi
 fi
+
+cd $PKG_ROOT
 
 if [ \( ! -e ./support/leiningen/lein \) -o \( -e ./npm-debug.log \) ]
 then
