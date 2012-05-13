@@ -12,7 +12,7 @@ rm -rf temp
 mkdir -p temp
 cd temp
 echo "Fetching ClojureScript..."
-curl -s -L https://github.com/clojure/clojurescript/tarball/ab4e25d8847ec44146bc4ea11e328da9110a8e80 -o clojure-clojurescript.tar.gz
+curl -s -L https://github.com/michaelsbradleyjr/clojurescript/tarball/node-clojurescript -o clojure-clojurescript.tar.gz
 
 if [ ! $? = 0 ]
 then
@@ -30,9 +30,6 @@ mv `ls` ../../clojure-clojurescript
 cd ..
 cd ..
 echo "Bootstrapping Clojure..."
-cp ./cljs/nodejs.cljs ./clojure-clojurescript/src/cljs/cljs/nodejs.cljs
-cp ./cljs/nodejs_externs.js ./clojure-clojurescript/src/cljs/cljs/nodejs_externs.js
-cp ./cljs/nodejscli.cljs ./clojure-clojurescript/src/cljs/cljs/nodejscli.cljs
 cd ./clojure-clojurescript/
 ./script/bootstrap
 

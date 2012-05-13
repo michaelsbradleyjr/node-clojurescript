@@ -83,6 +83,7 @@
     java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/goog.jar');
     java.classpath.push(__dirname + '/support/clojure-clojurescript/lib/js.jar');
     java.classpath.push(__dirname + '/support/clojure-clojurescript/src/clj');
+    java.classpath.push(__dirname + '/support/clojure-clojurescript/src/clj/cljs');
     java.classpath.push(__dirname + '/support/clojure-clojurescript/src/cljs');
     return java.classpath.push(__dirname + '/support/clj');
   };
@@ -97,14 +98,14 @@
     }
     this.StringReader = StringReader = this.java["import"]('java.io.StringReader');
     this.ClojureCompiler = ClojureCompiler = this.java["import"]('clojure.lang.Compiler');
-    ncljsc = fs.readFileSync(__dirname + '/support/clj/ncljsc.clj', 'utf8');
+    ncljsc = fs.readFileSync(__dirname + '/support/clojure-clojurescript/src/clj/cljs/closure.clj', 'utf8');
     ncljscSR = new StringReader(ncljsc);
     ClojureCompiler.loadSync(ncljscSR);
-    this.clojureAddClassPath = this.java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'pom-add-classpath');
+    this.clojureAddClassPath = this.java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'pom-add-classpath');
     this.addClassPath = function(cp) {
       return this.clojureAddClassPath.invokeSync(cp);
     };
-    return this.clojureBuild = this.java.callStaticMethodSync('clojure.lang.RT', 'var', 'ncljsc', 'build');
+    return this.clojureBuild = this.java.callStaticMethodSync('clojure.lang.RT', 'var', 'cljs.closure', 'build');
   };
   
   ClojureScript.addClassPath = function(cp) {

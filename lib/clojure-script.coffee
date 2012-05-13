@@ -38,6 +38,7 @@ ClojureScript.initJava = (options) ->
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/js.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj' )
+  java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj/cljs' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
   java.classpath.push ( __dirname + '/support/clj' )
 
@@ -47,16 +48,16 @@ ClojureScript.initClojureCompiler = (javaOptions = ClojureScript.javaOptions) ->
   @StringReader = StringReader = @java.import 'java.io.StringReader'
   @ClojureCompiler = ClojureCompiler = @java.import 'clojure.lang.Compiler'
 
-  ncljsc = fs.readFileSync ( __dirname + '/support/clj/ncljsc.clj' ), 'utf8'
+  ncljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript/src/clj/cljs/closure.clj' ), 'utf8'
   ncljscSR = new StringReader ncljsc
   ClojureCompiler.loadSync ncljscSR
 
-  @clojureAddClassPath = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'pom-add-classpath'
+  @clojureAddClassPath = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'pom-add-classpath'
 
   @addClassPath = (cp) ->
     @clojureAddClassPath.invokeSync cp
 
-  @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'ncljsc', 'build'
+  @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'build'
 
 
 ClojureScript.addClassPath = (cp) ->
