@@ -1,0 +1,165 @@
+#!/usr/bin/env node
+
+var path  = require('path');
+var fs    = require('fs');
+var shell = require('shelljs');
+var spawn = require('child_process').spawn;
+var program = require('commander');
+
+var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../');
+
+var ignoreConfig = process.argv.indexOf('--nlein-ignore-config');
+var iCI = ignoreConfig;
+if (ignoreConfig != -1) {
+ ignoreConfig = true;
+} else {
+ ignoreConfig = false;
+}
+if (ignoreConfig) {
+  process.argv.splice(iCI, 1);
+}
+
+var nleinConfig = null;
+if (!ignoreConfig) {
+  if (path.existsSync(pkg + '.nlein.json')) {
+    try {
+      nleinConfig = JSON.parse(fs.readFileSync(pkg + '.nlein.json', 'utf8'));
+    } catch (error) {
+      throw new Error( 'config found at ' + pkg + '.nlein.json' + ' but could not be parsed as valid JSON' );
+      process.exit(1);
+    }
+  }
+}
+
+var persistentNleinConfig = {};
+
+var noCheck = process.argv.indexOf('--nlein-no-check');
+var nCI = noCheck;
+if (noCheck != -1) {
+ noCheck = true;
+} else {
+ noCheck = false;
+}
+if (noCheck) {
+  process.argv.splice(nCI, 1);
+}
+
+var spawnLein = function (lein) {
+  process.env.CLASSPATH = pkg + 'support/clojure-clojurescript/lib/clojure.jar:'
+                        + pkg + 'support/clojure-clojurescript/lib/compiler.jar:'
+                        + pkg + 'support/clojure-clojurescript/lib/goog.jar:'
+                        + pkg + 'support/clojure-clojurescript/lib/js.jar';
+  var leinProc = spawn(lein
+                     , process.argv.slice(2)
+                     , { cwd: process.cwd(), env: process.env });
+  leinProc.stdout.setEncoding('utf8');
+  leinProc.stderr.setEncoding('utf8');
+  leinProc.stdout.pipe(process.stdout);
+  leinProc.stderr.pipe(process.stderr);
+
+  leinProc.on('exit', function (code) {
+    process.exit(code);
+  });
+};
+
+var leinExisting = shell.exec('which lein', { silent: true });
+
+var parseConfig = function (nleinConfig, recur) {
+  var list;
+  if (nleinConfig) {
+    if (nleinConfig.hasOwnProperty('delegate')) {
+      if (nleinConfig.delegate) {
+        if (leinExisting.output) {
+          spawnLein(leinExisting.output.slice(0, leinExisting.output.length - 1));
+        } else {
+          throw new Error( 'config at ' + pkg + '.nlein.json' + ' indicates '
+                         + 'nlein should delegate, but no lein executable was found on your PATH' );
+          process.exit(1);        
+        }
+      } else {
+        if (nleinConfig.hasOwnProperty('exit-when-not-delegating')) {
+          if (nleinConfig['exit-when-not-delegating']) {
+            process.stdout.write( 'config at ' + pkg + '.nlein.json '
+                         + 'indicates nlein\nshould exit when not delegating.\n'
+                         + 'Goodbye!\n' );
+            process.exit(0);
+          } else {
+            spawnLein(pkg + 'support/leiningen/lein');
+          }
+        } else {
+          if (!recur) {
+            console.log( 'config at ' + pkg + '.nlein.json indicates nlein\nshould '
+                       + 'not delegate.\nDo you want nlein to exit or invoke the '
+                       + 'bundled lein executable?' );
+          } else {
+            console.log( 'Do you want nlein to exit or invoke the bundled lein '
+                       + 'executable?' );
+          }
+          list = [ 'exit', 'invoke bundled' ];
+          program.choose(list, function (i) {
+            console.log('you chose:', list[i]);
+            if (list[i] === 'exit') {
+              nleinConfig['exit-when-not-delegating'] = true;
+            } else {
+              nleinConfig['exit-when-not-delegating'] = false;
+            }
+            list = [ 'yes', 'no' ];
+            console.log('Remember this setting?');
+            program.choose(list, function (i) {
+              console.log('you chose:', list[i]);
+              if (list[i] === 'yes') {
+                persistentNleinConfig['exit-when-not-delegating'] = nleinConfig['exit-when-not-delegating'];
+                fs.writeFileSync(pkg + '.nlein.json', JSON.stringify(persistentNleinConfig), 'utf8');
+                process.stdout.write('config saved at ' + pkg + '.nlein.json\n');
+              }
+              if (nleinConfig['exit-when-not-delegating']) {
+                process.stdout.write('Goodbye!\n');
+                process.exit(0);
+              } else {
+                parseConfig(nleinConfig);
+              }
+            });
+          });
+        }
+      }
+    } else {
+      if (noCheck) {
+        spawnLein(pkg + 'support/leiningen/lein');
+      } else {
+        if (!leinExisting.output) {
+          spawnLein(pkg + 'support/leiningen/lein');
+        } else {
+          console.log( 'A lein executable was found on your PATH:\n\n'
+                     + leinExisting.output
+                     + '\nShould nlein delegate to it?' );
+          list = [ 'yes', 'no' ];
+          program.choose(list, function (i){
+            console.log('you chose:', list[i]);
+            if (list[i] === 'yes') {
+              nleinConfig.delegate = true;
+            } else {
+              nleinConfig.delegate = false;
+            }
+            console.log('Remember this setting?');
+            program.choose(list, function (i) {
+              console.log('you chose:', list[i]);
+              if (list[i] === 'yes') {
+                persistentNleinConfig.delegate = nleinConfig.delegate;
+                fs.writeFileSync(pkg + '.nlein.json', JSON.stringify(persistentNleinConfig), 'utf8');
+              }
+              parseConfig(nleinConfig, true);
+            });
+          }); 
+        }
+      }
+    }
+  } else {
+    if (noCheck) {
+      spawnLein(pkg + 'support/leiningen/lein');
+    } else {
+      parseConfig({});
+    }
+  }
+};
+
+parseConfig(nleinConfig);

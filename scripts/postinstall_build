@@ -1,8 +1,12 @@
-var path = require('path');
-var cljs = require('../');
+#!/usr/bin/env node
 
-var options = { path: path.resolve(__dirname + '/../support/cljs/postinstall_build.cljs') };
-var outputDir = path.resolve(__dirname + '/../support/out');
+var path = require('path');
+var fs   = require('fs');
+
+var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../');
+
+var options = { path: ( pkg + 'support/cljs/postinstall_build.cljs' ) };
+var outputDir = pkg + 'support/out';
 var cljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false :output-dir "' + outputDir + '"}';
 var javaOptions = null;
 

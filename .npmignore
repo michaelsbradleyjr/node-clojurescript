@@ -12,12 +12,14 @@ docs_lib/
 lib/
 node_modules/
 support/clojure-clojurescript/
+support/leiningen/
 support/nodejuice/
 support/out/
 support/tools/
 test/
 
 .gitignore
+.nlein.json
 .travis.yml
 Cakefile
 manifest.coffee

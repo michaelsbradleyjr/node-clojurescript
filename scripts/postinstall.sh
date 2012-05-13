@@ -48,7 +48,6 @@ else
 cd ..
 echo "Cleaning up ClojureScript archive..."
 rm -rf temp
-cd ..
 
 fi
 fi
@@ -59,7 +58,7 @@ then
 
 mkdir -p ./support/out
 echo "Compiling core.cljs and nodejs.cljs..."
-node ./scripts/postinstall_build.js
+./scripts/postinstall_build
 
 if [ ! $? = 0 ]
 then
@@ -71,6 +70,42 @@ exit 1
 
 else
 echo "Finished compiling"
+
+fi
+fi
+
+if [ \( ! -e ./support/leiningen/lein \) -o \( -e ./npm-debug.log \) ]
+then
+
+cd ./support
+rm -rf leiningen
+rm -rf temp
+mkdir -p leiningen
+mkdir -p temp
+cd temp
+echo "Fetching Leiningen..."
+curl -s -L https://github.com/technomancy/leiningen/tarball/2.0.0-preview4 -o leiningen.tar.gz
+
+if [ ! $? = 0 ]
+then
+
+echo ""
+echo "Error: unable to download Leiningen!"
+echo ""
+exit 1
+
+else
+mkdir -p unpack
+tar xzf ./leiningen.tar.gz -C ./unpack
+cd unpack
+cd `ls`
+cp ./bin/lein ../../../leiningen/
+
+cd ..
+cd ..
+cd ..
+echo "Cleaning up Leiningen archive..."
+rm -rf temp
 
 fi
 fi

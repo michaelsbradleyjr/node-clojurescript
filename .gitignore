@@ -10,7 +10,9 @@ fuse*
 docs_lib/
 node_modules/
 support/clojure-clojurescript/
+support/leiningen/
 support/out/
 
+.nlein.json
 npm-debug.log
 support/nodejuice/symlinks/node

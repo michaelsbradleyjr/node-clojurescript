@@ -20,7 +20,8 @@
   },
   "main": "./index.js",
   "bin": {
-    "ncljsc": "./bin/ncljsc"
+    "ncljsc": "./bin/ncljsc",
+    "nlein": "./bin/nlein"
   },
   "scripts": {
     "test": "./node_modules/coffee-script/bin/cake test",
@@ -30,6 +31,7 @@
     "node": "~0.6"
   },
   "dependencies": {
+    "commander": ">=0.6.0",
     "java": ">=0.0.3",
     "shelljs": "0.0.5pre4",
     "temporary": ">=0.0.2"
