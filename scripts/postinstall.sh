@@ -58,7 +58,7 @@ then
 
 mkdir -p ./support/out
 echo "Compiling core.cljs and nodejs.cljs..."
-./scripts/postinstall_build
+node ./scripts/postinstall_build.js
 
 if [ ! $? = 0 ]
 then
