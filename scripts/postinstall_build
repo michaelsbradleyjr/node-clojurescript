@@ -5,6 +5,8 @@ var fs   = require('fs');
 
 var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../');
 
+var cljs = require(pkg);
+
 var options = { path: ( pkg + 'support/cljs/postinstall_build.cljs' ) };
 var outputDir = pkg + 'support/out';
 var cljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false :output-dir "' + outputDir + '"}';
