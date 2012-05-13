@@ -52,7 +52,7 @@
   
   ClojureScript.VERSION = '0.1.4-pre';
   
-  ClojureScript.CLJS_VERSION = 'r1011';
+  ClojureScript.CLJS_VERSION = 'r1211++';
   
   ClojureScript.depExts = ['.cljs', '.js', '.coffee'];
   
