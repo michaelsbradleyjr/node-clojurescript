@@ -21,10 +21,35 @@ describe 'ClojureScript.build', ->
 
     path = ( __dirname + '/cljs/hello.cljs' )
 
-    out = ClojureScript.build {path}
+    options =
+      async: false
+      path:  path
+
+    builder = ClojureScript.builder
+
+    callback = (err, js) -> if err then null else js
+
+    # callback will be called synchronously since options.async is false
+    #out = ClojureScript.build options, builder, callback
 
     #console.log out
 
-    ( expect out ).to.be.a 'string'
+    #( expect out ).to.be.a 'string'
 
-    done()
+    options =
+      async: true
+      path:  path
+
+    callback = (err, js) ->
+      if err
+        asyncOut = null
+      else
+        asyncOut = js
+
+      #console.log asyncOut
+
+      ( expect asyncOut ).to.be.a 'string'
+
+      done()
+
+    ClojureScript.build options, builder, callback

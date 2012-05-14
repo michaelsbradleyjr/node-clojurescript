@@ -143,16 +143,26 @@ buildFromDisk = (path, base) ->
   try
     t = task = {path, options, cljscOptions: o['options-cljsc'], javaOptions: o.java}
     ClojureScript.emit 'compile', task
-    if             o.run  then ClojureScript.run t.options, t.cljscOptions, t.javaOptions
+    if o.run
+      # callback will be called synchronously since o.async is false when o.run is true
+      callback = (err) -> if err then throw err
+      ClojureScript.run t.options, ClojureScript.builder, callback, t.cljscOptions, t.javaOptions
     else if o.join and t.path isnt o.join
+      # lacking implementation
       #sourceCode[sources.indexOf(t.path)] = t.input
       compileJoin()
     else
-      t.output = ClojureScript.build t.options, t.cljscOptions, t.javaOptions
-      ClojureScript.emit 'success', task
-      if o.print          then printLine t.output.trim()
-      else if o.compile   then writeJs t.path, t.output, base
-      else if o.lint      then lint t.path, t.output
+      # callback may be called sync or async depending on cli options
+      # or arguments passed to the required module
+      callback = (err, js) ->
+        if err then throw err
+        t.output = js
+        ClojureScript.emit 'success', task
+        if o.print          then printLine t.output.trim()
+        else if o.compile   then writeJs t.path, t.output, base
+        else if o.lint      then lint t.path, t.output
+      ClojureScript.build t.options, ClojureScript.builder, callback, t.cljscOptions, t.javaOptions
+
   catch err
     ClojureScript.emit 'failure', err, task
     return if ClojureScript.listeners('failure').length
