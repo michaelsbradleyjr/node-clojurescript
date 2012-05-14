@@ -95,18 +95,18 @@ ClojureScript.commandRun = ->
   loadRequires()                          if opts.require
   return (ClojureScript.usingPort = \
   opts.server ; startServer())            if opts.server
-  (ClojureScript.usingPort = \
-  opts.client ; ClojureScript.builder = \
-  ClojureScript.remoteBuilder)            if opts.client
-  ClojureScript.client = \
-  ( require ( __dirname + \
-  '/support/js/detached-jvm-client' ) )   if opts.client and opts.async
   return repl.prompt()                    if opts.interactive
   if ( opts.watch or opts['watch-deps'] ) and !fs.watch
     return printWarn "The --watch feature depends on Node v0.6.0+. You are running #{process.version}."
   return compileStdio()                   if opts.stdio
   return compileScript null, sources[0]   if opts.eval
   return repl.prompt()                    unless sources.length
+  (ClojureScript.usingPort = \
+  opts.client ; ClojureScript.builder = \
+  ClojureScript.remoteBuilder)            if opts.client
+  ClojureScript.client = \
+  ( require ( __dirname + \
+  '/support/js/detached-jvm-client' ) )   if opts.client and opts.async
   watchDeps()                             if opts['watch-deps'] and opts.watch
   literals = if opts.run then sources.splice 1 else []
   process.argv = process.argv[0..1].concat literals
@@ -460,7 +460,7 @@ parseOptions = ->
 
 # The compile-time options to pass to the ClojureScript compiler.
 compileOptions = (path) ->
-  {path, bare: opts.bare, header: opts.compile}
+  {path, async: opts.async, bare: opts.bare, header: opts.compile}
 
 # Start up a new Node.js instance with the arguments in `--nodejs` passed to
 # the `node` binary, preserving the other options.
@@ -481,3 +481,6 @@ usage = ->
 # Print the `--version` message and exit.
 version = ->
   printLine "ncljsc v#{ClojureScript.VERSION} (ClojureScript #{ClojureScript.CLJS_VERSION})"
+
+startServer = ->
+  ClojureScript.createServer().listen(ClojureScript.usingPort)

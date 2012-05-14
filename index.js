@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, timeLog, unwatchDir, usage, util, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, sourceCode, sources, spawn, startServer, timeLog, unwatchDir, usage, util, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   fs = require('fs');
   
@@ -570,13 +570,6 @@
     if (opts.server) {
       return (ClojureScript.usingPort = opts.server, startServer());
     }
-    if (opts.client) {
-      ClojureScript.usingPort = opts.client;
-      ClojureScript.builder = ClojureScript.remoteBuilder;
-    }
-    if (opts.client && opts.async) {
-      ClojureScript.client = require(__dirname + '/support/js/detached-jvm-client');
-    }
     if (opts.interactive) {
       return repl.prompt();
     }
@@ -591,6 +584,13 @@
     }
     if (!sources.length) {
       return repl.prompt();
+    }
+    if (opts.client) {
+      ClojureScript.usingPort = opts.client;
+      ClojureScript.builder = ClojureScript.remoteBuilder;
+    }
+    if (opts.client && opts.async) {
+      ClojureScript.client = require(__dirname + '/support/js/detached-jvm-client');
     }
     if (opts['watch-deps'] && opts.watch) {
       watchDeps();
@@ -1090,6 +1090,7 @@
   compileOptions = function(path) {
     return {
       path: path,
+      async: opts.async,
       bare: opts.bare,
       header: opts.compile
     };
@@ -1113,6 +1114,10 @@
   
   version = function() {
     return printLine("ncljsc v" + ClojureScript.VERSION + " (ClojureScript " + ClojureScript.CLJS_VERSION + ")");
+  };
+  
+  startServer = function() {
+    return ClojureScript.createServer().listen(ClojureScript.usingPort);
   };
   
   repl = {
