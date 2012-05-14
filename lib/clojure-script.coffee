@@ -87,7 +87,7 @@ ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp
 ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
 
 
-ClojureScript.build = (options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+ClojureScript.build = (options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions, builder, callback) ->
   o = options
   if not o.path then throw new Error 'no source path specified'
   if ( not @java ) then @initJava javaOptions

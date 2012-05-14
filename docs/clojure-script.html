@@ -87,7 +87,7 @@
 <span class="nv">ClojureScript.addBuildClasspath = </span><span class="nf">(options, cp) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :add-classpath \&quot;</span><span class="si">#{</span> <span class="nx">cp</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
 
 
-<span class="nv">ClojureScript.build = </span><span class="nf">(options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
+<span class="nv">ClojureScript.build = </span><span class="nf">(options = {}, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions, builder, callback) -&gt;</span>
   <span class="nv">o = </span><span class="nx">options</span>
   <span class="k">if</span> <span class="o">not</span> <span class="nx">o</span><span class="p">.</span><span class="nx">path</span> <span class="k">then</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;no source path specified&#39;</span>
   <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">@java</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">@initJava</span> <span class="nx">javaOptions</span>
