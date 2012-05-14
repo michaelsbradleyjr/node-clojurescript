@@ -38,7 +38,6 @@ ClojureScript.initJava = (options) ->
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/goog.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/lib/js.jar' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj' )
-  java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/clj/cljs' )
   java.classpath.push ( __dirname + '/support/clojure-clojurescript/src/cljs' )
   java.classpath.push ( __dirname + '/support/clj' )
 
@@ -48,20 +47,24 @@ ClojureScript.initClojureCompiler = (javaOptions = ClojureScript.javaOptions) ->
   @StringReader = StringReader = @java.import 'java.io.StringReader'
   @ClojureCompiler = ClojureCompiler = @java.import 'clojure.lang.Compiler'
 
-  ncljsc = fs.readFileSync ( __dirname + '/support/clojure-clojurescript/src/clj/cljs/closure.clj' ), 'utf8'
-  ncljscSR = new StringReader ncljsc
-  ClojureCompiler.loadSync ncljscSR
+  closureClj = fs.readFileSync ( __dirname + '/support/clojure-clojurescript/src/clj/cljs/closure.clj' ), 'utf8'
+  closureCljSR = new StringReader closureClj
+  ClojureCompiler.loadSync closureCljSR
 
-  @clojureAddClassPath = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'pom-add-classpath'
+  @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'build'
+
+  pomgClj = fs.readFileSync ( __dirname + '/support/clj/pomegranate.clj' ), 'utf8'
+  pomgCljSR = new StringReader pomgClj
+  ClojureCompiler.loadSync pomgCljSR
+
+  @clojureAddClassPath = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'pomegranate', 'add-classpath'
 
   @addClassPath = (cp) ->
     @clojureAddClassPath.invokeSync cp
 
-  @clojureBuild = @java.callStaticMethodSync 'clojure.lang.RT', 'var', 'cljs.closure', 'build'
-
 
 ClojureScript.addClassPath = (cp) ->
-  @initClojureCompiler()
+  if ( not @ClojureCompiler ) then @initClojureCompiler()
   @addClassPath cp
 
 
@@ -84,7 +87,7 @@ if ( path.existsSync pathCompiledNodejsJS )
 
 
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
-ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
+#ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"
 
 ClojureScript.defaultPort = 4242
 
@@ -95,8 +98,8 @@ ClojureScript.localBuilder = (options, cljscOptions, callback) ->
   if options.async
     ClojureScript.clojureBuild.invoke options.path, cljscOptions, (err, js) ->
       if err
-        err.message = "In #{options.path}, #{err.message}"
-        return callback err, null
+        console.log 'trying to call the args callback'
+        return ( callback err, null )
 
       if not options.bare
         js = ";(function() {\n  #{js}\n}).call(this);\n"
@@ -192,7 +195,8 @@ ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.
   else
     ( callback ( new Error 'source path must be a file or a directory' ), null )
 
-  cljscOptions = @addBuildClasspath cljscOptions, cp
+  #cljscOptions = @addBuildClasspath cljscOptions, cp
+  @addClassPath cp
 
   builder options, cljscOptions, callback
 
