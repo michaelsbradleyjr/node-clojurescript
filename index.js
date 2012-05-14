@@ -489,7 +489,7 @@
   
   BANNER = 'Usage: ncljsc [options] path/to/script.cljs -- [args]\n\nIf called without options, `ncljsc` will run your script.';
   
-  SWITCHES = [['-b', '--bare', '  compile without a top-level function wrapper'], ['-c', '--compile', '  compile to JavaScript and save as .js files'], ['-C', '--client [PORT*]', '  act as a build-client of a "detached" JVM listening on\n' + '                       the specified port (defaults to 4242)'], ['-e', '--eval', '  pass a string from the command line as input'], ['-F', '--flags-print', '  print the options parsed by "ncljsc" and the contents of\n' + '                       process.argv'], ['-h', '--help', '  display this help message'], ['-i', '--interactive', '  run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', '  concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', '  pass a string of options to the JVM, space separated,\n' + '                       leave off the leading dashes'], ['-l', '--lint', '  pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', '  pass options directly to the "node" binary'], ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the\n' + '                       ClojureScript compiler'], ['-o', '--output [DIR]', '  set the "ncljsc" output directory for compiled JavaScript\n' + '                       (distinct from :output-dir specified with -O)'], ['-p', '--print', '  print out the compiled JavaScript'], ['-r', '--require [FILE*]', '  require a library before executing your script'], ['-s', '--stdio', '  listen for and compile scripts over stdio'], ['-S', '--server [PORT*]', '  act as a "detached" JVM build-server listening on the \n' + '                       specified port (defaults to 4242)'], ['-v', '--version', '  display the version numbers of "ncljsc" and ClojureScript'], ['-W', '--watch-deps [FILE]', '  watch other dependencies not targeted by --watch,\n' + '                       rerun commands on changes, supply as colon separated\n' + '                       path list (requires --watch)'], ['-w', '--watch', '  watch scripts for changes and rerun commands']];
+  SWITCHES = [['-b', '--bare', '  compile without a top-level function wrapper'], ['-c', '--compile', '  compile to JavaScript and save as .js files'], ['-C', '--client [PORT]', '  act as a build-client of a "detached" JVM listening on\n' + '                       the specified port (defaults to 4242)'], ['-e', '--eval', '  pass a string from the command line as input'], ['-F', '--flags-print', '  print the options parsed by "ncljsc" and the contents of\n' + '                       process.argv'], ['-h', '--help', '  display this help message'], ['-i', '--interactive', '  run an interactive ClojureScript REPL'], ['-j', '--join [FILE]', '  concatenate the source ClojureScript before compiling'], ['-J', '--java [LIST]', '  pass a string of options to the JVM, space separated,\n' + '                       leave off the leading dashes'], ['-l', '--lint', '  pipe the compiled JavaScript through JavaScript Lint'], ['-n', '--nodejs [ARGS]', '  pass options directly to the "node" binary'], ['-O', '--options-cljsc [HASHMAP]', '  pass a hash-map of options (as a string) to the\n' + '                       ClojureScript compiler'], ['-o', '--output [DIR]', '  set the "ncljsc" output directory for compiled JavaScript\n' + '                       (distinct from :output-dir specified with -O)'], ['-p', '--print', '  print out the compiled JavaScript'], ['-r', '--require [FILE*]', '  require a library before executing your script'], ['-s', '--stdio', '  listen for and compile scripts over stdio'], ['-S', '--server [PORT]', '  act as a "detached" JVM build-server listening on the \n' + '                       specified port (defaults to 4242)'], ['-v', '--version', '  display the version numbers of "ncljsc" and ClojureScript'], ['-W', '--watch-deps [FILE]', '  watch other dependencies not targeted by --watch,\n' + '                       rerun commands on changes, supply as colon separated\n' + '                       path list (requires --watch)'], ['-w', '--watch', '  watch scripts for changes and rerun commands']];
   
   opts = {};
   
@@ -566,6 +566,16 @@
     }
     if (opts.require) {
       loadRequires();
+    }
+    if (opts.server) {
+      return (ClojureScript.usingPort = opts.server, startServer());
+    }
+    if (opts.client) {
+      ClojureScript.usingPort = opts.client;
+      ClojureScript.builder = ClojureScript.remoteBuilder;
+    }
+    if (opts.client && opts.async) {
+      ClojureScript.client = require(__dirname + '/support/js/detached-jvm-client');
     }
     if (opts.interactive) {
       return repl.prompt();
@@ -1065,6 +1075,9 @@
     o = opts = optionParser.parse(po);
     o.compile || (o.compile = !!o.output);
     o.run = !(o.compile || o.print || o.lint);
+    o.server = o.server ? (isNaN(parseInt(o.server)) ? ClojureScript.defaultPort : parseInt(o.server)) : false;
+    o.client = o.client ? (isNaN(parseInt(o.client)) ? ClojureScript.defaultPort : parseInt(o.client)) : false;
+    o.async = !(o.run || o.server || (!o.client));
     o.print = !!(o.print || (o["eval"] || o.stdio && o.compile));
     o['watch-deps'] && (o['watch-deps'] = o['watch-deps'].split(':'));
     sources = o["arguments"];

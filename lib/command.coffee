@@ -23,7 +23,7 @@ BANNER = '''
 SWITCHES = [
   ['-b', '--bare',                    '  compile without a top-level function wrapper']
   ['-c', '--compile',                 '  compile to JavaScript and save as .js files']
-  ['-C', '--client [PORT*]',          '  act as a build-client of a "detached" JVM listening on\n' + \
+  ['-C', '--client [PORT]',          '  act as a build-client of a "detached" JVM listening on\n' + \
                                       '                       the specified port (defaults to 4242)']
   ['-e', '--eval',                    '  pass a string from the command line as input']
   ['-F', '--flags-print',             '  print the options parsed by "ncljsc" and the contents of\n' + \
@@ -42,7 +42,7 @@ SWITCHES = [
   ['-p', '--print',                   '  print out the compiled JavaScript']
   ['-r', '--require [FILE*]',         '  require a library before executing your script']
   ['-s', '--stdio',                   '  listen for and compile scripts over stdio']
-  ['-S', '--server [PORT*]',          '  act as a "detached" JVM build-server listening on the \n' + \
+  ['-S', '--server [PORT]',          '  act as a "detached" JVM build-server listening on the \n' + \
                                       '                       specified port (defaults to 4242)']
   ['-v', '--version',                 '  display the version numbers of "ncljsc" and ClojureScript']
   ['-W', '--watch-deps [FILE]',       '  watch other dependencies not targeted by --watch,\n' + \
@@ -93,6 +93,14 @@ ClojureScript.commandRun = ->
   return usage()                          if opts.help
   return version()                        if opts.version
   loadRequires()                          if opts.require
+  return (ClojureScript.usingPort = \
+  opts.server ; startServer())            if opts.server
+  (ClojureScript.usingPort = \
+  opts.client ; ClojureScript.builder = \
+  ClojureScript.remoteBuilder)            if opts.client
+  ClojureScript.client = \
+  ( require ( __dirname + \
+  '/support/js/detached-jvm-client' ) )   if opts.client and opts.async
   return repl.prompt()                    if opts.interactive
   if ( opts.watch or opts['watch-deps'] ) and !fs.watch
     return printWarn "The --watch feature depends on Node v0.6.0+. You are running #{process.version}."
@@ -439,6 +447,11 @@ parseOptions = ->
   o = opts      = optionParser.parse po
   o.compile     or=  !!o.output
   o.run         = not (o.compile or o.print or o.lint)
+  o.server      = if o.server then ( if ( isNaN ( parseInt o.server )) \
+                  then ClojureScript.defaultPort else ( parseInt o.server ) ) else false
+  o.client      = if o.client then ( if ( isNaN ( parseInt o.client )) \
+                  then ClojureScript.defaultPort else ( parseInt o.client ) ) else false
+  o.async       = not (o.run or o.server or (not o.client))
   o.print       = !!  (o.print or (o.eval or o.stdio and o.compile))
   o['watch-deps'] and= o['watch-deps'].split ':'
   sources       = o.arguments
