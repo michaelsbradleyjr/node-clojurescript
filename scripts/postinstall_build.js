@@ -15,7 +15,8 @@ var cljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false 
 var javaOptions = null;
 
 try {
-  cljs.build(options, cljscOptions, javaOptions);
+  var callback = function (err) { if (err) { throw err; } };
+  cljs.build(options, cljs.builder, callback, cljscOptions, javaOptions);
 } catch (error) {
   process.stdout.write('\nError: ' + error.message + '\n');
   process.exit(1);
