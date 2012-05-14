@@ -33,7 +33,9 @@
   "dependencies": {
     "commander": ">=0.6.0",
     "java": ">=0.0.3",
+    "restify": ">=1.4.1",
     "shelljs": "0.0.5pre4",
+    "superagent": ">=0.4.1",
     "temporary": ">=0.0.2"
   },
   "devDependencies": {
