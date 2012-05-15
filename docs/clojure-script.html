@@ -1,9 +1,12 @@
 <!DOCTYPE html>  <html> <head>   <title>clojure-script.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="clojure-script.html">                 clojure-script.coffee               </a>                                           <a class="source" href="helpers.html">                 helpers.coffee               </a>                                           <a class="source" href="extensions.html">                 extensions.coffee               </a>                                           <a class="source" href="detached-jvm-server.html">                 detached-jvm-server.coffee               </a>                                           <a class="source" href="optparse.html">                 optparse.coffee               </a>                                           <a class="source" href="command.html">                 command.coffee               </a>                                           <a class="source" href="repl.html">                 repl.coffee               </a>                                           <a class="source" href="exporter.html">                 exporter.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               clojure-script.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="o">`</span> <span class="o">//</span> <span class="nx">TOP</span> <span class="o">`</span>
 
+<span class="nv">clc            = </span><span class="nx">require</span> <span class="s">&#39;cli-color&#39;</span>
 <span class="nv">fs             = </span><span class="nx">require</span> <span class="s">&#39;fs&#39;</span>
 <span class="nv">Module         = </span><span class="nx">require</span> <span class="s">&#39;module&#39;</span>
 <span class="nv">path           = </span><span class="nx">require</span> <span class="s">&#39;path&#39;</span>
 <span class="nv">readline       = </span><span class="nx">require</span> <span class="s">&#39;readline&#39;</span>
+<span class="nv">restify        = </span><span class="nx">require</span> <span class="s">&#39;restify&#39;</span>
+<span class="nv">shell          = </span><span class="nx">require</span> <span class="s">&#39;shelljs&#39;</span>
 <span class="nv">util           = </span><span class="nx">require</span> <span class="s">&#39;util&#39;</span>
 <span class="nv">vm             = </span><span class="nx">require</span> <span class="s">&#39;vm&#39;</span>
 
@@ -17,8 +20,6 @@
 <span class="nv">ClojureScript.VERSION = </span><span class="s">&#39;0.1.4-pre&#39;</span>
 
 <span class="nv">ClojureScript.CLJS_VERSION = </span><span class="s">&#39;r1211++&#39;</span>
-
-<span class="nv">ClojureScript.depExts = </span><span class="p">[</span> <span class="s">&#39;.cljs&#39;</span><span class="p">,</span> <span class="s">&#39;.js&#39;</span><span class="p">,</span> <span class="s">&#39;.coffee&#39;</span> <span class="p">]</span>
 
 <span class="nv">ClojureScript.Tempdir = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/dir&#39;</span>
 <span class="nv">ClojureScript.tmp = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempdir</span>
@@ -86,17 +87,23 @@
   <span class="nv">ClojureScript.compiledNodejsJS.exists = </span><span class="kc">true</span>
 
 
-<span class="nv">ClojureScript.tmpOut = </span><span class="nf">(options) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :tmp-out \&quot;</span><span class="si">#{</span> <span class="nx">@tmp</span><span class="p">.</span><span class="nx">path</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>ClojureScript.addBuildClasspath = (options, cp) -> options[0...( options.length - 1 )] + " :add-classpath \"#{ cp }\"}"</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ClojureScript.defaultPort = </span><span class="mi">4242</span>
+<span class="nv">ClojureScript.tmpOut = </span><span class="nf">(options) -&gt;</span> <span class="nx">options</span><span class="p">[</span><span class="mi">0</span><span class="p">...(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span> <span class="o">+</span> <span class="s">&quot; :tmp-out \&quot;</span><span class="si">#{</span> <span class="nx">@tmp</span><span class="p">.</span><span class="nx">path</span> <span class="si">}</span><span class="s">\&quot;}&quot;</span>
 
-<span class="nv">ClojureScript.localBuilder = </span><span class="nf">(options, cljscOptions, callback) -&gt;</span>
+<span class="nv">ClojureScript.defaultPort = </span><span class="mi">4242</span>
 
-  <span class="nv">header = </span><span class="s">&quot;Generated by ClojureScript </span><span class="si">#{</span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">CLJS_VERSION</span><span class="si">}</span><span class="s"> (ncljsc v</span><span class="si">#{</span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">VERSION</span><span class="si">}</span><span class="s">)&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>presently, attempting asynchronous calls to cljs.closure/build is
+<span class="nv">ClojureScript.localBuilder = </span><span class="nf">(options, cljscOptions, callback, javaOptions = ClojureScript.javaOptions) -&gt;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">java</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">initJava</span> <span class="nx">javaOptions</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">ClojureCompiler</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">initClojureCompiler</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">classpath</span>
+    <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">addClassPath</span> <span class="nx">options</span><span class="p">.</span><span class="nx">classpath</span>
+
+  <span class="nv">header = </span><span class="s">&quot;Generated by ClojureScript </span><span class="si">#{</span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">CLJS_VERSION</span><span class="si">}</span><span class="s"> (ncljsc v</span><span class="si">#{</span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">VERSION</span><span class="si">}</span><span class="s">)&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>presently, attempting asynchronous calls to cljs.closure/build is
 resulting in exceptions mentioning java.lang.NullPointerException,
 so for now options.async will never be set to true by parseOptions
 in command.coffee</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
     <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">clojureBuild</span><span class="p">.</span><span class="nx">invoke</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">cljscOptions</span><span class="p">,</span> <span class="nf">(err, js) -&gt;</span>
       <span class="k">if</span> <span class="nx">err</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&#39;trying to call the args callback&#39;</span>
         <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span> <span class="p">)</span>
 
       <span class="k">if</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">bare</span>
@@ -113,23 +120,45 @@ in command.coffee</p>             </td>             <td class="code">           
       <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">js</span> <span class="p">)</span> <span class="nx">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">header</span>
 
     <span class="k">catch</span> <span class="nx">err</span>
-      <span class="nv">err.message = </span><span class="s">&quot;In </span><span class="si">#{</span><span class="nx">options</span><span class="p">.</span><span class="nx">path</span><span class="si">}</span><span class="s">, </span><span class="si">#{</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="s">&quot;</span>
-      <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>callback is called synchronously in this case</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">callback</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;// </span><span class="si">#{</span><span class="nx">header</span><span class="si">}</span><span class="s">\n</span><span class="si">#{</span><span class="nx">js</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>callback is called synchronously in this case</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">callback</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;// </span><span class="si">#{</span><span class="nx">header</span><span class="si">}</span><span class="s">\n</span><span class="si">#{</span><span class="nx">js</span><span class="si">}</span><span class="s">&quot;</span>
 
 
 <span class="nv">ClojureScript.remoteBuilder = </span><span class="nf">(options, cljscOptions, callback) -&gt;</span>
-  <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
-    <span class="s">&#39;send async http request&#39;</span>
+
+  <span class="nv">async = </span><span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
+  <span class="k">delete</span> <span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
+  <span class="nv">options.cljscOptions = </span><span class="nx">cljscOptions</span>
+  <span class="nv">options.port = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">usingPort</span>
+
+  <span class="k">if</span> <span class="nx">async</span>
+    <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">makeRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nf">(err, response) -&gt;</span>
+      <span class="nv">err = </span><span class="nx">err</span> <span class="o">or</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+      <span class="nv">js  = </span><span class="nx">response</span><span class="p">.</span><span class="nx">js</span>
+      <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
 
   <span class="k">else</span>
-    <span class="s">&#39;send sync http request&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>this default may be modified at runtime depending on cli options or
+    <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="nx">replace</span> <span class="sr">/\&quot;/g</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="s">&#39;supercalifragilisticexpialidocious&#39;</span>
+    <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/js/detached-jvm-client.js --request \&#39;&#39;</span> <span class="o">+</span> <span class="nx">options</span> <span class="o">+</span> <span class="s">&#39;\&#39;&#39;</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">false</span>
+    <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
+      <span class="k">try</span>
+        <span class="nv">response = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">response</span><span class="p">.</span><span class="nx">output</span>
+        <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+          <span class="nv">err = </span><span class="k">new</span> <span class="nb">Error</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+        <span class="k">else</span>
+          <span class="nv">err = </span><span class="kc">null</span>
+        <span class="nv">js  = </span><span class="nx">response</span><span class="p">.</span><span class="nx">js</span>
+
+        <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
+      <span class="k">catch</span> <span class="nx">err</span>
+        <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+    <span class="k">else</span>
+      <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;http request script exited with code </span><span class="si">#{</span><span class="nx">response</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span> <span class="p">),</span> <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>this default may be modified at runtime depending on cli options or
 arguments passed to the required module</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ClojureScript.builder = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">localBuilder</span>
 
 
 <span class="nv">ClojureScript.build = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
   <span class="k">if</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span> <span class="k">then</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;no source path specified&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
-  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">@java</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">@initJava</span> <span class="nx">javaOptions</span>
-  <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">@ClojureCompiler</span> <span class="p">)</span> <span class="k">then</span> <span class="nx">@initClojureCompiler</span><span class="p">()</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="nx">cljscOptions</span> <span class="o">isnt</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">options</span> <span class="p">)</span>
     <span class="nv">cljscOptions = </span><span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/^\s*(\{.*\})\s*$/</span>
@@ -184,7 +213,10 @@ arguments passed to the required module</p>             </td>             <td cl
   <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isFile</span><span class="p">()</span> <span class="p">)</span>
     <span class="nv">cp = </span><span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">resolved</span>
   <span class="k">else</span>
-    <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must be a file or a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>cljscOptions = @addBuildClasspath cljscOptions, cp</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">@addClassPath</span> <span class="nx">cp</span>
+    <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must be a file or a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+
+  <span class="nv">options.path = </span><span class="nx">resolved</span>
+  <span class="nv">options.classpath = </span><span class="nx">cp</span>
 
   <span class="nx">builder</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cljscOptions</span><span class="p">,</span> <span class="nx">callback</span>
 
@@ -201,7 +233,7 @@ arguments passed to the required module</p>             </td>             <td cl
 
   <span class="nx">mainModule</span><span class="p">.</span><span class="nx">moduleCache</span> <span class="o">and=</span> <span class="p">{}</span>
 
-  <span class="nv">mainModule.paths = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;module&#39;</span><span class="p">).</span><span class="nx">_nodeModulePaths</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">realpathSync</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>fairly certain this is the correct control flow, since this module
+  <span class="nv">mainModule.paths = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;module&#39;</span><span class="p">).</span><span class="nx">_nodeModulePaths</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">realpathSync</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>fairly certain this is the correct control flow, since this module
 does not attempt to support the deprecated <code>require.registerExtension</code>
 (coffee-script still supports it as of its version 1.3.1)</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span> <span class="nx">mainModule</span><span class="p">.</span><span class="nx">filename</span> <span class="p">)</span> <span class="o">is</span> <span class="s">&#39;.cljs&#39;</span> <span class="p">)</span>
     <span class="k">if</span> <span class="nx">require</span><span class="p">.</span><span class="nx">extensions</span>
@@ -209,10 +241,10 @@ does not attempt to support the deprecated <code>require.registerExtension</code
     <span class="k">else</span>
       <span class="nx">callback</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;missing require.extensions, can\&#39;t proceed&#39;</span>
   <span class="k">else</span>
-    <span class="nx">callback</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;ClojureScript.run method does not yet support compiling directly from a source string&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>original coffee-script control flow, for reference:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
+    <span class="nx">callback</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;ClojureScript.run method does not yet support compiling directly from a source string&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>original coffee-script control flow, for reference:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>if path.extname(mainModule.filename) isnt '.coffee' or require.extensions
   mainModule.<em>compile compile(code, options), mainModule.filename
 else
-  mainModule.</em>compile code, mainModule.filename</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>&nbsp;<br />
+  mainModule.</em>compile code, mainModule.filename</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>&nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
 &nbsp;<br />
