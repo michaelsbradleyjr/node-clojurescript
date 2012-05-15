@@ -58,23 +58,27 @@ if (asCli) {
     output({ reqbody: body, err: err.message, js: null });
   });
   var tmpfile = process.argv[3];
-  var body = fs.readFileSync(tmpfile, 'utf8');
-  var err;
-  try {
-    body = JSON.parse(body);
-    if (!body) {
-      err = new Error('bad request body');
-      output({ reqbody: body, err: err.message, js: null });
-    } else {
-      var callback = function (err, res) {
-        // response contains the message portion of err, and in a cli
-        // context the final 'output' step is to print to stdout, not
-        // call another function
-        output(res);
-      };
-      exports.makeRequest(body, callback);
+  fs.readFile(tmpfile, 'utf8', function (err, data) {
+    if (err) {
+      return output({ reqbody: null, err: err.message, js: null });
     }
-  } catch (error) {
-      output({ reqbody: body, err: error.message, js: null });
-  }
+    var body = data;
+    try {
+      body = JSON.parse(data);
+      if (!body) {
+        err = new Error('bad request body');
+        output({ reqbody: body, err: err.message, js: null });
+      } else {
+        var callback = function (err, res) {
+          // response contains the message portion of err, and in a cli
+          // context the final 'output' step is to print to stdout, not
+          // call another function
+          output(res);
+        };
+        exports.makeRequest(body, callback);
+      }
+    } catch (error) {
+        output({ reqbody: body, err: error.message, js: null });
+    }
+  });
 }
