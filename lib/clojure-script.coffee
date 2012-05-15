@@ -8,6 +8,7 @@ readline       = require 'readline'
 restify        = require 'restify'
 shell          = require 'shelljs'
 util           = require 'util'
+uuid           = require 'node-uuid'
 vm             = require 'vm'
 
 {EventEmitter} = require 'events'

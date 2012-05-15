@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, clc, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, restify, shell, sourceCode, sources, spawn, startServer, timeLog, unwatchDir, usage, util, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, clc, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, restify, shell, sourceCode, sources, spawn, startServer, timeLog, unwatchDir, usage, util, uuid, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   clc = require('cli-color');
   
@@ -43,6 +43,8 @@
   shell = require('shelljs');
   
   util = require('util');
+  
+  uuid = require('node-uuid');
   
   vm = require('vm');
   
@@ -381,7 +383,9 @@
   }
   
   ClojureScript.createServer = function() {
-    var iBuilder, iCallback, iOptions, server;
+    var credpath, iBuilder, iCallback, iOptions, server;
+    credpath = (new ClojureScript.Tempfile).path;
+    console.log(credpath);
     console.log('Starting up, please wait...');
     iOptions = {
       async: false,

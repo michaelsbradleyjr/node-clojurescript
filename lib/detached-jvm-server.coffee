@@ -1,5 +1,8 @@
 ClojureScript.createServer = ->
 
+  credpath = ( new ClojureScript.Tempfile ).path
+  console.log credpath
+
   console.log 'Starting up, please wait...'
 
   # initial build, to prime the JVM and compiler
