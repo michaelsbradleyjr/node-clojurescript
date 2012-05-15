@@ -9,6 +9,7 @@ fuse*
 
 docs_lib/
 node_modules/
+support/.lein/
 support/clojure-clojurescript/
 support/leiningen/
 support/out/

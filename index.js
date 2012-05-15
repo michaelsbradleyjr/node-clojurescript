@@ -62,6 +62,8 @@
   
   ClojureScript.Tempdir = require('temporary/lib/dir');
   
+  ClojureScript.Tempfile = require('temporary/lib/file');
+  
   ClojureScript.tmp = new ClojureScript.Tempdir;
   
   ClojureScript.defaultJavaOptions = '';
@@ -204,7 +206,7 @@
   };
   
   ClojureScript.remoteBuilder = function(options, cljscOptions, callback) {
-    var async, err, js, response;
+    var async, err, js, response, tmpfile;
     async = options.async;
     delete options.async;
     options.cljscOptions = cljscOptions;
@@ -217,11 +219,11 @@
         return callback(err, js);
       });
     } else {
-      options = JSON.stringify(options).replace(/\"/g, function() {
-        return 'supercalifragilisticexpialidocious';
-      });
-      response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request \'' + options + '\'', {
-        silent: false
+      tmpfile = new ClojureScript.Tempfile;
+      options = JSON.stringify(options);
+      fs.writeFileSync(tmpfile.path, options, 'utf8');
+      response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request ' + tmpfile.path, {
+        silent: true
       });
       if (response.code === 0) {
         try {

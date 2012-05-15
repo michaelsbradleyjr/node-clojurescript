@@ -21,7 +21,8 @@ ClojureScript.VERSION = '0.1.4-pre'
 
 ClojureScript.CLJS_VERSION = 'r1211++'
 
-ClojureScript.Tempdir = require 'temporary/lib/dir'
+ClojureScript.Tempdir  = require 'temporary/lib/dir'
+ClojureScript.Tempfile = require 'temporary/lib/file'
 ClojureScript.tmp = new ClojureScript.Tempdir
 
 ClojureScript.defaultJavaOptions = ''
@@ -143,8 +144,10 @@ ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
       callback err, js
 
   else
-    options = JSON.stringify(options).replace /\"/g, -> 'supercalifragilisticexpialidocious'
-    response = shell.exec ( 'node ' + __dirname + '/support/js/detached-jvm-client.js --request \'' + options + '\'' ), silent: false
+    tmpfile = new ClojureScript.Tempfile
+    options = JSON.stringify options
+    fs.writeFileSync tmpfile.path, options, 'utf8'
+    response = shell.exec ( 'node ' + __dirname + '/support/js/detached-jvm-client.js --request ' + tmpfile.path ), silent: true
     if response.code is 0
       try
         response = JSON.parse response.output

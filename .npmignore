@@ -11,6 +11,7 @@ docs/
 docs_lib/
 lib/
 node_modules/
+support/.lein/
 support/clojure-clojurescript/
 support/leiningen/
 support/nodejuice/

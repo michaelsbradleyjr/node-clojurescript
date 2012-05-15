@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var fs      = require('fs');
 var util    = require('util');
 var request = require('superagent');
 
@@ -56,9 +57,8 @@ if (asCli) {
   process.on('uncaughtException', function (err) {
     output({ reqbody: body, err: err.message, js: null });
   });
-  var body = process.argv[3].replace(/supercalifragilisticexpialidocious/g, function () {
-    return '\"';
-  });
+  var tmpfile = process.argv[3];
+  var body = fs.readFileSync(tmpfile, 'utf8');
   var err;
   try {
     body = JSON.parse(body);

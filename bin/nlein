@@ -19,11 +19,11 @@ if (ignoreConfig) {
   process.argv.splice(iCI, 1);
 }
 
-var nleinConfig = null;
+var refNleinConfig = null;
 if (!ignoreConfig) {
   if (path.existsSync(pkg + '.nlein.json')) {
     try {
-      nleinConfig = JSON.parse(fs.readFileSync(pkg + '.nlein.json', 'utf8'));
+      refNleinConfig = JSON.parse(fs.readFileSync(pkg + '.nlein.json', 'utf8'));
     } catch (error) {
       throw new Error( 'config found at ' + pkg + '.nlein.json' + ' but could not be parsed as valid JSON' );
       process.exit(1);
@@ -49,6 +49,9 @@ var spawnLein = function (lein) {
                         + pkg + 'support/clojure-clojurescript/lib/compiler.jar:'
                         + pkg + 'support/clojure-clojurescript/lib/goog.jar:'
                         + pkg + 'support/clojure-clojurescript/lib/js.jar';
+  if (!refNleinConfig || !refNleinConfig.delegate) {
+    process.env.LEIN_HOME = pkg + 'support/.lein';
+  }
   var leinProc = spawn(lein
                      , process.argv.slice(2)
                      , { cwd: process.cwd(), env: process.env });
@@ -157,9 +160,10 @@ var parseConfig = function (nleinConfig, recur) {
     if (noCheck) {
       spawnLein(pkg + 'support/leiningen/lein');
     } else {
-      parseConfig({});
+      refNleinConfig = {};
+      parseConfig(refNleinConfig);
     }
   }
 };
 
-parseConfig(nleinConfig);
+parseConfig(refNleinConfig);

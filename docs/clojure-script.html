@@ -21,7 +21,8 @@
 
 <span class="nv">ClojureScript.CLJS_VERSION = </span><span class="s">&#39;r1211++&#39;</span>
 
-<span class="nv">ClojureScript.Tempdir = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/dir&#39;</span>
+<span class="nv">ClojureScript.Tempdir  = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/dir&#39;</span>
+<span class="nv">ClojureScript.Tempfile = </span><span class="nx">require</span> <span class="s">&#39;temporary/lib/file&#39;</span>
 <span class="nv">ClojureScript.tmp = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempdir</span>
 
 <span class="nv">ClojureScript.defaultJavaOptions = </span><span class="s">&#39;&#39;</span>
@@ -137,8 +138,10 @@ in command.coffee</p>             </td>             <td class="code">           
       <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
 
   <span class="k">else</span>
-    <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="nx">replace</span> <span class="sr">/\&quot;/g</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="s">&#39;supercalifragilisticexpialidocious&#39;</span>
-    <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/js/detached-jvm-client.js --request \&#39;&#39;</span> <span class="o">+</span> <span class="nx">options</span> <span class="o">+</span> <span class="s">&#39;\&#39;&#39;</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">false</span>
+    <span class="nv">tmpfile = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempfile</span>
+    <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">options</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+    <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/js/detached-jvm-client.js --request &#39;</span> <span class="o">+</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
     <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
       <span class="k">try</span>
         <span class="nv">response = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">response</span><span class="p">.</span><span class="nx">output</span>
