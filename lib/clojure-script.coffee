@@ -16,6 +16,7 @@ vm             = require 'vm'
 {Script}       = vm
 {spawn, exec}  = require 'child_process'
 
+
 ClojureScript = (port) ->
   if port
     ClojureScript.usingPort = parseInt port
@@ -24,6 +25,7 @@ ClojureScript = (port) ->
   ClojureScript.client      = require ( __dirname + '/support/js/detached-jvm-client' )
   ClojureScript.builder     = ClojureScript.remoteBuilder
   ClojureScript
+
 
 ClojureScript.VERSION = '0.1.4-pre'
 
@@ -38,6 +40,8 @@ ClojureScript.javaOptions = ClojureScript.defaultJavaOptions
 
 ClojureScript.defaultCljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
 ClojureScript.cljscOptions = ClojureScript.defaultCljscOptions
+
+ClojureScript.defaultPort = 4242
 
 
 ClojureScript.initJava = (options) ->
@@ -96,7 +100,6 @@ if ( path.existsSync pathCompiledNodejsJS )
 
 ClojureScript.tmpOut = (options) -> options[0...( options.length - 1 )] + " :tmp-out \"#{ @tmp.path }\"}"
 
-ClojureScript.defaultPort = 4242
 
 ClojureScript.localBuilder = (options, cljscOptions, callback, javaOptions = ClojureScript.javaOptions) ->
   if ( not ClojureScript.java ) then ClojureScript.initJava javaOptions
@@ -109,8 +112,10 @@ ClojureScript.localBuilder = (options, cljscOptions, callback, javaOptions = Clo
 
   # presently, attempting asynchronous calls to cljs.closure/build is
   # resulting in exceptions mentioning java.lang.NullPointerException,
-  # so for now options.async will never be set to true by parseOptions
-  # in command.coffee
+  # so for now options.async will not be set to true by parseOptions
+  # in command.coffee in those cases where localBuilder would be used
+  # rather than remoteBuilder (async works correctly in those
+  # remoteBuilder cases where sync builds are not required)
   if options.async
     ClojureScript.clojureBuild.invoke options.path, cljscOptions, (err, js) ->
       if err
@@ -169,9 +174,7 @@ ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
 
           catch err
             callback err, null
-
   else
-
     buildRequest = (options, callback) ->
       tmpfile = new ClojureScript.Tempfile
       options = JSON.stringify options

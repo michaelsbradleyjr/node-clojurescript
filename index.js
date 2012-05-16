@@ -85,6 +85,8 @@
   
   ClojureScript.cljscOptions = ClojureScript.defaultCljscOptions;
   
+  ClojureScript.defaultPort = 4242;
+  
   ClojureScript.initJava = function(options) {
     var java, jo, _i, _len, _ref1;
     this.java = java = require('java');
@@ -163,8 +165,6 @@
   ClojureScript.tmpOut = function(options) {
     return options.slice(0, options.length - 1) + (" :tmp-out \"" + this.tmp.path + "\"}");
   };
-  
-  ClojureScript.defaultPort = 4242;
   
   ClojureScript.localBuilder = function(options, cljscOptions, callback, javaOptions) {
     var header, js;
