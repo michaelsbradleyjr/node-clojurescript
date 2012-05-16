@@ -4,7 +4,7 @@
 
 [node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) aims to provide seamless integration between [NodeJS](http://nodejs.org/) and [ClojureScript](https://github.com/clojure/clojurescript). This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and Clojure communities.
 
-Working packages are available on the [npm](http://npmjs.org/) registry: &nbsp;[clojure-script](http://search.npmjs.org/#/clojure-script).
+Packages are available on the [npm](http://npmjs.org/) registry: &nbsp;[clojure-script](http://search.npmjs.org/#/clojure-script).
 
 
 ## Description
@@ -74,9 +74,9 @@ With `ncljsc` still running, replace the contents of `hello.cljs` with:
      (.writeHead res 200 (clj->js {:Content-Type "text/plain"}))
      (.end res "Hello, World\n"))))
 
-(.listen server 4242 "127.0.0.1")
+(.listen server 4200 "127.0.0.1")
 
-(println "Server running at http://127.0.0.1:4242")
+(println "Server running at http://127.0.0.1:4200")
 
 ;; Helper
 (defn clj->js
@@ -109,6 +109,7 @@ $ forever -w -c ncljsc hello.cljs
 
 When you make changes to `hello.cljs`, the script will be restarted automatically and you should not get an error like you would with `ncljsc -w`. However, this reintroduces the problem of the *slow* startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.
 
+### Faster, faster!
 
 ## Prerequisites
 
