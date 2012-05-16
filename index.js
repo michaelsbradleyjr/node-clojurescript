@@ -460,7 +460,7 @@
     console.log('Starting up, please wait...');
     iOptions = {
       async: false,
-      path: __dirname + '/support/cljs/postinstall_build.cljs'
+      path: __dirname + '/support/cljs/detached_jvm_server_initial_build.cljs'
     };
     iBuilder = ClojureScript.localBuilder;
     iCallback = function(err) {

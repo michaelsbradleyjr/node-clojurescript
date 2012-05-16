@@ -11,7 +11,7 @@ ClojureScript.createServer = ->
   console.log 'Starting up, please wait...'
 
   # initial build, to prime the JVM and compiler
-  iOptions  = { async: false, path: ( __dirname + '/support/cljs/postinstall_build.cljs' ) }
+  iOptions  = { async: false, path: ( __dirname + '/support/cljs/detached_jvm_server_initial_build.cljs' ) }
   iBuilder  = ClojureScript.localBuilder
   iCallback = (err) -> if err then throw err
   ClojureScript.build iOptions, iBuilder, iCallback
