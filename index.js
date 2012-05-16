@@ -1,6 +1,6 @@
 /*//////////////////////// NODE-CLOJURESCRIPT //////////////////////////
  *
- * Version 0.1.4-pre
+ * Version 0.1.4
  * https://github.com/michaelsbradleyjr/node-clojurescript
  *
  * This software is Copyright (c) 2012 by Michael Bradley, Jr.
@@ -67,7 +67,7 @@
     return ClojureScript;
   };
   
-  ClojureScript.VERSION = '0.1.4-pre';
+  ClojureScript.VERSION = '0.1.4';
   
   ClojureScript.CLJS_VERSION = 'r1236';
   
