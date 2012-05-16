@@ -16,7 +16,13 @@ vm             = require 'vm'
 {Script}       = vm
 {spawn, exec}  = require 'child_process'
 
-ClojureScript = {}
+ClojureScript = (port) ->
+  if port
+    ClojureScript.usingPort = parseInt port
+  else
+    ClojureScript.usingPort = ClojureScript.defaultPort
+  ClojureScript.builder     = ClojureScript.remoteBuilder
+  ClojureScript
 
 ClojureScript.VERSION = '0.1.4-pre'
 

@@ -16,7 +16,13 @@
 <span class="p">{</span><span class="nx">Script</span><span class="p">}</span>       <span class="o">=</span> <span class="nx">vm</span>
 <span class="p">{</span><span class="nx">spawn</span><span class="p">,</span> <span class="nx">exec</span><span class="p">}</span>  <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;child_process&#39;</span>
 
-<span class="nv">ClojureScript = </span><span class="p">{}</span>
+<span class="nv">ClojureScript = </span><span class="nf">(port) -&gt;</span>
+  <span class="k">if</span> <span class="nx">port</span>
+    <span class="nv">ClojureScript.usingPort = </span><span class="nb">parseInt</span> <span class="nx">port</span>
+  <span class="k">else</span>
+    <span class="nv">ClojureScript.usingPort = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultPort</span>
+  <span class="nv">ClojureScript.builder     = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">remoteBuilder</span>
+  <span class="nx">ClojureScript</span>
 
 <span class="nv">ClojureScript.VERSION = </span><span class="s">&#39;0.1.4-pre&#39;</span>
 
