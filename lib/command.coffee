@@ -5,7 +5,7 @@
 # interactive REPL.
 
 # Allow ClojureScript to emit Node.js events.
-extend ClojureScript, new EventEmitter
+ClojureScript.extend ClojureScript, new EventEmitter
 
 printLine = (line) -> process.stdout.write line + '\n'
 printWarn = (line) -> process.stderr.write line + '\n'

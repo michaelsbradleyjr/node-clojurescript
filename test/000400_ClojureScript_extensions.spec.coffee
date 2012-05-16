@@ -21,30 +21,28 @@ describe 'ClojureScript extensions', ->
 
     file = ( __dirname + '/cljs/hello.cljs' )
 
-    #{hello} = require file
+    {hello} = require file
 
-    #( expect hello.greet 'world' ).to.equal 'hello world'
+    ( expect hello.greet 'world' ).to.equal 'hello world'
 
     done()
 
   it '''
-    should auto-compile by sending a build request to a "detached" JVM when a port number is passed to the function returned by require\'ing the clojure-script module
+    should build using a "detached" JVM when the function returned by require\'ing clojure-script is called with a port number
   ''', (done) ->
 
     ( expect ClojureScript.usingPort ).not.to.exist
     ( expect ClojureScript.builder   ).to.equal ClojureScript.localBuilder
 
-    ClojureScript = (require index)(9999)
+    ClojureScript 9999
 
     ( expect ClojureScript.usingPort ).to.equal 9999
     ( expect ClojureScript.builder   ).to.equal ClojureScript.remoteBuilder
 
-    file = ( __dirname + '/cljs/hello.cljs' )
+    file = ( __dirname + '/cljs/foo.cljs' )
 
-    {hello} = require file
+    {foo} = require file
 
-    console.log 'global.key: ', typeof global.key
-
-    ( expect hello.greet 'world' ).to.equal 'hello worlddd'
+    ( expect foo.bar 'world' ).to.equal 'fooBar world'
 
     done()

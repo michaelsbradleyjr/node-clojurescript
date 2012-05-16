@@ -21,6 +21,7 @@ ClojureScript = (port) ->
     ClojureScript.usingPort = parseInt port
   else
     ClojureScript.usingPort = ClojureScript.defaultPort
+  ClojureScript.client      = require ( __dirname + '/support/js/detached-jvm-client' )
   ClojureScript.builder     = ClojureScript.remoteBuilder
   ClojureScript
 
@@ -35,8 +36,8 @@ ClojureScript.tmp = new ClojureScript.Tempdir
 ClojureScript.defaultJavaOptions = ''
 ClojureScript.javaOptions = ClojureScript.defaultJavaOptions
 
-ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
-ClojureScript.options = ClojureScript.defaultOptions
+ClojureScript.defaultCljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false}'
+ClojureScript.cljscOptions = ClojureScript.defaultCljscOptions
 
 
 ClojureScript.initJava = (options) ->
@@ -82,7 +83,6 @@ compiledCoreJS = ''
 ClojureScript.compiledCoreJS = -> compiledCoreJS
 if ( path.existsSync pathCompiledCoreJS )
   compiledCoreJS = fs.readFileSync pathCompiledCoreJS, 'utf8'
-  ClojureScript.compiledCoreJS = -> compiledCoreJS
   ClojureScript.compiledCoreJS.exists = true
 
 
@@ -91,7 +91,6 @@ compiledNodejsJS = ''
 ClojureScript.compiledNodejsJS = -> compiledNodejsJS
 if ( path.existsSync pathCompiledNodejsJS )
   compiledNodejsJS = fs.readFileSync pathCompiledNodejsJS, 'utf8'
-  ClojureScript.compiledNodejsJS = -> compiledNodejsJS
   ClojureScript.compiledNodejsJS.exists = true
 
 
@@ -172,12 +171,13 @@ ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
             callback err, null
 
   else
+
     buildRequest = (options, callback) ->
       tmpfile = new ClojureScript.Tempfile
       options = JSON.stringify options
       fs.writeFileSync tmpfile.path, options, 'utf8'
       response = shell.exec ( 'node ' + __dirname + \
-                              '/support/js/detached-jvm-client.js --request-build ' + tmpfile.path ), silent: true
+                              '/support/js/detached-jvm-client.js --request-build ' + tmpfile.path ), { async: false, silent: true }
       if response.code is 0
 
         try
@@ -203,7 +203,7 @@ ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
 
     else
       response = shell.exec ( 'node ' + __dirname + \
-                              '/support/js/detached-jvm-client.js --request-creds ' + options.port ), silent: true
+                              '/support/js/detached-jvm-client.js --request-creds ' + options.port ), { async: false, silent: true }
       if response.code is 0
 
         try
@@ -234,13 +234,13 @@ ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
 ClojureScript.builder = ClojureScript.localBuilder
 
 
-ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
-  if not options.path then ( callback ( new Error 'no source path specified' ), null )
+ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) ->
+  if not options.path then return ( callback ( new Error 'no source path specified' ), null )
 
-  if ( cljscOptions isnt ClojureScript.options )
+  if ( cljscOptions isnt @cljscOptions )
     cljscOptions = cljscOptions.match /^\s*(\{.*\})\s*$/
     if ( not cljscOptions )
-      ( callback ( new Error 'malformed ClojureScript options hash-map' ), null )
+      return ( callback ( new Error 'malformed ClojureScript options hash-map' ), null )
     else
       cljscOptions = cljscOptions[1]
 
@@ -250,7 +250,7 @@ ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.
          ( cljscOptions.match /\:output-dir\s*\"[^\"]*(\:|(\}$))/ ) or \
          ( cljscOptions.match /\:output-dir\s*[^\']*\'\s*(\:|(\}$))/ ) or \
          ( cljscOptions.match /\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/ ) )
-      ( callback ( new Error 'path specified as :output-dir must be wrapped in double-quotes' ), null )
+      return ( callback ( new Error 'path specified as :output-dir must be wrapped in double-quotes' ), null )
 
     outputdir = cljscOptions.match /\:output-dir\s*(\".*\")/
     if outputdir
@@ -258,9 +258,9 @@ ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.
       outputdir = outputdir[1...( outputdir.length - 1 )]
       outputdir = path.resolve ( path.normalize outputdir )
       if ( not path.existsSync outputdir )
-        ( callback ( new Error 'path specified as :output-dir must exist' ), null )
+        return ( callback ( new Error 'path specified as :output-dir must exist' ), null )
       if ( not ( fs.statSync outputdir ).isDirectory() )
-        ( callback ( new Error 'path specified as :output-dir must be a directory' ), null )
+        return ( callback ( new Error 'path specified as :output-dir must be a directory' ), null )
       @['output-dir'] = outputdir
 
   if ( not outputdir? )
@@ -274,23 +274,23 @@ ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.
   if @compiledCoreJS.exists
     outcljscore = outcljs + '/core.js'
     if ( not ( path.existsSync outcljscore ) )
-      fs.writeFileSync outcljscore, ClojureScript.compiledCoreJS(), 'utf8'
+      fs.writeFileSync outcljscore, @compiledCoreJS(), 'utf8'
 
   if @compiledNodejsJS.exists
     outcljsnodejs = outcljs + '/nodejs.js'
     if ( not ( path.existsSync outcljsnodejs ) )
-      fs.writeFileSync outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8'
+      fs.writeFileSync outcljsnodejs, @compiledNodejsJS(), 'utf8'
 
   resolved = path.resolve ( path.normalize options.path )
   if ( not ( path.existsSync resolved ) )
-    ( callback ( new Error 'source path must exist' ), null )
+    return ( callback ( new Error 'source path must exist' ), null )
   stats = fs.statSync resolved
   if ( stats.isDirectory() )
     cp = resolved
   else if ( stats.isFile() )
     cp = path.dirname resolved
   else
-    ( callback ( new Error 'source path must be a file or a directory' ), null )
+    return ( callback ( new Error 'source path must be a file or a directory' ), null )
 
   options.path = resolved
   options.classpath = cp
@@ -298,11 +298,11 @@ ClojureScript.build = (options, builder, callback, cljscOptions = ClojureScript.
   builder options, cljscOptions, callback
 
 
-ClojureScript.eval = (options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+ClojureScript.eval = (options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) ->
   throw new Error 'ClojureScript.eval method is not yet implemented'
 
 
-ClojureScript.run = (options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) ->
+ClojureScript.run = (options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) ->
   mainModule = require.main
 
   mainModule.filename = process.argv[1] =

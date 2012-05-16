@@ -21,6 +21,7 @@
     <span class="nv">ClojureScript.usingPort = </span><span class="nb">parseInt</span> <span class="nx">port</span>
   <span class="k">else</span>
     <span class="nv">ClojureScript.usingPort = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultPort</span>
+  <span class="nv">ClojureScript.client      = </span><span class="nx">require</span> <span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/js/detached-jvm-client&#39;</span> <span class="p">)</span>
   <span class="nv">ClojureScript.builder     = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">remoteBuilder</span>
   <span class="nx">ClojureScript</span>
 
@@ -35,8 +36,8 @@
 <span class="nv">ClojureScript.defaultJavaOptions = </span><span class="s">&#39;&#39;</span>
 <span class="nv">ClojureScript.javaOptions = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultJavaOptions</span>
 
-<span class="nv">ClojureScript.defaultOptions = </span><span class="s">&#39;{:optimizations :simple :target :nodejs :pretty-print false}&#39;</span>
-<span class="nv">ClojureScript.options = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultOptions</span>
+<span class="nv">ClojureScript.defaultCljscOptions = </span><span class="s">&#39;{:optimizations :simple :target :nodejs :pretty-print false}&#39;</span>
+<span class="nv">ClojureScript.cljscOptions = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">defaultCljscOptions</span>
 
 
 <span class="nv">ClojureScript.initJava = </span><span class="nf">(options) -&gt;</span>
@@ -82,7 +83,6 @@
 <span class="nv">ClojureScript.compiledCoreJS = </span><span class="o">-&gt;</span> <span class="nx">compiledCoreJS</span>
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledCoreJS</span> <span class="p">)</span>
   <span class="nv">compiledCoreJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledCoreJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
-  <span class="nv">ClojureScript.compiledCoreJS = </span><span class="o">-&gt;</span> <span class="nx">compiledCoreJS</span>
   <span class="nv">ClojureScript.compiledCoreJS.exists = </span><span class="kc">true</span>
 
 
@@ -91,7 +91,6 @@
 <span class="nv">ClojureScript.compiledNodejsJS = </span><span class="o">-&gt;</span> <span class="nx">compiledNodejsJS</span>
 <span class="k">if</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">pathCompiledNodejsJS</span> <span class="p">)</span>
   <span class="nv">compiledNodejsJS = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">pathCompiledNodejsJS</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
-  <span class="nv">ClojureScript.compiledNodejsJS = </span><span class="o">-&gt;</span> <span class="nx">compiledNodejsJS</span>
   <span class="nv">ClojureScript.compiledNodejsJS.exists = </span><span class="kc">true</span>
 
 
@@ -166,12 +165,13 @@ in command.coffee</p>             </td>             <td class="code">           
             <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
 
   <span class="k">else</span>
+
     <span class="nv">buildRequest = </span><span class="nf">(options, callback) -&gt;</span>
       <span class="nv">tmpfile = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempfile</span>
       <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">options</span>
       <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
       <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="o">\</span>
-                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-build &#39;</span> <span class="o">+</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
+                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-build &#39;</span> <span class="o">+</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span> <span class="p">),</span> <span class="p">{</span> <span class="nv">async: </span><span class="kc">false</span><span class="p">,</span> <span class="nv">silent: </span><span class="kc">true</span> <span class="p">}</span>
       <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
 
         <span class="k">try</span>
@@ -197,7 +197,7 @@ in command.coffee</p>             </td>             <td class="code">           
 
     <span class="k">else</span>
       <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="o">\</span>
-                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-creds &#39;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">port</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
+                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-creds &#39;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">port</span> <span class="p">),</span> <span class="p">{</span> <span class="nv">async: </span><span class="kc">false</span><span class="p">,</span> <span class="nv">silent: </span><span class="kc">true</span> <span class="p">}</span>
       <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
 
         <span class="k">try</span>
@@ -224,13 +224,13 @@ in command.coffee</p>             </td>             <td class="code">           
 arguments passed to the required module</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ClojureScript.builder = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">localBuilder</span>
 
 
-<span class="nv">ClojureScript.build = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
-  <span class="k">if</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span> <span class="k">then</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;no source path specified&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+<span class="nv">ClojureScript.build = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) -&gt;</span>
+  <span class="k">if</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span> <span class="k">then</span> <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;no source path specified&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
 
-  <span class="k">if</span> <span class="p">(</span> <span class="nx">cljscOptions</span> <span class="o">isnt</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">options</span> <span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">cljscOptions</span> <span class="o">isnt</span> <span class="nx">@cljscOptions</span> <span class="p">)</span>
     <span class="nv">cljscOptions = </span><span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/^\s*(\{.*\})\s*$/</span>
     <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">cljscOptions</span> <span class="p">)</span>
-      <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;malformed ClojureScript options hash-map&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+      <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;malformed ClojureScript options hash-map&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
     <span class="k">else</span>
       <span class="nv">cljscOptions = </span><span class="nx">cljscOptions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -240,7 +240,7 @@ arguments passed to the required module</p>             </td>             <td cl
          <span class="p">(</span> <span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/\:output-dir\s*\&quot;[^\&quot;]*(\:|(\}$))/</span> <span class="p">)</span> <span class="o">or</span> <span class="o">\</span>
          <span class="p">(</span> <span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/\:output-dir\s*[^\&#39;]*\&#39;\s*(\:|(\}$))/</span> <span class="p">)</span> <span class="o">or</span> <span class="o">\</span>
          <span class="p">(</span> <span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/\:output-dir\s*[^\&quot;]*\&quot;\s*(\:|(\}$))/</span> <span class="p">)</span> <span class="p">)</span>
-      <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be wrapped in double-quotes&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+      <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be wrapped in double-quotes&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
 
     <span class="nv">outputdir = </span><span class="nx">cljscOptions</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/\:output-dir\s*(\&quot;.*\&quot;)/</span>
     <span class="k">if</span> <span class="nx">outputdir</span>
@@ -248,9 +248,9 @@ arguments passed to the required module</p>             </td>             <td cl
       <span class="nv">outputdir = </span><span class="nx">outputdir</span><span class="p">[</span><span class="mi">1</span><span class="p">...(</span> <span class="nx">outputdir</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)]</span>
       <span class="nv">outputdir = </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="nx">outputdir</span> <span class="p">)</span>
       <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outputdir</span> <span class="p">)</span>
-        <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must exist&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must exist&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
       <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">statSync</span> <span class="nx">outputdir</span> <span class="p">).</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="p">)</span>
-        <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;path specified as :output-dir must be a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
       <span class="nx">@</span><span class="p">[</span><span class="s">&#39;output-dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">outputdir</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="nx">outputdir</span><span class="o">?</span> <span class="p">)</span>
@@ -264,23 +264,23 @@ arguments passed to the required module</p>             </td>             <td cl
   <span class="k">if</span> <span class="nx">@compiledCoreJS</span><span class="p">.</span><span class="nx">exists</span>
     <span class="nv">outcljscore = </span><span class="nx">outcljs</span> <span class="o">+</span> <span class="s">&#39;/core.js&#39;</span>
     <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outcljscore</span> <span class="p">)</span> <span class="p">)</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljscore</span><span class="p">,</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledCoreJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljscore</span><span class="p">,</span> <span class="nx">@compiledCoreJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
 
   <span class="k">if</span> <span class="nx">@compiledNodejsJS</span><span class="p">.</span><span class="nx">exists</span>
     <span class="nv">outcljsnodejs = </span><span class="nx">outcljs</span> <span class="o">+</span> <span class="s">&#39;/nodejs.js&#39;</span>
     <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">outcljsnodejs</span> <span class="p">)</span> <span class="p">)</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljsnodejs</span><span class="p">,</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">compiledNodejsJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">outcljsnodejs</span><span class="p">,</span> <span class="nx">@compiledNodejsJS</span><span class="p">(),</span> <span class="s">&#39;utf8&#39;</span>
 
   <span class="nv">resolved = </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span> <span class="nx">options</span><span class="p">.</span><span class="nx">path</span> <span class="p">)</span>
   <span class="k">if</span> <span class="p">(</span> <span class="o">not</span> <span class="p">(</span> <span class="nx">path</span><span class="p">.</span><span class="nx">existsSync</span> <span class="nx">resolved</span> <span class="p">)</span> <span class="p">)</span>
-    <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must exist&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must exist&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
   <span class="nv">stats = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">statSync</span> <span class="nx">resolved</span>
   <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">()</span> <span class="p">)</span>
     <span class="nv">cp = </span><span class="nx">resolved</span>
   <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">isFile</span><span class="p">()</span> <span class="p">)</span>
     <span class="nv">cp = </span><span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span> <span class="nx">resolved</span>
   <span class="k">else</span>
-    <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must be a file or a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;source path must be a file or a directory&#39;</span> <span class="p">),</span> <span class="kc">null</span> <span class="p">)</span>
 
   <span class="nv">options.path = </span><span class="nx">resolved</span>
   <span class="nv">options.classpath = </span><span class="nx">cp</span>
@@ -288,11 +288,11 @@ arguments passed to the required module</p>             </td>             <td cl
   <span class="nx">builder</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cljscOptions</span><span class="p">,</span> <span class="nx">callback</span>
 
 
-<span class="nv">ClojureScript.eval = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
+<span class="nv">ClojureScript.eval = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) -&gt;</span>
   <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&#39;ClojureScript.eval method is not yet implemented&#39;</span>
 
 
-<span class="nv">ClojureScript.run = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.options, javaOptions = ClojureScript.javaOptions) -&gt;</span>
+<span class="nv">ClojureScript.run = </span><span class="nf">(options, builder, callback, cljscOptions = ClojureScript.cljscOptions, javaOptions = ClojureScript.javaOptions) -&gt;</span>
   <span class="nv">mainModule = </span><span class="nx">require</span><span class="p">.</span><span class="nx">main</span>
 
   <span class="nv">mainModule.filename = </span><span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>

@@ -3,10 +3,9 @@ if require.extensions
     options  =
       async: false
       path:  filename
-    builder  = ClojureScript.builder
     callback = (err, js) -> if err then throw err else js
 
     # since async is false, the callback will be invoked synchronously
-    content = ClojureScript.build options, builder, callback
+    content = ClojureScript.build options, ClojureScript.builder, callback
 
     module._compile content, filename

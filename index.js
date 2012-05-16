@@ -26,7 +26,7 @@
 
 ;(function (undefined) {
   
-  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, clc, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, extend, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, restify, shell, sourceCode, sources, spawn, startServer, timeLog, unwatchDir, usage, util, uuid, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
+  var BANNER, CliOptionParser, ClojureScript, EventEmitter, LONG_FLAG, MULTI_FLAG, Module, OPTIONAL, SHORT_FLAG, SWITCHES, Script, buildFromDisk, buildPath, buildRuleCliOpt, buildRulesCliOpt, clc, compileJoin, compileOptions, compileScript, compileStdio, compiledCoreJS, compiledNodejsJS, exec, exports, forkNode, fs, hidden, inspect, joinTimeout, lint, loadRequires, makePad, normalizeArgumentsCliOpt, notSources, optionParser, opts, outFiles, outputPath, parseOptions, path, pathCompiledCoreJS, pathCompiledNodejsJS, printFlags, printLine, printWarn, readline, removeSource, repl, restify, shell, sourceCode, sources, spawn, startServer, timeLog, unwatchDir, usage, util, uuid, version, vm, wait, watch, watchDeps, watchDepsDir, watchDepsFile, watchDir, watchers, writeJs, _ref;
   
   clc = require('cli-color');
   
@@ -62,6 +62,7 @@
     } else {
       ClojureScript.usingPort = ClojureScript.defaultPort;
     }
+    ClojureScript.client = require(__dirname + '/support/js/detached-jvm-client');
     ClojureScript.builder = ClojureScript.remoteBuilder;
     return ClojureScript;
   };
@@ -80,9 +81,9 @@
   
   ClojureScript.javaOptions = ClojureScript.defaultJavaOptions;
   
-  ClojureScript.defaultOptions = '{:optimizations :simple :target :nodejs :pretty-print false}';
+  ClojureScript.defaultCljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false}';
   
-  ClojureScript.options = ClojureScript.defaultOptions;
+  ClojureScript.cljscOptions = ClojureScript.defaultCljscOptions;
   
   ClojureScript.initJava = function(options) {
     var java, jo, _i, _len, _ref1;
@@ -143,9 +144,6 @@
   
   if (path.existsSync(pathCompiledCoreJS)) {
     compiledCoreJS = fs.readFileSync(pathCompiledCoreJS, 'utf8');
-    ClojureScript.compiledCoreJS = function() {
-      return compiledCoreJS;
-    };
     ClojureScript.compiledCoreJS.exists = true;
   }
   
@@ -159,9 +157,6 @@
   
   if (path.existsSync(pathCompiledNodejsJS)) {
     compiledNodejsJS = fs.readFileSync(pathCompiledNodejsJS, 'utf8');
-    ClojureScript.compiledNodejsJS = function() {
-      return compiledNodejsJS;
-    };
     ClojureScript.compiledNodejsJS.exists = true;
   }
   
@@ -262,6 +257,7 @@
         options = JSON.stringify(options);
         fs.writeFileSync(tmpfile.path, options, 'utf8');
         response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request-build ' + tmpfile.path, {
+          async: false,
           silent: true
         });
         if (response.code === 0) {
@@ -288,6 +284,7 @@
         return buildRequest(options, callback);
       } else {
         response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request-creds ' + options.port, {
+          async: false,
           silent: true
         });
         if (response.code === 0) {
@@ -321,23 +318,23 @@
   ClojureScript.build = function(options, builder, callback, cljscOptions, javaOptions) {
     var cp, outcljs, outcljscore, outcljsnodejs, outputdir, resolved, stats;
     if (cljscOptions == null) {
-      cljscOptions = ClojureScript.options;
+      cljscOptions = ClojureScript.cljscOptions;
     }
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
     }
     if (!options.path) {
-      callback(new Error('no source path specified'), null);
+      return callback(new Error('no source path specified'), null);
     }
-    if (cljscOptions !== ClojureScript.options) {
+    if (cljscOptions !== this.cljscOptions) {
       cljscOptions = cljscOptions.match(/^\s*(\{.*\})\s*$/);
       if (!cljscOptions) {
-        callback(new Error('malformed ClojureScript options hash-map'), null);
+        return callback(new Error('malformed ClojureScript options hash-map'), null);
       } else {
         cljscOptions = cljscOptions[1];
       }
       if ((cljscOptions.match(/\:output-dir\s*\'.*\'/)) || (cljscOptions.match(/\:output-dir\s*[^\'\"]*(\:|(\}$))/)) || (cljscOptions.match(/\:output-dir\s*\'[^\']*(\:|(\}$))/)) || (cljscOptions.match(/\:output-dir\s*\"[^\"]*(\:|(\}$))/)) || (cljscOptions.match(/\:output-dir\s*[^\']*\'\s*(\:|(\}$))/)) || (cljscOptions.match(/\:output-dir\s*[^\"]*\"\s*(\:|(\}$))/))) {
-        callback(new Error('path specified as :output-dir must be wrapped in double-quotes'), null);
+        return callback(new Error('path specified as :output-dir must be wrapped in double-quotes'), null);
       }
       outputdir = cljscOptions.match(/\:output-dir\s*(\".*\")/);
       if (outputdir) {
@@ -345,10 +342,10 @@
         outputdir = outputdir.slice(1, outputdir.length - 1);
         outputdir = path.resolve(path.normalize(outputdir));
         if (!path.existsSync(outputdir)) {
-          callback(new Error('path specified as :output-dir must exist'), null);
+          return callback(new Error('path specified as :output-dir must exist'), null);
         }
         if (!(fs.statSync(outputdir)).isDirectory()) {
-          callback(new Error('path specified as :output-dir must be a directory'), null);
+          return callback(new Error('path specified as :output-dir must be a directory'), null);
         }
         this['output-dir'] = outputdir;
       }
@@ -364,18 +361,18 @@
     if (this.compiledCoreJS.exists) {
       outcljscore = outcljs + '/core.js';
       if (!(path.existsSync(outcljscore))) {
-        fs.writeFileSync(outcljscore, ClojureScript.compiledCoreJS(), 'utf8');
+        fs.writeFileSync(outcljscore, this.compiledCoreJS(), 'utf8');
       }
     }
     if (this.compiledNodejsJS.exists) {
       outcljsnodejs = outcljs + '/nodejs.js';
       if (!(path.existsSync(outcljsnodejs))) {
-        fs.writeFileSync(outcljsnodejs, ClojureScript.compiledNodejsJS(), 'utf8');
+        fs.writeFileSync(outcljsnodejs, this.compiledNodejsJS(), 'utf8');
       }
     }
     resolved = path.resolve(path.normalize(options.path));
     if (!(path.existsSync(resolved))) {
-      callback(new Error('source path must exist'), null);
+      return callback(new Error('source path must exist'), null);
     }
     stats = fs.statSync(resolved);
     if (stats.isDirectory()) {
@@ -383,7 +380,7 @@
     } else if (stats.isFile()) {
       cp = path.dirname(resolved);
     } else {
-      callback(new Error('source path must be a file or a directory'), null);
+      return callback(new Error('source path must be a file or a directory'), null);
     }
     options.path = resolved;
     options.classpath = cp;
@@ -392,7 +389,7 @@
   
   ClojureScript["eval"] = function(options, builder, callback, cljscOptions, javaOptions) {
     if (cljscOptions == null) {
-      cljscOptions = ClojureScript.options;
+      cljscOptions = ClojureScript.cljscOptions;
     }
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
@@ -403,7 +400,7 @@
   ClojureScript.run = function(options, builder, callback, cljscOptions, javaOptions) {
     var mainModule;
     if (cljscOptions == null) {
-      cljscOptions = ClojureScript.options;
+      cljscOptions = ClojureScript.cljscOptions;
     }
     if (javaOptions == null) {
       javaOptions = ClojureScript.javaOptions;
@@ -423,7 +420,7 @@
     }
   };
   
-  ClojureScript.extend = extend = function(object, properties) {
+  ClojureScript.extend = function(object, properties) {
     var key, val;
     for (key in properties) {
       val = properties[key];
@@ -434,12 +431,11 @@
   
   if (require.extensions) {
     require.extensions['.cljs'] = function(module, filename) {
-      var builder, callback, content, options;
+      var callback, content, options;
       options = {
         async: false,
         path: filename
       };
-      builder = ClojureScript.builder;
       callback = function(err, js) {
         if (err) {
           throw err;
@@ -447,7 +443,7 @@
           return js;
         }
       };
-      content = ClojureScript.build(options, builder, callback);
+      content = ClojureScript.build(options, ClojureScript.builder, callback);
       return module._compile(content, filename);
     };
   }
@@ -654,7 +650,7 @@
     return result;
   };
   
-  extend(ClojureScript, new EventEmitter);
+  ClojureScript.extend(ClojureScript, new EventEmitter);
   
   printLine = function(line) {
     return process.stdout.write(line + '\n');
