@@ -29,7 +29,7 @@ ClojureScript = (port) ->
 
 ClojureScript.VERSION = '0.1.4-pre'
 
-ClojureScript.CLJS_VERSION = 'r1211++'
+ClojureScript.CLJS_VERSION = 'r1236'
 
 ClojureScript.Tempdir  = require 'temporary/lib/dir'
 ClojureScript.Tempfile = require 'temporary/lib/file'
