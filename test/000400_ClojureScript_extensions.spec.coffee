@@ -10,10 +10,34 @@ ClojureScript = require index
 {expect} = chai
 chai.use sinonChai
 
+{spawn, exec}  = require 'child_process'
+
 
 
 
 describe 'ClojureScript extensions', ->
+
+  killTree = (pid, signal) ->
+    exec ( 'sh ../support/tools/killtree.sh ' + pid ), { cwd: __dirname }, (err, stdout, stderr) ->
+      try
+        process.kill pid, signal
+      catch error
+        'silently ignore error, already killed'
+
+  killProc = (proc, signal = 'SIGTERM') ->
+    for p in ( if proc? then ( [].concat proc ) else [] )
+      do (p) ->
+        p.removeAllListeners()
+        killTree p.pid, signal
+    while proc?.length
+      proc.shift()
+
+  detProcs = []
+
+  afterEach (done) ->
+    killProc detProcs
+    done()
+
 
   it '''
     should auto-compile a ".cljs" file loaded with NodeJS-require
@@ -34,15 +58,32 @@ describe 'ClojureScript extensions', ->
     ( expect ClojureScript.usingPort ).not.to.exist
     ( expect ClojureScript.builder   ).to.equal ClojureScript.localBuilder
 
-    ClojureScript 9999
+    ( detJVMserver = spawn ( '../bin/ncljsc' ), \
+                           [ '-S', 23456 ], \
+                           { cwd: __dirname }
+    )
+    detProcs.push detJVMserver
+    detJVMserver.stdout.setEncoding 'utf8'
 
-    ( expect ClojureScript.usingPort ).to.equal 9999
-    ( expect ClojureScript.builder   ).to.equal ClojureScript.remoteBuilder
+    lookFor = /Detached JVM server listening/
+    looking = (data) ->
+      lookFor.test data
 
-    file = ( __dirname + '/cljs/foo.cljs' )
+    detJVMserver.stdout.on 'data', ( look = (data) ->
+      if looking(data)
+        detJVMserver.stdout.removeListener 'data', look
+        detJVMserver.emit 'started' )
 
-    {foo} = require file
+    detJVMserver.on 'started', ->
+      ClojureScript 23456
 
-    ( expect foo.bar 'world' ).to.equal 'fooBar world'
+      ( expect ClojureScript.usingPort ).to.equal 23456
+      ( expect ClojureScript.builder   ).to.equal ClojureScript.remoteBuilder
 
-    done()
+      file = ( __dirname + '/cljs/foo.cljs' )
+
+      {foo} = require file
+
+      ( expect foo.bar 'world' ).to.equal 'fooBar world'
+
+      done()
