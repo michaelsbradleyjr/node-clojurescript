@@ -24,7 +24,7 @@ SWITCHES = [
   ['-b', '--bare',                    '  compile without a top-level function wrapper']
   ['-c', '--compile',                 '  compile to JavaScript and save as .js files']
   ['-C', '--client [PORT]',           '  act as a build-client of a "detached" JVM listening on\n' + \
-                                      '                       the specified port (defaults to 4242)']
+                                      '                       the specified port (default is 4242)']
   ['-e', '--eval',                    '  pass a string from the command line as input']
   ['-F', '--flags-print',             '  print the options parsed by "ncljsc" and the contents of\n' + \
                                       '                       process.argv']
@@ -43,7 +43,7 @@ SWITCHES = [
   ['-r', '--require [FILE*]',         '  require a library before executing your script']
   ['-s', '--stdio',                   '  listen for and compile scripts over stdio']
   ['-S', '--server [PORT]',           '  act as a "detached" JVM build-server listening on the \n' + \
-                                      '                       specified port (defaults to 4242)']
+                                      '                       specified port (default is 4242)']
   ['-v', '--version',                 '  display the version numbers of "ncljsc" and ClojureScript']
   ['-W', '--watch-deps [FILE]',       '  watch other dependencies not targeted by --watch,\n' + \
                                       '                       rerun commands on changes, supply as colon separated\n' + \
