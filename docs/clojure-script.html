@@ -126,38 +126,95 @@ in command.coffee</p>             </td>             <td class="code">           
 
 
 <span class="nv">ClojureScript.remoteBuilder = </span><span class="nf">(options, cljscOptions, callback) -&gt;</span>
-
   <span class="nv">async = </span><span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
   <span class="k">delete</span> <span class="nx">options</span><span class="p">.</span><span class="nx">async</span>
   <span class="nv">options.cljscOptions = </span><span class="nx">cljscOptions</span>
   <span class="nv">options.port = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">usingPort</span>
 
   <span class="k">if</span> <span class="nx">async</span>
-    <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">makeRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nf">(err, response) -&gt;</span>
-      <span class="nv">err = </span><span class="nx">err</span> <span class="o">or</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
-      <span class="nv">js  = </span><span class="nx">response</span><span class="p">.</span><span class="nx">js</span>
-      <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
-
-  <span class="k">else</span>
-    <span class="nv">tmpfile = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempfile</span>
-    <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">options</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
-    <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s">&#39;/support/js/detached-jvm-client.js --request &#39;</span> <span class="o">+</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
-    <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
-      <span class="k">try</span>
-        <span class="nv">response = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">response</span><span class="p">.</span><span class="nx">output</span>
-        <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
-          <span class="nv">err = </span><span class="k">new</span> <span class="nb">Error</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
-        <span class="k">else</span>
-          <span class="nv">err = </span><span class="kc">null</span>
+    <span class="nv">buildRequest = </span><span class="nf">(options, callback) -&gt;</span>
+      <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">buildRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nf">(err, response) -&gt;</span>
+        <span class="nv">err = </span><span class="nx">err</span> <span class="o">or</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
         <span class="nv">js  = </span><span class="nx">response</span><span class="p">.</span><span class="nx">js</span>
-
         <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
-      <span class="k">catch</span> <span class="nx">err</span>
-        <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+    <span class="k">if</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">detachedJVMcreds</span>
+      <span class="nv">creds = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">detachedJVMcreds</span>
+      <span class="nv">options.username = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">username</span>
+      <span class="nv">options.password = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">password</span>
+      <span class="nx">buildRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span>
 
     <span class="k">else</span>
-      <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;http request script exited with code </span><span class="si">#{</span><span class="nx">response</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span> <span class="p">),</span> <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>this default may be modified at runtime depending on cli options or
+      <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">credsRequest</span> <span class="nx">options</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nf">(err, response) -&gt;</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="k">then</span> <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span> <span class="p">)</span>
+        <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span> <span class="nx">response</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span><span class="p">,</span> <span class="nf">(err, data) -&gt;</span>
+          <span class="k">if</span> <span class="nx">err</span> <span class="k">then</span> <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span> <span class="p">)</span>
+
+          <span class="k">try</span>
+            <span class="nv">ClojureScript.detachedJVMcreds = creds = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">data</span>
+            <span class="nv">options.username = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">username</span>
+            <span class="nv">options.password = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">password</span>
+            <span class="nx">buildRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span>
+
+          <span class="k">catch</span> <span class="nx">err</span>
+            <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+  <span class="k">else</span>
+    <span class="nv">buildRequest = </span><span class="nf">(options, callback) -&gt;</span>
+      <span class="nv">tmpfile = </span><span class="k">new</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">Tempfile</span>
+      <span class="nv">options = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">options</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+      <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="o">\</span>
+                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-build &#39;</span> <span class="o">+</span> <span class="nx">tmpfile</span><span class="p">.</span><span class="nx">path</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
+      <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
+
+        <span class="k">try</span>
+          <span class="nv">response = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">response</span><span class="p">.</span><span class="nx">output</span>
+          <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+            <span class="nv">err = </span><span class="k">new</span> <span class="nb">Error</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+          <span class="k">else</span>
+            <span class="nv">err = </span><span class="kc">null</span>
+          <span class="nv">js  = </span><span class="nx">response</span><span class="p">.</span><span class="nx">js</span>
+          <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">js</span>
+
+        <span class="k">catch</span> <span class="nx">err</span>
+          <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+      <span class="k">else</span>
+        <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;http request script exited with code </span><span class="si">#{</span><span class="nx">response</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span> <span class="p">),</span> <span class="kc">null</span>
+
+    <span class="k">if</span> <span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">detachedJVMcreds</span>
+      <span class="nv">creds = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">detachedJVMcreds</span>
+      <span class="nv">options.username = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">username</span>
+      <span class="nv">options.password = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">password</span>
+      <span class="nx">buildRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span>
+
+    <span class="k">else</span>
+      <span class="nv">response = </span><span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span> <span class="p">(</span> <span class="s">&#39;node &#39;</span> <span class="o">+</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="o">\</span>
+                              <span class="s">&#39;/support/js/detached-jvm-client.js --request-creds &#39;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">port</span> <span class="p">),</span> <span class="nv">silent: </span><span class="kc">true</span>
+      <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
+
+        <span class="k">try</span>
+          <span class="nv">response = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">response</span><span class="p">.</span><span class="nx">output</span>
+          <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+            <span class="nv">err = </span><span class="k">new</span> <span class="nb">Error</span> <span class="nx">response</span><span class="p">.</span><span class="nx">err</span>
+            <span class="k">return</span> <span class="p">(</span> <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span> <span class="p">)</span>
+
+          <span class="k">try</span>
+            <span class="nv">data = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">response</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+            <span class="nv">ClojureScript.detachedJVMcreds = creds = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">data</span>
+            <span class="nv">options.username = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">username</span>
+            <span class="nv">options.password = </span><span class="nx">creds</span><span class="p">.</span><span class="nx">password</span>
+            <span class="nx">buildRequest</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span>
+
+          <span class="k">catch</span> <span class="nx">err</span>
+            <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+        <span class="k">catch</span> <span class="nx">err</span>
+          <span class="nx">callback</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">null</span>
+
+      <span class="k">else</span>
+        <span class="nx">callback</span> <span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;http request script exited with code </span><span class="si">#{</span><span class="nx">response</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span> <span class="p">),</span> <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>this default may be modified at runtime depending on cli options or
 arguments passed to the required module</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ClojureScript.builder = </span><span class="nx">ClojureScript</span><span class="p">.</span><span class="nx">localBuilder</span>
 
 

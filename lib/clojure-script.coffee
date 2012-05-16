@@ -132,38 +132,95 @@ ClojureScript.localBuilder = (options, cljscOptions, callback, javaOptions = Clo
 
 
 ClojureScript.remoteBuilder = (options, cljscOptions, callback) ->
-
   async = options.async
   delete options.async
   options.cljscOptions = cljscOptions
   options.port = ClojureScript.usingPort
 
   if async
-    ClojureScript.client.makeRequest options, (err, response) ->
-      err = err or response.err
-      js  = response.js
-      callback err, js
-
-  else
-    tmpfile = new ClojureScript.Tempfile
-    options = JSON.stringify options
-    fs.writeFileSync tmpfile.path, options, 'utf8'
-    response = shell.exec ( 'node ' + __dirname + '/support/js/detached-jvm-client.js --request ' + tmpfile.path ), silent: true
-    if response.code is 0
-      try
-        response = JSON.parse response.output
-        if response.err
-          err = new Error response.err
-        else
-          err = null
+    buildRequest = (options, callback) ->
+      ClojureScript.client.buildRequest options, (err, response) ->
+        err = err or response.err
         js  = response.js
-
         callback err, js
-      catch err
-        callback err, null
+
+    if ClojureScript.detachedJVMcreds
+      creds = ClojureScript.detachedJVMcreds
+      options.username = creds.username
+      options.password = creds.password
+      buildRequest options, callback
 
     else
-      callback ( new Error "http request script exited with code #{response.code}" ), null
+      ClojureScript.client.credsRequest options.port, (err, response) ->
+        if err then return ( callback err, null )
+        fs.readFile response.path, 'utf8', (err, data) ->
+          if err then return ( callback err, null )
+
+          try
+            ClojureScript.detachedJVMcreds = creds = JSON.parse data
+            options.username = creds.username
+            options.password = creds.password
+            buildRequest options, callback
+
+          catch err
+            callback err, null
+
+  else
+    buildRequest = (options, callback) ->
+      tmpfile = new ClojureScript.Tempfile
+      options = JSON.stringify options
+      fs.writeFileSync tmpfile.path, options, 'utf8'
+      response = shell.exec ( 'node ' + __dirname + \
+                              '/support/js/detached-jvm-client.js --request-build ' + tmpfile.path ), silent: true
+      if response.code is 0
+
+        try
+          response = JSON.parse response.output
+          if response.err
+            err = new Error response.err
+          else
+            err = null
+          js  = response.js
+          callback err, js
+
+        catch err
+          callback err, null
+
+      else
+        callback ( new Error "http request script exited with code #{response.code}" ), null
+
+    if ClojureScript.detachedJVMcreds
+      creds = ClojureScript.detachedJVMcreds
+      options.username = creds.username
+      options.password = creds.password
+      buildRequest options, callback
+
+    else
+      response = shell.exec ( 'node ' + __dirname + \
+                              '/support/js/detached-jvm-client.js --request-creds ' + options.port ), silent: true
+      if response.code is 0
+
+        try
+          response = JSON.parse response.output
+          if response.err
+            err = new Error response.err
+            return ( callback err, null )
+
+          try
+            data = fs.readFileSync response.path, 'utf8'
+            ClojureScript.detachedJVMcreds = creds = JSON.parse data
+            options.username = creds.username
+            options.password = creds.password
+            buildRequest options, callback
+
+          catch err
+            callback err, null
+
+        catch err
+          callback err, null
+
+      else
+        callback ( new Error "http request script exited with code #{response.code}" ), null
 
 # this default may be modified at runtime depending on cli options or
 # arguments passed to the required module

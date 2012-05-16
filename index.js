@@ -208,40 +208,102 @@
   };
   
   ClojureScript.remoteBuilder = function(options, cljscOptions, callback) {
-    var async, err, js, response, tmpfile;
+    var async, buildRequest, creds, data, err, response;
     async = options.async;
     delete options.async;
     options.cljscOptions = cljscOptions;
     options.port = ClojureScript.usingPort;
     if (async) {
-      return ClojureScript.client.makeRequest(options, function(err, response) {
-        var js;
-        err = err || response.err;
-        js = response.js;
-        return callback(err, js);
-      });
-    } else {
-      tmpfile = new ClojureScript.Tempfile;
-      options = JSON.stringify(options);
-      fs.writeFileSync(tmpfile.path, options, 'utf8');
-      response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request ' + tmpfile.path, {
-        silent: true
-      });
-      if (response.code === 0) {
-        try {
-          response = JSON.parse(response.output);
-          if (response.err) {
-            err = new Error(response.err);
-          } else {
-            err = null;
-          }
+      buildRequest = function(options, callback) {
+        return ClojureScript.client.buildRequest(options, function(err, response) {
+          var js;
+          err = err || response.err;
           js = response.js;
           return callback(err, js);
-        } catch (err) {
-          return callback(err, null);
-        }
+        });
+      };
+      if (ClojureScript.detachedJVMcreds) {
+        creds = ClojureScript.detachedJVMcreds;
+        options.username = creds.username;
+        options.password = creds.password;
+        return buildRequest(options, callback);
       } else {
-        return callback(new Error("http request script exited with code " + response.code), null);
+        return ClojureScript.client.credsRequest(options.port, function(err, response) {
+          if (err) {
+            return callback(err, null);
+          }
+          return fs.readFile(response.path, 'utf8', function(err, data) {
+            if (err) {
+              return callback(err, null);
+            }
+            try {
+              ClojureScript.detachedJVMcreds = creds = JSON.parse(data);
+              options.username = creds.username;
+              options.password = creds.password;
+              return buildRequest(options, callback);
+            } catch (err) {
+              return callback(err, null);
+            }
+          });
+        });
+      }
+    } else {
+      buildRequest = function(options, callback) {
+        var err, js, response, tmpfile;
+        tmpfile = new ClojureScript.Tempfile;
+        options = JSON.stringify(options);
+        fs.writeFileSync(tmpfile.path, options, 'utf8');
+        response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request-build ' + tmpfile.path, {
+          silent: true
+        });
+        if (response.code === 0) {
+          try {
+            response = JSON.parse(response.output);
+            if (response.err) {
+              err = new Error(response.err);
+            } else {
+              err = null;
+            }
+            js = response.js;
+            return callback(err, js);
+          } catch (err) {
+            return callback(err, null);
+          }
+        } else {
+          return callback(new Error("http request script exited with code " + response.code), null);
+        }
+      };
+      if (ClojureScript.detachedJVMcreds) {
+        creds = ClojureScript.detachedJVMcreds;
+        options.username = creds.username;
+        options.password = creds.password;
+        return buildRequest(options, callback);
+      } else {
+        response = shell.exec('node ' + __dirname + '/support/js/detached-jvm-client.js --request-creds ' + options.port, {
+          silent: true
+        });
+        if (response.code === 0) {
+          try {
+            response = JSON.parse(response.output);
+            if (response.err) {
+              err = new Error(response.err);
+              return callback(err, null);
+            }
+            try {
+              data = fs.readFileSync(response.path, 'utf8');
+              ClojureScript.detachedJVMcreds = creds = JSON.parse(data);
+              options.username = creds.username;
+              options.password = creds.password;
+              return buildRequest(options, callback);
+            } catch (err) {
+              return callback(err, null);
+            }
+          } catch (err) {
+            return callback(err, null);
+          }
+        } else {
+          return callback(new Error("http request script exited with code " + response.code), null);
+        }
       }
     }
   };
@@ -383,9 +445,14 @@
   }
   
   ClojureScript.createServer = function() {
-    var credpath, iBuilder, iCallback, iOptions, server;
-    credpath = (new ClojureScript.Tempfile).path;
-    console.log(credpath);
+    var credPath, creds, iBuilder, iCallback, iOptions, server;
+    credPath = (new ClojureScript.Tempfile).path;
+    creds = {
+      username: uuid.v1(),
+      password: uuid.v1()
+    };
+    fs.writeFileSync(credPath, JSON.stringify(creds), 'utf8');
+    fs.chmodSync(credPath, '640');
     console.log('Starting up, please wait...');
     iOptions = {
       async: false,
@@ -403,28 +470,39 @@
     server.use(restify.bodyParser({
       mapParams: false
     }));
+    server.use(restify.authorizationParser());
+    server.get('/creds/', function(req, res, next) {
+      return res.send({
+        path: credPath
+      });
+    });
     server.post('/build/', function(req, res, next) {
       var callback, cljscOptions, options;
       if (req.is('application/json')) {
-        options = req.body;
-        cljscOptions = options.cljscOptions;
-        delete options.cljscOptions;
-        callback = function(err, js) {
-          if (err) {
-            res.send({
-              err: err.message,
-              js: null
-            });
-            return console.log((new Date).toString(), ":", clc.bold(clc.red('build failed')));
-          } else {
-            res.send({
-              err: null,
-              js: js
-            });
-            return console.log((new Date).toString(), ":", clc.bold(clc.green('build successful')));
-          }
-        };
-        return ClojureScript.builder(options, cljscOptions, callback);
+        if ((req.authorization.basic != null) && ((req.authorization.basic.username === creds.username) && (req.authorization.basic.password === creds.password))) {
+          options = req.body;
+          cljscOptions = options.cljscOptions;
+          delete options.cljscOptions;
+          callback = function(err, js) {
+            if (err) {
+              res.send({
+                err: err.message,
+                js: null
+              });
+              return console.log((new Date).toString(), ":", clc.bold(clc.red('build failed')));
+            } else {
+              res.send({
+                err: null,
+                js: js
+              });
+              return console.log((new Date).toString(), ":", clc.bold(clc.green('build successful')));
+            }
+          };
+          return ClojureScript.builder(options, cljscOptions, callback);
+        } else {
+          res.send(401, new Error('Unauthorized build request'));
+          return console.log((new Date).toString(), ":", clc.bold(clc.magenta('bad request')));
+        }
       } else {
         res.send(415, new Error('request Content-Type must be application/json'));
         return console.log((new Date).toString(), ":", clc.bold(clc.magenta('bad request')));
