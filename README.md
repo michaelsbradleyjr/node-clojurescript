@@ -238,7 +238,7 @@ $ node other.js
 
 ### Remote builds and `require`
 
-It's entirely possible to leverage the `require` support in combination with node-clojurescript's client-server mode described in the *[Faster, faster!]((#faster-faster)* section above.
+It's entirely possible to leverage the `require` support in combination with node-clojurescript's client-server mode described in the *[Faster, faster!](#faster-faster)* section above.
 
 Suppose you have a "detached" JVM server process running on port `8888`:
 
