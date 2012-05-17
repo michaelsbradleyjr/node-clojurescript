@@ -238,7 +238,7 @@ $ node other.js
 
 ### Remote builds and `require`
 
-It's entirely possible to leverage the `require` support in combination with node-clojurescript's client-server mode described in the *[Faster, faster!]((#faster-faste)* section above.
+It's entirely possible to leverage the `require` support in combination with node-clojurescript's client-server mode described in the *[Faster, faster!]((#faster-faster)* section above.
 
 Suppose you have a "detached" JVM server process running on port `8888`:
 
@@ -335,7 +335,7 @@ All in all, the purpose of `nlein` is to provide an easy way for NodeJS develope
 There are several goals that need to be accomplished in short order:
 
 * The tooling developed in CoffeeScript needs to be re-implemented in ClojureScript so that this library will be pseudo self-hosting.
-* A plugin for the [Leiningen](https://github.com/technomancy/leiningen) build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.
+* A plugin for the Leiningen build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.
 * Missing features of `ncljsc` need to be implemented, the most important being a [REPL](https://github.com/clojure/clojurescript/wiki/The-REPL-and-Evaluation-Environments).
 * More and better documentation and examples.
 
