@@ -92,19 +92,18 @@ Now replace the contents of `hello.cljs` with:
     :else x))
 ```
 
-Save it, then rerun `ncljsc hello.cljs` and point your browser at [localhost:4200](http://127.0.0.1:4200).
+Save it, then rerun `ncljsc hello.cljs` and point your browser to [localhost:4200](http://127.0.0.1:4200).
 
 Did it work? Cool! &nbsp;(maybe submit an [issue](https://github.com/michaelsbradleyjr/node-clojurescript/issues) if it didn't)
 
 ### *Faster, faster!*
 
-The slow compile times mentioned above are owing to startup time of the JVM, plus the time to initially load the two underlying compilers (ClojureScript and Google Closure).
+The slow compile times mentioned above are owing to startup time of the JVM, plus the time to initially load the two underlying compilers (ClojureScript and Google Closure). This is an annoying problem...
 
 *Problem solved!* &nbsp;Starting with `v0.1.4`, node-clojurescript offers a way to compile against a long-running, "detached" JVM server:
 
 ```bash
 $ ncljsc --server 4242
-
 ```
 
 Invoke the command above and leave the terminal open (or run it in a [tmux](http://tmux.sourceforge.net/) or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running.
@@ -136,7 +135,7 @@ The `--server` process accepts "build requests" over HTTP, listening on `localho
 
 It's 2012 and you shouldn't *have* to manually re-run your scripts while you're developing them. And you don't!
 
-After some experimentation, [supervisor](https://github.com/isaacs/node-supervisor) seems (to the author) to be the simplest and most flexible NodeJS-based tool for automatically re-starting scripts when change them. Make sure to install it globally: `npm install -g supervisor`.
+After some experimentation, [supervisor](https://github.com/isaacs/node-supervisor) seems (to the author) to be the simplest and most flexible NodeJS-based tool for automatically re-starting scripts in a development workflow. Make sure to install it globally: `npm install -g supervisor`.
 
 With `supervisor` installed and a `ncljsc --server` process running, revisit the directory where you created `hello.cljs` and do:
 
@@ -152,7 +151,7 @@ Now edit `hello.cljs` and watch what happens when you save it. *Fantastic!* &nbs
 
 In addition to running `.cljs` scripts, `ncljsc` can also be used to write compiled JavaScript to disk. For example:
 
-**saves to hello.js in the same directory ** (local build)
+**saves to hello.js in the same directory** (local build)
 ```bash
 $ ncljsc --compile hello.cljs
 ```
@@ -211,7 +210,7 @@ $ npm install -g clojure-script
 ...
 ```
 
-That's it! Installing `clojure-script` (the npm package name for this library) will automatically perform a package-localized installation of Clojure 1.3.0, ClojureScript r1011, Google Closure Compiler, etc.
+That's it! Installing `clojure-script` (the npm package name for this library) will automatically perform a package-localized installation of Clojure, ClojureScript, Google Closure Compiler, etc.
 
 If you get an error during installation, look closely at the error message. Maybe you made a typo while following the steps above? If you can't figure it out, feel free to submit an [issue](https://github.com/michaelsbradleyjr/node-clojurescript/issues).
 
@@ -244,13 +243,13 @@ It's entirely possible to leverage the `require` support in combination with nod
 Suppose you have a "detached" JVM server process running on port `8888`:
 
 ```bash
-$ ncljsc -S 8888
+$ ncljsc --server 8888
 ```
 
 In your `.js` script you can then indicate:
 
 ```javascript
-require('clojure-script)(8888);
+require('clojure-script')(8888);
 
 require('./hello.cljs');
 ```
@@ -261,7 +260,6 @@ You can call the function returned by `require` without arguments, like so:
 
 ```javascript
 require('clojure-script')();
-
 ...
 ```
 
@@ -359,7 +357,7 @@ $ ncljsc --help
 
 Google Groups: [clojure](https://groups.google.com/forum/?fromgroups#!forum/clojure), &nbsp;[nodejs](https://groups.google.com/forum/?fromgroups#!forum/nodejs)
 
-`#clojure`, `#clojurescript` and `#node.js` channels on Freenode.
+`#clojure`, `#clojurescript` and `#node.js` channels on Freenode IRC.
 
 [prelude](https://github.com/bbatsov/prelude), &nbsp;[prelude-modules](https://github.com/bbatsov/prelude-modules), &nbsp;and [Emacs for OS X](http://emacsformacosx.com/) (latest pretest)
 
