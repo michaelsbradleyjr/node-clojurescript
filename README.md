@@ -161,14 +161,14 @@ Now edit `hello.cljs` and watch what happens when you save it. *Fantastic!* &nbs
 
 In addition to running `.cljs` scripts, `ncljsc` can also be used to write compiled JavaScript to disk. For example:
 
-**saves to hello.js in the same directory** (local build)
+**saves to `hello.js` in the same directory** (local build)
 ```bash
 $ ncljsc --compile hello.cljs
 ```
 
-**saves to myscript.js in the same directory** (remote build)
+**saves to `myscript/hello.js` in the same directory** (remote build)
 ```bash
-$ ncljsc --compile --output myscript.js --client 4242 hello.cljs
+$ ncljsc --compile --output myscript --client 4242 hello.cljs
 ```
 
 **re-compiles and re-saves when changes are made** (remote build)
@@ -217,7 +217,6 @@ When you install `node`, the `npm` tool will get installed along with it. So as 
 
 ```bash
 $ npm install -g clojure-script
-...
 ```
 
 That's it! Installing `clojure-script` (the npm package name for this library) will automatically perform a package-localized installation of Clojure, ClojureScript, Google Closure Compiler, etc.
@@ -331,7 +330,6 @@ If you've installed the `clojure-script` module globally with `npm install -g cl
 
 ```bash
 $ nlein
-...
 ```
 
 `nlein` is a simple proxy script and does not feature any customizations of Leiningen. If you already have a `lein` executable on your path, `nlein` will ask whether it should delegate to it, with the option to remember your decision.
