@@ -106,7 +106,17 @@ The slow compile times mentioned above are owing to startup time of the JVM, plu
 $ ncljsc --server 4242
 ```
 
-Invoke the command above and leave the terminal open (or run it in a [tmux](http://tmux.sourceforge.net/) or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running.
+Invoke the command above and leave the terminal open (or run it in a [tmux](http://tmux.sourceforge.net/) or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running. After 10+ seconds you should see:
+
+```bash
+$ ncljsc --server 4242
+Starting up, please wait...
+
+Initial build completed, JVM and compiler are primed and ready!
+Detached JVM server listening at http://127.0.0.1:4242/
+```
+
+If you see something about a `DTraceProviderBindings` error, just ignore it as it's [harmless](https://github.com/mcavage/node-restify/issues/100). Depending on your platform, no error may be reported.
 
 Now open another terminal and go back to the directory where you created `hello.cljs`. Then do:
 
