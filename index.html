@@ -1,4 +1,3 @@
-
 <!DOCTYPE html><html><head><title>README.md - Github Flavored Markdown
       Server</title><link rel="stylesheet"
                           href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github-7c372a292745323c14c18e58c1d046031f9243c2.css"><link rel="stylesheet"
@@ -10,9 +9,9 @@
 
 <h1>node-clojurescript</h1>
 
-<p><a href="https://github.com/michaelsbradleyjr/node-clojurescript">node-clojurescript</a> aims to provide seamless integration between <a href="http://nodejs.org/">NodeJS</a> and <a href="https://github.com/clojure/clojurescript">ClojureScript</a>. This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and Clojure communities.</p>
+<p><a href="https://github.com/michaelsbradleyjr/node-clojurescript">node-clojurescript</a> aims to provide seamless integration between <a href="http://nodejs.org/">NodeJS</a> and <a href="https://github.com/clojure/clojurescript">ClojureScript</a>. This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and <a href="http://clojure.org">Clojure</a> communities.</p>
 
-<p>Working packages are available on the <a href="http://npmjs.org/">npm</a> registry: &nbsp;<a href="http://search.npmjs.org/#/clojure-script">clojure-script</a>.</p>
+<p>Packages are available on the <a href="http://npmjs.org/">npm</a> registry: &nbsp;<a href="http://search.npmjs.org/#/clojure-script">clojure-script</a>.</p>
 
 <h2>Description</h2>
 
@@ -20,13 +19,12 @@
 
 <h2>Quick Start</h2>
 
-<p>Want to get started? There are some prerequisites, but if you'd prefer to trouble with those later:</p>
+<p>Want to get started? There are some <a href="#prerequisites">prerequisites</a>, but if you'd prefer to trouble with those later:</p>
 
 <div class='highlight'><pre><code>$ npm install -g clojure-script
 </code></pre></div>
 
-<p>If you get an error message from npm, it means you need to review
-  the <em><a href="#prerequisites">Prerequisites</a></em> section of this README.<br />Let's continue...</p>
+<p>If you get an error message from npm, it means you need to review the <em><a href="#prerequisites">Prerequisites</a></em> section of this README.<br />Let's continue...</p>
 
 <div class='highlight'><pre><code>$ touch hello.cljs &amp;&amp; vim hello.cljs
 </code></pre></div>
@@ -46,22 +44,20 @@
 
 <p>Save it, and leave the editor open. In another terminal, navigate to the directory where you created <code>hello.cljs</code> and do:</p>
 
-<div class='highlight'><pre><code>$ ncljsc -w hello.cljs
+<div class='highlight'><pre><code>$ ncljsc hello.cljs
 </code></pre></div>
 
-<p>When you first invoke <code>ncljsc</code>, it fires up the JVM, the ClojureScript compiler and the <a href="https://developers.google.com/closure/compiler">Google Closure Compiler</a>. This means the first-round compilation will be <em>slow</em>, even <em>really slow</em>. That's expected.</p>
+<p>When you invoke <code>ncljsc</code>, it fires up the JVM, the ClojureScript compiler and the <a href="https://developers.google.com/closure/compiler">Google Closure Compiler</a>. This means the compilation will seem <em>slow</em>, even <em>really slow</em> (10+ seconds), especially if you're used to the sub-second compile times of CoffeeScript. That's expected, and the issue will be revisited in the <em><a href="#faster-faster">Faster, faster!</a></em> section below.</p>
 
 <p><strong>N.B.</strong> the compiled JavaScript will be evaluated by the NodeJS (V8) runtime, not by the JVM.</p>
 
 <p>You should eventually see printed in your terminal:</p>
 
-<div class='highlight'><pre><code>$ ncljsc -w hello.cljs
+<div class='highlight'><pre><code>$ ncljsc hello.cljs
 Hello, World!
 </code></pre></div>
 
-<p>Notice that we passed the <code>-w</code> flag to <code>ncljsc</code>. That tells it to keep running, watch for changes in the source file and re-compile automatically. Since the JVM is already up and running, re-compiles should be much faster.</p>
-
-<p>With <code>ncljsc</code> still running, replace the contents of <code>hello.cljs</code> with:</p>
+<p>Now replace the contents of <code>hello.cljs</code> with:</p>
 
 <div class='highlight'><pre><code>(ns hello
   (:require [cljs.nodejs :as nodejs]
@@ -75,9 +71,9 @@ Hello, World!
      (.writeHead res 200 (clj-&gt;js {:Content-Type "text/plain"}))
      (.end res "Hello, World\n"))))
 
-(.listen server 4242 "127.0.0.1")
+(.listen server 4200 "127.0.0.1")
 
-(println "Server running at <a href='http://127.0.0.1:4242'>http://127.0.0.1:4242</a>")
+(println "Server running at <a href='http://127.0.0.1:4200'>http://127.0.0.1:4200</a>")
 
 ;; Helper
 (defn clj-&gt;js
@@ -95,19 +91,99 @@ Hello, World!
     :else x))
 </code></pre></div>
 
+<p>Save it, then rerun <code>ncljsc hello.cljs</code> and point your browser to <a href="http://127.0.0.1:4200">localhost:4200</a>.</p>
+
 <p>Did it work? Cool! &nbsp;(maybe submit an <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">issue</a> if it didn't)</p>
 
-<p>So now what you should do is read up on Clojure and ClojureScript
-  and <em>get to busy!</em> &nbsp;See the <em><a href="#resources">Resources</a></em> section below.</p>
+<h3><em>Faster, faster!</em></h3>
 
-<h3>Note</h3>
+<p>The slow compile times mentioned above are owing to startup time of the JVM, plus the time to initially load the two underlying compilers (ClojureScript and Google Closure). This is an annoying problem...</p>
 
-<p>For long-running scripts, e.g. ones that listen on network ports, naive use of the <code>-w</code> flag will result in an <code>Error: listen EADDRINUSE</code> exception being thrown upon recompile. This is not a bug with <code>ncljsc</code>, you will encounter the same error if you do the equivalent with <code>coffee -w</code>. In which case you can instead use a NodeJS tool like <a href="https://github.com/nodejitsu/forever">forever</a>:</p>
+<p><em>Problem solved!</em> &nbsp;Starting with <code>v0.1.4</code>, node-clojurescript offers a way to compile against a long-running, "detached" JVM server:</p>
 
-<div class='highlight'><pre><code>$ forever -w -c ncljsc hello.cljs
+<div class='highlight'><pre><code>$ ncljsc --server 4242
 </code></pre></div>
 
-<p>When you make changes to <code>hello.cljs</code>, the script will be restarted automatically and you should not get an error like you would with <code>ncljsc -w</code>. However, this reintroduces the problem of the <em>slow</em> startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.</p>
+<p>Invoke the command above and leave the terminal open (or run it in a <a href="http://tmux.sourceforge.net/">tmux</a> or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running. After 10+ seconds you should see:</p>
+
+<div class='highlight'><pre><code>$ ncljsc --server 4242
+Starting up, please wait...
+
+Initial build completed, JVM and compiler are primed and ready!
+Detached JVM server listening at <a href='http://127.0.0.1:4242/'>http://127.0.0.1:4242/</a>
+</code></pre></div>
+
+<p>If you see something about a <code>DTraceProviderBindings</code> error, just ignore it as it's <a href="https://github.com/mcavage/node-restify/issues/100">harmless</a>. Depending on your platform, no error may be reported.</p>
+
+<p>Now open another terminal and go back to the directory where you created <code>hello.cljs</code>. Then do:</p>
+
+<div class='highlight'><pre><code>$ ncljsc --client 4242 hello.cljs
+</code></pre></div>
+
+<p>You should notice a marked difference in the time required for the script to run. Once the <code>--server</code> JVM is "hot", compile times should take only a few seconds, instead of 10+ seconds. That's because the <code>--client</code> process does not start its own JVM.</p>
+
+<h4>How does it work?</h4>
+
+<p>The <code>--server</code> process accepts "build requests" over HTTP, listening on <code>localhost</code> at the specified port. The <code>--client</code> then makes synchronous or asynchronous requests (depending on how it's invoked). And that's it: from the perspective of the end-user, the only difference is that these "remote" builds happen more quickly than "local" builds. Overall usage of <code>ncljsc</code> is the same whether you run remote or local builds.</p>
+
+<h4>A few notes:</h4>
+
+<ul>
+<li>This feature is under active development and won't always work correctly, e.g. errors may not always make it back to the client and the return value of a build may be an empty string. It's best to keep an eye on the terminal output of the server process for signs of trouble.</li>
+<li>You may use whatever port number you prefer, as long as the client and server use the same port.</li>
+<li>Requests are restricted to the <code>localhost</code> interface. <em>(security)</em></li>
+<li>There is a transparent exchange of credentials hard-wired into the client-server logic, so that arbitrary processes can't make build requests. <em>(security)</em></li>
+<li>Aforesaid "credentials exchange" requires server and client processes to be run as the same user. <em>(security)</em></li>
+<li>Credentials aren't persistent, so if the server process is bounced (you restart it, maybe it crashed), client processes must be restarted if they're long-running and will attempt further build requests. <em>(security?)</em></li>
+<li>Don't use the client-server mode in a production environment. <em>(goes without saying?)</em></li>
+</ul>
+
+<h3>Automatic re-compiles</h3>
+
+<p>It's 2012 and you shouldn't <em>have</em> to manually re-run your scripts while you're developing them. And you don't!</p>
+
+<p>After some experimentation, <a href="https://github.com/isaacs/node-supervisor">supervisor</a> seems (to the author) to be the simplest and most flexible NodeJS-based tool for automatically re-starting scripts in a development workflow. Make sure to install it globally: <code>npm install -g supervisor</code>.</p>
+
+<p>With <code>supervisor</code> installed and a <code>ncljsc --server</code> process running, revisit the directory where you created <code>hello.cljs</code> and do:</p>
+
+<div class='highlight'><pre><code>$ supervisor -w hello.cljs -n exit -x ncljsc -- --client 4242 hello.cljs 
+</code></pre></div>
+
+<p>That's a lot of flags for a single command, but see <code>supervisor --help</code> and you'll soon have the hang of it. Note that we're making use of <code>--client 4242</code>, which is proper to <code>ncljsc</code>, not <code>supervisor</code>.</p>
+
+<p>Now edit <code>hello.cljs</code> and watch what happens when you save it. <em>Fantastic!</em> &nbsp; It compiles quickly, and will do so repeatedly whenever you save changes, so long as you keep <code>supervisor</code> running.</p>
+
+<h3>Compiling to disk</h3>
+
+<p>In addition to running <code>.cljs</code> scripts, <code>ncljsc</code> can also be used to write compiled JavaScript to disk. For example:</p>
+
+<p><strong>saves to <code>hello.js</code> in the same directory</strong> (local build)</p>
+
+<div class='highlight'><pre><code>$ ncljsc --compile hello.cljs
+</code></pre></div>
+
+<p><strong>saves to <code>myscript/hello.js</code> in the same directory</strong> (remote build)</p>
+
+<div class='highlight'><pre><code>$ ncljsc --compile --output myscript --client 4242 hello.cljs
+</code></pre></div>
+
+<p><strong>re-compiles and re-saves when changes are made</strong> (remote build)</p>
+
+<div class='highlight'><pre><code>$ supervisor -w hello.cljs -n exit -x ncljsc -- --client 4242 --compile hello.cljs 
+</code></pre></div>
+
+<h3>More options</h3>
+
+<p>The <code>ncljsc</code> command provides additional capabilities. Try:</p>
+
+<div class='highlight'><pre><code>$ ncljsc --help
+</code></pre></div>
+
+<p>Not all of the features have been implemented yet. Also, you'll notice that <code>ncljsc</code> provides built-in <code>--watch</code> and <code>--watch-deps</code> options. Those do work, but there are some outstanding <a href="https://github.com/joyent/node/issues/3172">bugs</a> related to NodeJS's <code>fs.watch</code> facility. As such, it seemed better to propose <code>supervisor</code> as a file watching tool than explain a bunch of caveats regarding the built-in watch support. But by all means experiment and <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">report back</a>.</p>
+
+<h3>What's Next?</h3>
+
+<p>So now what you should do is read up on Clojure and ClojureScript and <em>get to busy!</em> &nbsp;See the <em><a href="#resources">Resources</a></em> section below.</p>
 
 <h2>Prerequisites</h2>
 
@@ -133,10 +209,9 @@ $ nvm use v0.6.17
 <p>When you install <code>node</code>, the <code>npm</code> tool will get installed along with it. So as long you have Java in place (see above), you should be ready to run:</p>
 
 <div class='highlight'><pre><code>$ npm install -g clojure-script
-...
 </code></pre></div>
 
-<p>That's it! Installing <code>clojure-script</code> (the npm package  name for this library) will automatically perform a  package-localized installation of Clojure 1.3.0, ClojureScript r1011, Google Closure Compiler, etc.</p>
+<p>That's it! Installing <code>clojure-script</code> (the npm package name for this library) will automatically perform a package-localized installation of Clojure, ClojureScript, Google Closure Compiler, etc.</p>
 
 <p>If you get an error during installation, look closely at the error message. Maybe you made a typo while following the steps above? If you can't figure it out, feel free to submit an <a href="https://github.com/michaelsbradleyjr/node-clojurescript/issues">issue</a>.</p>
 
@@ -159,6 +234,32 @@ require('./hello');
 
 <p><strong><span style="color:red;">N.B.</span></strong> This is a handy feature for development purposes. But it would be a terrible idea to publish a package on the npm registry which makes use of this technique. Modules <em>developed</em> in ClojureScript should be <em>published</em> with <em>only</em> compiled JavaScript loaded at runtime (via NodeJS's <code>require</code>).</p>
 
+<h3>Remote builds and <code>require</code></h3>
+
+<p>It's entirely possible to leverage the <code>require</code> support in combination with node-clojurescript's client-server mode described in the <em><a href="#faster-faster">Faster, faster!</a></em> section above.</p>
+
+<p>Suppose you have a "detached" JVM server process running on port <code>8888</code>:</p>
+
+<div class='highlight'><pre><code>$ ncljsc --server 8888
+</code></pre></div>
+
+<p>In your <code>.js</code> script you can then indicate:</p>
+
+<div class='highlight'><pre><code>require('clojure-script')(8888);
+
+require('./hello.cljs');
+</code></pre></div>
+
+<p>In this context, the client-logic makes a <em>synchronous</em> (not async) build request against the server process. <code>hello.cljs</code> will be transparently compiled and loaded as before, but more quickly.</p>
+
+<p>You can call the function returned by <code>require</code> without arguments, like so:</p>
+
+<div class='highlight'><pre><code>require('clojure-script')();
+...
+</code></pre></div>
+
+<p>In that case, the port number will default to <code>4242</code> (make sure the server process is using the same port). Note that calling the function without arguments and <em>not</em> calling it are two distinct things. If you don't call it, the <code>clojure-script</code> module will start a new JVM and perform a local build. If you do call it, with or without arguments, a JVM will <em>not</em> be started and the module will make a remote build request.</p>
+
 <h2>Namespaces</h2>
 
 <p>Clojure and ClojureScript support the notion of <a href="http://clojure.org/namespaces">namespaces</a>. Unlike loading <a href="http://nodejs.org/api/modules.html">modules</a> with NodeJS's <code>require</code>, using ClojureScript's namespace <code>:require</code> will result in the namespaced module being <em>inlined</em> as part of the compiled JavaScript (scope is carefully preserved).</p>
@@ -168,7 +269,8 @@ require('./hello');
 <p><strong>foo.cljs</strong></p>
 
 <div class='highlight'><pre><code>(ns foo
-  (:require [bar :as bar]))
+  (:require [cljs.nodejs :as nodejs]
+            [bar :as bar]))
 
 (defn ^:export greet [name, title]
   (str "Hello, " (bar/title title) " " name))
@@ -176,7 +278,8 @@ require('./hello');
 
 <p><strong>bar.cljs</strong></p>
 
-<div class='highlight'><pre><code>(ns bar)
+<div class='highlight'><pre><code>(ns bar
+  (:require [cljs.nodejs :as nodejs]))
 
 (defn ^:export title [t]
   (str t " Amazing" ))
@@ -204,13 +307,28 @@ Hello, Mr. Amazing ClojureScript developer!
 
 <p>Examining the plentiful contents of <code>compiled.js</code>, you'll see (toward the bottom) that both <code>foo.cljs</code> and <code>bar.cljs</code> were compiled into the stand-alone JS file.</p>
 
+<h2>Bundled Leiningen</h2>
+
+<p><a href="https://github.com/technomancy/leiningen">Leiningen</a> is a popular and flexible build tool in wide use among Clojure developers. node-clojurescript bundles the shell script front-end to Leiningen (the <code>lein</code> command) and proxies to it with an executable script named <code>nlein</code>.</p>
+
+<p>If you've installed the <code>clojure-script</code> module globally with <code>npm install -g clojure-script</code>, then you should be able to run:</p>
+
+<div class='highlight'><pre><code>$ nlein
+</code></pre></div>
+
+<p><code>nlein</code> is a simple proxy script and does not feature any customizations of Leiningen. If you already have a <code>lein</code> executable on your path, <code>nlein</code> will ask whether it should delegate to it, with the option to remember your decision.</p>
+
+<p>Note that <code>nlein</code>, when it's not delegating to another <code>lein</code>, will store JAR files and other things it downloads in the <code>support/.lein</code> directory, relative to the root of the <code>clojure-script</code> package. This is to keep <code>nlein</code> from even potentially conflicting with an existing installation. Normally, <code>lein</code> stores such things in <code>$HOME/.lein</code>.</p>
+
+<p>All in all, the purpose of <code>nlein</code> is to provide an easy way for NodeJS developers to get up and running with Leiningen. If you're already using Leiningen, you may choose to ignore <code>nlein</code> and go about your business as usual.</p>
+
 <h2>Coming Soon</h2>
 
 <p>There are several goals that need to be accomplished in short order:</p>
 
 <ul>
 <li>The tooling developed in CoffeeScript needs to be re-implemented in ClojureScript so that this library will be pseudo self-hosting.</li>
-<li>A plugin for the <a href="https://github.com/technomancy/leiningen">Leiningen</a> build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.</li>
+<li>A plugin for the Leiningen build tool needs to be adapted or written, for use in development of complex ClojureScript projects in conjunction with this library and other NodeJS modules.</li>
 <li>Missing features of <code>ncljsc</code> need to be implemented, the most important being a <a href="https://github.com/clojure/clojurescript/wiki/The-REPL-and-Evaluation-Environments">REPL</a>.</li>
 <li>More and better documentation and examples.</li>
 </ul>
@@ -224,13 +342,15 @@ Hello, Mr. Amazing ClojureScript developer!
 
 <p><a href="http://himera.herokuapp.com/synonym.html">ClojureScript: Translations from JavaScript</a></p>
 
-<p><a href="http://clojuredocs.org">ClojureDocs</a></p>
-
-<p>Google Groups: <a href="https://groups.google.com/forum/?fromgroups#!forum/clojure">clojure</a>, &nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/nodejs">nodejs</a></p>
+<p><a href="http://clojuredocs.org">ClojureDocs</a>, &nbsp;<a href="http://clojure.org">Clojure.org</a></p>
 
 <p><a href="http://nodejs.org/api">NodeJS Documentation</a></p>
 
-<p><code>#clojure</code>, <code>#clojurescript</code> and <code>#node.js</code> channels on Freenode.</p>
+<p><a href="https://github.com/technomancy/leiningen">Leiningen</a>, <a href="https://github.com/technomancy/leiningen/wiki">wiki</a></p>
+
+<p>Google Groups: <a href="https://groups.google.com/forum/?fromgroups#!forum/clojure">clojure</a>, &nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/nodejs">nodejs</a></p>
+
+<p><code>#clojure</code>, <code>#clojurescript</code> and <code>#node.js</code> channels on Freenode IRC.</p>
 
 <p><a href="https://github.com/bbatsov/prelude">prelude</a>, &nbsp;<a href="https://github.com/bbatsov/prelude-modules">prelude-modules</a>, &nbsp;and <a href="http://emacsformacosx.com/">Emacs for OS X</a> (latest pretest)</p>
 
