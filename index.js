@@ -890,6 +890,9 @@
   joinTimeout = null;
   
   compileJoin = function() {
+    if (!opts.join) {
+      return;
+    }
     throw new Error('ncljsc --join not yet implemented');
   };
   

@@ -2,7 +2,7 @@
 
 # node-clojurescript
 
-[node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) aims to provide seamless integration between [NodeJS](http://nodejs.org/) and [ClojureScript](https://github.com/clojure/clojurescript). This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and Clojure communities.
+[node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) aims to provide seamless integration between [NodeJS](http://nodejs.org/) and [ClojureScript](https://github.com/clojure/clojurescript). This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and [Clojure](http://clojure.org) communities.
 
 Packages are available on the [npm](http://npmjs.org/) registry: &nbsp;[clojure-script](http://search.npmjs.org/#/clojure-script).
 
@@ -14,7 +14,7 @@ The ClojureScript library ships with some basic mechanisms for creating compiled
 
 ## Quick Start
 
-Want to get started? There are some prerequisites, but if you'd prefer to trouble with those later:
+Want to get started? There are some [prerequisites](#prerequisites), but if you'd prefer to trouble with those later:
 
 ```bash
 $ npm install -g clojure-script
@@ -43,23 +43,21 @@ Now paste in something like:
 Save it, and leave the editor open. In another terminal, navigate to the directory where you created `hello.cljs` and do:
 
 ```bash
-$ ncljsc -w hello.cljs
+$ ncljsc hello.cljs
 ```
 
-When you first invoke `ncljsc`, it fires up the JVM, the ClojureScript compiler and the [Google Closure Compiler](https://developers.google.com/closure/compiler). This means the first-round compilation will be *slow*, even *really slow*. That's expected.
+When you invoke `ncljsc`, it fires up the JVM, the ClojureScript compiler and the [Google Closure Compiler](https://developers.google.com/closure/compiler). This means the compilation will seem *slow*, even *really slow* (10+ seconds), especially if you're used to the sub-second compile times of CoffeeScript. That's expected, and the issue will be revisited in the *[Faster, faster!](#faster-faster)* section below.
 
 **N.B.** the compiled JavaScript will be evaluated by the NodeJS (V8) runtime, not by the JVM.
 
 You should eventually see printed in your terminal:
 
 ```bash
-$ ncljsc -w hello.cljs
+$ ncljsc hello.cljs
 Hello, World!
 ```
 
-Notice that we passed the `-w` flag to `ncljsc`. That tells it to keep running, watch for changes in the source file and re-compile automatically. Since the JVM is already up and running, re-compiles should be much faster.
-
-With `ncljsc` still running, replace the contents of `hello.cljs` with:
+Now replace the contents of `hello.cljs` with:
 
 ```clojure
 (ns hello
@@ -94,22 +92,94 @@ With `ncljsc` still running, replace the contents of `hello.cljs` with:
     :else x))
 ```
 
+Save it, then rerun `ncljsc hello.cljs` and point your browser at [localhost:4200](http://127.0.0.1:4200).
+
 Did it work? Cool! &nbsp;(maybe submit an [issue](https://github.com/michaelsbradleyjr/node-clojurescript/issues) if it didn't)
 
-So now what you should do is read up on Clojure and ClojureScript and *get to busy!* &nbsp;See the *[Resources](#resources)* section below.
+### *Faster, faster!*
 
+The slow compile times mentioned above are owing to startup time of the JVM, plus the time to initially load the two underlying compilers (ClojureScript and Google Closure).
 
-### Note
-
-For long-running scripts, e.g. ones that listen on network ports, naive use of the `-w` flag will result in an `Error: listen EADDRINUSE` exception being thrown upon recompile. This is not a bug with `ncljsc`, you will encounter the same error if you do the equivalent with `coffee -w`. In which case you can instead use a NodeJS tool like [forever](https://github.com/nodejitsu/forever):
+*Problem solved!* &nbsp;Starting with `v0.1.4`, node-clojurescript offers a way to compile against a long-running, "detached" JVM server:
 
 ```bash
-$ forever -w -c ncljsc hello.cljs
+$ ncljsc --server 4242
+
 ```
 
-When you make changes to `hello.cljs`, the script will be restarted automatically and you should not get an error like you would with `ncljsc -w`. However, this reintroduces the problem of the *slow* startup-compile time, as the JVM is killed upon restart. A better solution will be developed in the near future, stay tuned.
+Invoke the command above and leave the terminal open (or run it in a [tmux](http://tmux.sourceforge.net/) or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running.
 
-### Faster, faster!
+Now open another terminal and go back to the directory where you created `hello.cljs`. Then do:
+
+```bash
+$ ncljsc --client 4242 hello.cljs
+```
+
+You should notice a marked difference in the time required for the script to run. Once the `--server` JVM is "hot", compile times should be on the order of 2 to 3 seconds, instead of 10+ seconds. That's because the `--client` process does not start its own JVM.
+
+#### How does it work?
+
+The `--server` process accepts "build requests" over HTTP, listening on `localhost` at the specified port. The `--client` then makes synchronous or asynchronous requests (depending on how it's invoked). And that's it: from the perspective of the end-user, the only difference is that these "remote" builds happen more quickly than "local" builds. Overall usage of `ncljsc` is the same whether you run remote or local builds.
+
+#### A few notes:
+
+* This feature is under active development and won't always work correctly, e.g. errors may not always make it back to the client and the return value of a build may be an empty string. It's best to keep an eye on the terminal output of the server process for signs of trouble.
+* You may use whatever port number you prefer, as long as the client and server use the same port.
+* Requests are restricted to the `localhost` interface. *(security)*
+* There is a transparent exchange of credentials hard-wired into the client-server logic, so that arbitrary processes can't make build requests. *(security)*
+* Aforesaid "credentials exchange" requires server and client processes to be run as the same user. *(security)*
+* Credentials aren't persistent, so if the server process is bounced (you restart it, maybe it crashed), client processes must be restarted if they're long-running and will attempt further build requests. *(security?)*
+* Don't use the client-server mode in a production environment. *(goes without saying?)*
+
+
+### Automatic re-compiles
+
+It's 2012 and you shouldn't *have* to manually re-run your scripts while you're developing them. And you don't!
+
+After some experimentation, [supervisor](https://github.com/isaacs/node-supervisor) seems (to the author) to be the simplest and most flexible NodeJS-based tool for automatically re-starting scripts when change them. Make sure to install it globally: `npm install -g supervisor`.
+
+With `supervisor` installed and a `ncljsc --server` process running, revisit the directory where you created `hello.cljs` and do:
+
+```bash
+$ supervisor -w hello.cljs -n exit -x ncljsc -- --client 4242 hello.cljs 
+```
+
+That's a lot of flags for a single command, but see `supervisor --help` and you'll soon have the hang of it. Note that we're making use of `--client 4242`, which is proper to `ncljsc`, not `supervisor`.
+
+Now edit `hello.cljs` and watch what happens when you save it. *Fantastic!* &nbsp; It compiles quickly, and will do so repeatedly whenever you save changes, so long as you keep `supervisor` running.
+
+### Compiling to disk
+
+In addition to running `.cljs` scripts, `ncljsc` can also be used to write compiled JavaScript to disk. For example:
+
+**saves to hello.js in the same directory ** (local build)
+```bash
+$ ncljsc --compile hello.cljs
+```
+
+**saves to myscript.js in the same directory** (remote build)
+```bash
+$ ncljsc --compile --output myscript.js --client 4242 hello.cljs
+```
+
+**re-compiles and re-saves when changes are made** (remote build)
+```bash
+$ supervisor -w hello.cljs -n exit -x ncljsc -- --client 4242 --compile hello.cljs 
+```
+
+### More options
+
+The `ncljsc` command provides additional capabilities. Try:
+
+```bash
+$ ncljsc --help
+```
+
+Not all of the features have been implemented yet. Also, you'll notice that `ncljsc` provides built-in `--watch` and `--watch-deps` options. Those do work, but there are some outstanding [bugs](https://github.com/joyent/node/issues/3172) related to NodeJS's `fs.watch` facility. As such, it seemed better to propose `supervisor` as a file watching tool than explain a bunch of caveats regarding the built-in watch support. But by all means experiment and [report back](https://github.com/michaelsbradleyjr/node-clojurescript/issues).
+
+### What's Next?
+
+So now what you should do is read up on Clojure and ClojureScript and *get to busy!* &nbsp;See the *[Resources](#resources)* section below.
 
 ## Prerequisites
 
@@ -167,6 +237,35 @@ $ node other.js
 
 **<span style="color:red;">N.B.</span>** This is a handy feature for development purposes. But it would be a terrible idea to publish a package on the npm registry which makes use of this technique. Modules *developed* in ClojureScript should be *published* with *only* compiled JavaScript loaded at runtime (via NodeJS's `require`).
 
+### Remote builds and `require`
+
+It's entirely possible to leverage the `require` support in combination with node-clojurescript's client-server mode described in the *[Faster, faster!]((#faster-faste)* section above.
+
+Suppose you have a "detached" JVM server process running on port `8888`:
+
+```bash
+$ ncljsc -S 8888
+```
+
+In your `.js` script you can then indicate:
+
+```javascript
+require('clojure-script)(8888);
+
+require('./hello.cljs');
+```
+
+In this context, the client-logic makes a *synchronous* (not async) build request against the server process. `hello.cljs` will be transparently compiled and loaded as before, but more quickly.
+
+You can call the function returned by `require` without arguments, like so:
+
+```javascript
+require('clojure-script')();
+
+...
+```
+
+In that case, the port number will default to `4242` (make sure the server process is using the same port). Note that calling the function without arguments and *not* calling it are two distinct things. If you don't call it, the `clojure-script` module will start a new JVM and perform a local build. If you do call it, with or without arguments, a JVM will *not* be started and the module will make a remote build request.
 
 ## Namespaces
 
@@ -177,14 +276,16 @@ Try creating two scripts, `foo.cljs` and `bar.cljs`:
 **foo.cljs**
 ```clojure
 (ns foo
-  (:require [bar :as bar]))
+  (:require [cljs.nodejs :as nodejs]
+            [bar :as bar]))
 
 (defn ^:export greet [name, title]
   (str "Hello, " (bar/title title) " " name))
 ```
 **bar.cljs**
 ```clojure
-(ns bar)
+(ns bar
+  (:require [cljs.nodejs :as nodejs]))
 
 (defn ^:export title [t]
   (str t " Amazing" ))
@@ -214,6 +315,23 @@ Hello, Mr. Amazing ClojureScript developer!
 
 Examining the plentiful contents of `compiled.js`, you'll see (toward the bottom) that both `foo.cljs` and `bar.cljs` were compiled into the stand-alone JS file.
 
+## Bundled Leiningen
+
+[Leiningen](https://github.com/technomancy/leiningen) is a popular and flexible build tool in wide use among Clojure developers. node-clojurescript bundles the shell script front-end to Leiningen (the `lein` command) and proxies to it with an executable script named `nlein`.
+
+If you've installed the `clojure-script` module globally with `npm install -g clojure-script`, then you should be able to run:
+
+```bash
+$ nlein
+...
+```
+
+`nlein` is a simple proxy script and does not feature any customizations of Leiningen. If you already have a `lein` executable on your path, `nlein` will ask whether it should delegate to it, with the option to remember your decision.
+
+Note that `nlein`, when it's not delegating to another `lein`, will store JAR files and other things it downloads in the `support/.lein` directory, relative to the root of the `clojure-script` package. This is to keep `nlein` from even potentially conflicting with an existing installation. Normally, `lein` stores such things in `$HOME/.lein`.
+
+All in all, the purpose of `nlein` is to provide an easy way for NodeJS developers to get up and running with Leiningen. If you're already using Leiningen, you may choose to ignore `nlein` and go about your business as usual.
+
 ## Coming Soon
 
 There are several goals that need to be accomplished in short order:
@@ -233,11 +351,13 @@ $ ncljsc --help
 
 [ClojureScript: Translations from JavaScript](http://himera.herokuapp.com/synonym.html)
 
-[ClojureDocs](http://clojuredocs.org)
-
-Google Groups: [clojure](https://groups.google.com/forum/?fromgroups#!forum/clojure), &nbsp;[nodejs](https://groups.google.com/forum/?fromgroups#!forum/nodejs)
+[ClojureDocs](http://clojuredocs.org), &nbsp;[Clojure.org](http://clojure.org)
 
 [NodeJS Documentation](http://nodejs.org/api)
+
+[Leiningen](https://github.com/technomancy/leiningen), [wiki](https://github.com/technomancy/leiningen/wiki)
+
+Google Groups: [clojure](https://groups.google.com/forum/?fromgroups#!forum/clojure), &nbsp;[nodejs](https://groups.google.com/forum/?fromgroups#!forum/nodejs)
 
 `#clojure`, `#clojurescript` and `#node.js` channels on Freenode.
 

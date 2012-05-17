@@ -192,8 +192,8 @@ compileStdio = ->
 # them together.
 joinTimeout = null
 compileJoin = ->
+  return unless opts.join
   throw new Error 'ncljsc --join not yet implemented'
-  #return unless opts.join
   #unless sourceCode.some((code) -> code is null)
   #  clearTimeout joinTimeout
   #  joinTimeout = wait 100, ->
