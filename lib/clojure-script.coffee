@@ -27,7 +27,7 @@ ClojureScript = (port) ->
   ClojureScript
 
 
-ClojureScript.VERSION = '0.1.4'
+ClojureScript.VERSION = '0.1.5-pre'
 
 ClojureScript.CLJS_VERSION = 'r1236'
 
