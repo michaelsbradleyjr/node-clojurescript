@@ -124,7 +124,7 @@ Now open another terminal and go back to the directory where you created `hello.
 $ ncljsc --client 4242 hello.cljs
 ```
 
-You should notice a marked difference in the time required for the script to run. Once the `--server` JVM is "hot", compile times should be on the order of 2 to 3 seconds, instead of 10+ seconds. That's because the `--client` process does not start its own JVM.
+You should notice a marked difference in the time required for the script to run. Once the `--server` JVM is "hot", compile times should take only a few seconds, instead of 10+ seconds. That's because the `--client` process does not start its own JVM.
 
 #### How does it work?
 
