@@ -1,1 +1,0 @@
-rad ( /\/rad.*/, 'hello world' )

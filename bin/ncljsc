@@ -2,7 +2,8 @@
 
 var path = require('path');
 var fs   = require('fs');
-var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../');
+var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-var ncljsc = require(pkg);
-ncljsc.commandRun();
+var ncljsc = require(lib + '/ncljsc/command');
+
+ncljsc.run();

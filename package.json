@@ -12,19 +12,18 @@
     "clojure-script",
     "java"
   ],
-  "version": "0.1.5-pre",
+  "version": "0.2.0-pre",
   "homepage": "http://michaelsbradleyjr.github.com/node-clojurescript",
   "repository": {
     "type": "git",
     "url": "git://github.com/michaelsbradleyjr/node-clojurescript.git"
   },
-  "main": "./index.js",
+  "main": "./lib/ncljsc/core.js",
   "bin": {
     "ncljsc": "./bin/ncljsc",
     "nlein": "./bin/nlein"
   },
   "scripts": {
-    "test": "./node_modules/coffee-script/bin/cake test",
     "postinstall": "sh ./scripts/postinstall.sh"
   },
   "engines": {
@@ -41,23 +40,14 @@
     "temporary": ">=0.0.2"
   },
   "devDependencies": {
-    "chai": ">=0.4.2",
-    "clog": ">=0.1.2",
-    "coffee-script": ">=1.2.0",
-    "docco" : "https://github.com/michaelsbradleyjr/docco/tarball/master",
-    "gfms": ">=0.0.3",
-    "mocha": "https://github.com/michaelsbradleyjr/mocha/tarball/check-ENOENT-1.0.3",
-    "nopt" : ">=1.0.10",
-    "sinon": ">=1.3.1",
-    "sinon-chai": ">=1.1.0",
-    "touch": ">=0.0.1",
-    "underscore": ">=1.3.1",
-    "underscore.string": ">=2.0.0",
-    "watch" : ">=0.5.1"
+    "clojure-script": "0.1.4"
   },
   "optionalDependencies": {},
   "directories": {
     "lib": "./lib",
+    "scripts": "./scripts",
+    "src": "./src",
+    "support": "./support",
     "test": "./test"
   }
 }
