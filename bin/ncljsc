@@ -2,8 +2,6 @@
 
 var path = require('path');
 var fs   = require('fs');
-var pkg  = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+var lib  = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-var ncljsc = require(lib + '/ncljsc/command');
-
-ncljsc.run();
+require(lib + '/clojurescript/command').clojurescript.command.run();
