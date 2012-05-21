@@ -1,5 +1,5 @@
 (ns ^{:doc "Helpers for clojure-script"}
-  clojurescript.helpers
+  clojure-script.helpers
   (:refer-clojure :exclude
     [js->clj]))
 

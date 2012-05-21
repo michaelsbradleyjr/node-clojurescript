@@ -1,7 +1,7 @@
 (ns ^{:doc "Core clojure-script library."}
-  clojurescript.core
+  clojure-script.core
   (:require [cljs.nodejs :as nodejs]
-            [clojurescript.helpers :as helpers]))
+            [clojure-script.helpers :as helpers]))
 
 (defn ^:export build
   []

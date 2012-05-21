@@ -7,7 +7,6 @@ fuse*
 .#*
 *.swp
 
-docs_lib/
 node_modules/
 support/.lein/
 support/clojure-clojurescript/
@@ -16,4 +15,3 @@ support/out/
 
 .nlein.json
 npm-debug.log
-support/nodejuice/symlinks/node

@@ -8,13 +8,10 @@ fuse*
 *.swp
 
 docs/
-docs_lib/
-lib/
 node_modules/
 support/.lein/
 support/clojure-clojurescript/
 support/leiningen/
-support/nodejuice/
 support/out/
 support/tools/
 test/
@@ -22,9 +19,5 @@ test/
 .gitignore
 .nlein.json
 .travis.yml
-Cakefile
-manifest.coffee
-nodejuice.js
 npm-debug.log
-support/VERSIONING.txt
 TODO.txt

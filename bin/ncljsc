@@ -4,4 +4,4 @@ var path = require('path');
 var fs   = require('fs');
 var lib  = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-require(lib + '/clojurescript/command').clojurescript.command.run();
+require(lib + '/clojure_script/command').clojure_script.command.run();
