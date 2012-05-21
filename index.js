@@ -81,7 +81,7 @@
   
   ClojureScript.javaOptions = ClojureScript.defaultJavaOptions;
   
-  ClojureScript.defaultCljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false}';
+  ClojureScript.defaultCljscOptions = '{:optimizations :simple :target :nodejs :pretty-print true}';
   
   ClojureScript.cljscOptions = ClojureScript.defaultCljscOptions;
   

@@ -11,7 +11,7 @@ var cljs = require(pkg);
 var options = { path: ( pkg + 'support/cljs/postinstall_build.cljs' ) };
 var outputDir = pkg + 'support/out';
 shell.exec('mkdir -p ' + pkg + 'support/out', { silent: true });
-var cljscOptions = '{:optimizations :simple :target :nodejs :pretty-print false :output-dir "' + outputDir + '"}';
+var cljscOptions = '{:optimizations :simple :target :nodejs :pretty-print true :output-dir "' + outputDir + '"}';
 var javaOptions = null;
 
 try {
