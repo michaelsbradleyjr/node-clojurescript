@@ -59,6 +59,8 @@ var spawnLein = function (lein) {
   leinProc.stderr.setEncoding('utf8');
   leinProc.stdout.pipe(process.stdout);
   leinProc.stderr.pipe(process.stderr);
+  process.stdin.resume();
+  process.stdin.pipe(leinProc.stdin);
 
   leinProc.on('exit', function (code) {
     process.exit(code);
