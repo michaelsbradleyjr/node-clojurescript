@@ -45,13 +45,6 @@ if (noCheck) {
 }
 
 var spawnLein = function (lein) {
-  process.env.CLASSPATH = pkg + '/support/clojure-clojurescript/lib/clojure.jar:'
-                        + pkg + '/support/clojure-clojurescript/lib/compiler.jar:'
-                        + pkg + '/support/clojure-clojurescript/lib/goog.jar:'
-                        + pkg + '/support/clojure-clojurescript/lib/js.jar'
-                        + pkg + '/support/clojure-clojurescript/src/clj'
-                        + pkg + '/support/clojure-clojurescript/src/cljs'
-                        + pkg + '/support/clojure-clojurescript/clj';
   if (!refNleinConfig || !refNleinConfig.delegate) {
     process.env.LEIN_HOME = pkg + '/support/.lein';
   }
