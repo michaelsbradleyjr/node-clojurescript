@@ -1,6 +1,6 @@
 var http     = require("http")
 ,   posix    = require("fs")
-,   sys      = require("sys")
+,   util = require('util')
 ,   argv     = process.ARGV || process.argv
 ,   appdir   = argv[2]
 ,   njdir    = argv[3]
@@ -86,7 +86,7 @@ http.createServer(function ( req, res ) {
     else                             send_file( req, res, action );
 
 }).listen( config.wsgi.port, config.wsgi.host );
-sys.puts("\nWSGI Server("+process.pid+")");
+util.puts("\nWSGI Server("+process.pid+")");
 utility.inform(config.wsgi);
 
 function error404( req, res, file ) {

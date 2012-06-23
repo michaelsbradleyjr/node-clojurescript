@@ -1,4 +1,4 @@
-var sys      = require('sys')
+var util = require('util')
 ,   http     = require('http')
 ,   argv     = process.ARGV || process.argv
 ,   appdir   = argv[2]
@@ -43,7 +43,7 @@ http.createServer(function (req, res) {
                         url      : req.url,
                         code     : response.statusCode,
                         response : data.replace( rxml, '' ),
-                        headers  : sys.inspect(response.headers)
+                        headers  : util.inspect(response.headers)
                     }, function( type, data ) {
                         data = utility.amuse( data, host );
                         response.headers['content-length'] = data.length;
@@ -70,5 +70,5 @@ http.createServer(function (req, res) {
 
 }).listen( config.sidekick.port, config.sidekick.host );
 
-sys.puts("\nSidekick Server("+process.pid+")");
+util.puts("\nSidekick Server("+process.pid+")");
 utility.inform(config.sidekick);
