@@ -1176,7 +1176,7 @@
     sourceCode.splice(index, 1);
     if (removeJs && !opts.join) {
       jsPath = outputPath(source, base);
-      return path.exists(jsPath, function(exists) {
+      return fs.exists(jsPath, function(exists) {
         if (exists) {
           return fs.unlink(jsPath, function(err) {
             if (err && err.code !== 'ENOENT') {
@@ -1218,7 +1218,7 @@
         }
       });
     };
-    return path.exists(jsDir, function(exists) {
+    return fs.exists(jsDir, function(exists) {
       if (exists) {
         return compile();
       } else {
