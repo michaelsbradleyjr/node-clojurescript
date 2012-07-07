@@ -144,7 +144,7 @@
     return compiledCoreJS;
   };
   
-  if (path.existsSync(pathCompiledCoreJS)) {
+  if (fs.existsSync(pathCompiledCoreJS)) {
     compiledCoreJS = fs.readFileSync(pathCompiledCoreJS, 'utf8');
     ClojureScript.compiledCoreJS.exists = true;
   }
@@ -157,7 +157,7 @@
     return compiledNodejsJS;
   };
   
-  if (path.existsSync(pathCompiledNodejsJS)) {
+  if (fs.existsSync(pathCompiledNodejsJS)) {
     compiledNodejsJS = fs.readFileSync(pathCompiledNodejsJS, 'utf8');
     ClojureScript.compiledNodejsJS.exists = true;
   }
@@ -342,7 +342,7 @@
         outputdir = outputdir[1];
         outputdir = outputdir.slice(1, outputdir.length - 1);
         outputdir = path.resolve(path.normalize(outputdir));
-        if (!path.existsSync(outputdir)) {
+        if (!fs.existsSync(outputdir)) {
           return callback(new Error('path specified as :output-dir must exist'), null);
         }
         if (!(fs.statSync(outputdir)).isDirectory()) {
@@ -356,23 +356,23 @@
       cljscOptions = this.tmpOut(cljscOptions);
     }
     outcljs = outputdir + '/cljs';
-    if (!(path.existsSync(outcljs))) {
+    if (!(fs.existsSync(outcljs))) {
       fs.mkdirSync(outcljs);
     }
     if (this.compiledCoreJS.exists) {
       outcljscore = outcljs + '/core.js';
-      if (!(path.existsSync(outcljscore))) {
+      if (!(fs.existsSync(outcljscore))) {
         fs.writeFileSync(outcljscore, this.compiledCoreJS(), 'utf8');
       }
     }
     if (this.compiledNodejsJS.exists) {
       outcljsnodejs = outcljs + '/nodejs.js';
-      if (!(path.existsSync(outcljsnodejs))) {
+      if (!(fs.existsSync(outcljsnodejs))) {
         fs.writeFileSync(outcljsnodejs, this.compiledNodejsJS(), 'utf8');
       }
     }
     resolved = path.resolve(path.normalize(options.path));
-    if (!(path.existsSync(resolved))) {
+    if (!(fs.existsSync(resolved))) {
       return callback(new Error('source path must exist'), null);
     }
     stats = fs.statSync(resolved);
