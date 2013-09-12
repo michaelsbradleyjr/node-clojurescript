@@ -21,7 +21,7 @@ if (ignoreConfig) {
 
 var refNleinConfig = null;
 if (!ignoreConfig) {
-  if (path.existsSync(pkg + '/.nlein.json')) {
+  if (fs.existsSync(pkg + '/.nlein.json')) {
     try {
       refNleinConfig = JSON.parse(fs.readFileSync(pkg + '/.nlein.json', 'utf8'));
     } catch (error) {
