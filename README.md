@@ -107,13 +107,13 @@ The slow compile times mentioned above are owing to startup time of the JVM, plu
 *Problem solved!* &nbsp;Starting with `v0.1.4`, node-clojurescript offers a way to compile against a long-running, "detached" JVM server:
 
 ```bash
-$ ncljsc --server 4242
+$ nohup ncljsc --server 4242 &
 ```
 
-Invoke the command above and leave the terminal open (or run it in a [tmux](http://tmux.sourceforge.net/) or screen session). You don't need to navigate to a particular path before starting it, bu you need to leave it running. After 10+ seconds you should see:
+Invoke the command above, which will start the process and keep it persistently running in the background (even if the terminal is closed). You don't need to navigate to a particular path before starting it, bu you need to leave it running. After 10+ seconds, you should be able to see the following output in nohup.out:
 
 ```bash
-$ ncljsc --server 4242
+$ cat nohup.out
 Starting up, please wait...
 
 Initial build completed, JVM and compiler are primed and ready!
