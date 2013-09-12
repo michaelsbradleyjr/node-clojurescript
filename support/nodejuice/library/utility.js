@@ -1,6 +1,6 @@
 var posix    = require("fs")
 ,   http     = require('http')
-,   sys      = require("sys")
+,   util = require('util')
 ,   argv     = process.ARGV || process.argv
 ,   appdir   = argv[2]
 ,   njdir    = argv[3]
@@ -156,9 +156,9 @@ var recurse = exports.recurse = function( start, ignore, callback ) {
 };
 
 var inform = exports.inform = function(obj) {
-    if (!devmode) return sys.puts(JSON.stringify(obj));
+    if (!devmode) return util.puts(JSON.stringify(obj));
 
-    sys.puts(JSON.stringify(obj).replace( rxdigi, function( num ) {
+    util.puts(JSON.stringify(obj).replace( rxdigi, function( num ) {
         return "\033[0;36;1m" + num + "\033[0m";
     } ).replace( rxclever, function( _, key, del ) {
         return (del ? ' \033[0;35;1m' : '\033[0;32;1m"') + key +

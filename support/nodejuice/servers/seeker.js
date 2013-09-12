@@ -1,4 +1,4 @@
-var sys        = require('sys')
+var util = require('util')
 ,   http       = require('http')
 ,   fs         = require('fs')
 ,   argv       = process.ARGV || process.argv
@@ -109,7 +109,7 @@ http.createServer(function ( req, res ) {
 
 }).listen( config.seeker.port, config.seeker.host );
 
-sys.puts("\nSeeker Server("+process.pid+")");
+util.puts("\nSeeker Server("+process.pid+")");
 utility.inform(config.seeker);
 
 function update( file, curr, prev, stat ) {
