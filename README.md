@@ -1,5 +1,9 @@
 [![Build Status](https://secure.travis-ci.org/michaelsbradleyjr/node-clojurescript.png?branch=master)](http://travis-ci.org/michaelsbradleyjr/node-clojurescript)
 
+# `Inactive`
+
+*This repository is no longer actively maintained. Please use or create a fork.*
+
 # node-clojurescript
 
 [node-clojurescript](https://github.com/michaelsbradleyjr/node-clojurescript) aims to provide seamless integration between [NodeJS](http://nodejs.org/) and [ClojureScript](https://github.com/clojure/clojurescript). This is a young project, started in May 2012, it's under active development and welcomes participation by the NodeJS and [Clojure](http://clojure.org) communities.
